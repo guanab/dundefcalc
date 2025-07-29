@@ -5,6 +5,9 @@ It works in a similar fashion to TBot in DDRnG community, but can run locally. N
 I made this app for personal use so I don't need to open Discord each time I want to check armor drops.
 
 ## How to run
+
+Download [dundefcalc.py](https://github.com/guanab/dundefcalc/raw/refs/heads/main/dundefcalc.py) (right click, save as)
+
 **Windows**
 1. install Python (https://www.python.org/downloads/)
 2. run dundefcalc.py with Python
