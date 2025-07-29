@@ -4,58 +4,101 @@
 import math
 
 
+class Armor:
+    res1 = 0
+    res2 = 0
+    res3 = 0
+    res4 = 0
+    mainstat = 0
+    upgrades = 0
+    side1 = 0
+    side2 = 0
+    side3 = 0
+    upsonres = 0
+
+    def getresups(self):
+        return upstomax(self.res1) + upstomax(self.res2) + upstomax(self.res3) \
+            + upstomax(self.res4)
+
+    def gettotal(self):
+        if self.upgrades > 0:
+            return self.mainstat + self.upgrades + self.side1 + self.side2 + \
+                self.side3 - self.upsonres - 1
+        else:
+            return self.mainstat
+
+    def gettotalbonus(self):
+        if self.upgrades > 0:
+            totalstats = self.mainstat + self.upgrades - self.upsonres - 1
+            totalbonus = int(math.ceil(totalstats * 1.4))
+            if self.side1 > 0:
+                totalstats += self.side1
+                totalbonus += int(math.ceil(self.side1 * 1.4))
+            if self.side2 > 0:
+                totalstats += self.side2
+                totalbonus += int(math.ceil(self.side2 * 1.4))
+            if self.side3 > 0:
+                totalstats += self.side3
+                totalbonus += int(math.ceil(self.side3 * 1.4))
+            return totalbonus
+        else:
+            return int(math.ceil(self.mainstat * 1.4))
+
+
 def res(arglist):
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
-    upsneeded = 0
-    i = 0
-    while i < 4:
-        upsneeded += upstomax(arglist[i])
-        i += 1
+    a = Armor()
+    a.res1 = arglist[0]
+    a.res2 = arglist[1]
+    a.res3 = arglist[2]
+    a.res4 = arglist[3]
+    upsneeded = a.getresups()
     match len(arglist):
         case 4:
             print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
 to hit max resistances\n")
         case 6 | 7 | 8 | 9:
-            mainstat = arglist[4]
-            upgrades = arglist[5]
-            totalstats = mainstat + upgrades - upsneeded - 1
-            totalbonus = int(math.ceil(totalstats * 1.4))
-            i = 6
-            while i < len(arglist):
-                sidestat = arglist[i]
-                totalstats += sidestat
-                totalbonus += int(math.ceil(sidestat * 1.4))
-                i += 1
+            a.mainstat = arglist[4]
+            a.upgrades = arglist[5]
+            a.upsonres = upsneeded
+            if len(arglist) > 6:
+                a.side1 = arglist[6]
+            if len(arglist) > 7:
+                a.side2 = arglist[7]
+            if len(arglist) > 8:
+                a.side3 = arglist[8]
+            totalstats = a.gettotal()
+            totalbonus = a.gettotalbonus()
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
         case _:
             print("\ninvalid arguments\n")
+    del a
 
 
 def bonus(arglist):
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
-    mainstat = arglist[0]
+    a = Armor()
+    a.mainstat = arglist[0]
     if len(arglist) > 1:
-        upgrades = arglist[1]
-        totalstats = mainstat + upgrades - 1
-        totalbonus = int(math.ceil(totalstats * 1.4))
-        i = 2
-        while i < len(arglist):
-            sidestat = arglist[i]
-            totalstats += sidestat
-            totalbonus += int(math.ceil(sidestat * 1.4))
-            i += 1
-    else:
-        totalstats = mainstat
-        totalbonus = int(math.ceil(mainstat * 1.4))
+        a.upgrades = arglist[1]
+    if len(arglist) > 2:
+        a.side1 = arglist[2]
+    if len(arglist) > 3:
+        a.side2 = arglist[3]
+    if len(arglist) > 4:
+        a.side3 = arglist[4]
+    totalstats = a.gettotal()
+    totalbonus = a.gettotalbonus()
     print(f"\nyour piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
+    del a
 
 
 def upstomax(resvalue):
@@ -119,18 +162,23 @@ def main():
         return
     inputlist = userinput.split()
     argcount = len(inputlist) - 1
+    arglist = []
+    if argcount > 0:
+        arglist = listtoint(inputlist[1:])
+        if type(arglist) is not list:
+            return
 
     match inputlist[0]:
         case "res":
             if argcount < 4 or argcount == 5 or argcount > 9:
                 print("\ninvalid arguments\n")
             else:
-                res(inputlist[1:])
+                res(arglist)
         case "bonus":
             if argcount < 1 or argcount > 5:
                 print("\ninvalid arguments\n")
             else:
-                bonus(inputlist[1:])
+                bonus(arglist)
         case "exit":
             print("\nending program\n")
             quit()
