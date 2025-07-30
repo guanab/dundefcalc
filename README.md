@@ -24,15 +24,18 @@ Download [dundefcalc.py](https://github.com/guanab/dundefcalc/raw/refs/heads/mai
 `bonus mainstat upgrades side1 side2 side3`<br>
 - calculates the stat total your armor will reach if main stat is upgraded to the maximum<br>
 <br>
+
 **res**<br>
 `res res1 res2 res3 res4 mainstat upgrades side1 side2 side3`<br>
 - calcluates the stat total your armor will reach when resistances are upgraded to 29 and rest of the upgrades are spent on main stat
 - can also be used with only resistance values to calculate amount of upgrades needed to reach max res<br>
 <br>
+
 **3res**<br>
 `3res res1 res2 res3 mainstat upgrades side1 side2 side3`<br>
 - same as res but calculates upgrades needed to reach 35 res on 3 resistances<br>
 <br>
+
 **lt**<br>
 `lt stattotal` or `lt tdmg trate`<br>
 - calculates how much tower damage and rate you should aim for lightning towers
