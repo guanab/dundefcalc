@@ -3,7 +3,7 @@ File: dundefcalc.py
 Author: Guanab
 Description: A commandline calculating tool for Dungeon Defenders
 """
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 import math
 
@@ -283,7 +283,7 @@ def main():
         if type(arglist) is not list:
             return
 
-    match inputlist[0]:
+    match inputlist[0].lower():
         case "res":
             if argcount < 4 or argcount == 5 or argcount > 9:
                 print("\ninvalid arguments\n")
