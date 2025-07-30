@@ -1,7 +1,9 @@
 # DunDefCalc
 
-DunDefCalc (short for Dungeon Defenders Calculator) is a simple commandline tool to calculate maximum stat potential of armor pieces.<br><br>
-It works in a similar fashion to TBot in DDRnG community, but can run locally. Not all features of TBot are supported, but I can try to replicate them if there's enough interest.<br><br>
+DunDefCalc (short for Dungeon Defenders Calculator) is a simple commandline tool to calculate maximum stat potential of armor pieces.<br>
+<br>
+It works in a similar fashion to TBot in DDRnG community, but can run locally. Not all features of TBot are supported, but I can try to replicate them if there's enough interest.<br>
+<br>
 I made this app for personal use so I don't need to open Discord each time I want to check armor drops.
 
 ## How to run
@@ -17,13 +19,19 @@ Download [dundefcalc.py](https://github.com/guanab/dundefcalc/raw/refs/heads/mai
 2. run `python dundefcalc.py` in terminal
 
 ## Available commands
-- **bonus** mainstat upgrades side1 side2 side3
-    - calculates the stat total your armor will reach if main stat is upgraded to the maximum
-- **res** res1 res2 res3 res4 mainstat upgrades side1 side2 side3
-    - calcluates the stat total your armor will reach when resistances are upgraded to 29 and rest of the upgrades are spent on main stat
-    - can also be used with only resistance values to calculate amount of upgrades needed to reach max res
+
+**bonus**<br>
+`bonus mainstat upgrades side1 side2 side3`
+- calculates the stat total your armor will reach if main stat is upgraded to the maximum<br>
+
+**res**<br>
+`res res1 res2 res3 res4 mainstat upgrades side1 side2 side3`
+- calcluates the stat total your armor will reach when resistances are upgraded to 29 and rest of the upgrades are spent on main stat
+- can also be used with only resistance values to calculate amount of upgrades needed to reach max res<br>
+
+**3res**<br>
+`3res res1 res2 res3 mainstat upgrades side1 side2 side3`
+- same as res but calculates upgrades needed to reach 35 res on 3 resistances
 
 ## Known limitations / issues
-- res command doesn't work with 3 or fewer resistance values, you always need 4 res values. you can insert 0 to ignore that res value though
-- res command doesn't consider filler upgrades when upgrading past 23 and fails to inform user if the piece doesn't have enough total upgrades
-- calculated set bonus sometimes differs by 1-2 points compared to TBot (probably a rounding issue)
+- res commands don't consider filler upgrades when upgrading past 23 and fail to inform user if the piece doesn't have enough total upgrades
