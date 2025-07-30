@@ -139,6 +139,21 @@ or \033[1m{totalbonus}\033[0m with set bonus\n")
     del a
 
 
+def lt(arglist):
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    if len(arglist) == 1:
+        stattotal = arglist[0]
+    else:
+        stattotal = arglist[0] + arglist[1]
+    rate = int(stattotal / 2.21)
+    dmg = stattotal - rate
+    print(f"\nwith a stat total of \033[1m{stattotal}\033[0m,")
+    print(f"aim for roughly \033[1m{dmg}\033[0m damage and \033[1m{rate}\
+\033[0m rate\n")
+
+
 def upstomax(resvalue):
     resvalue = int(resvalue)
     match resvalue:
@@ -193,7 +208,7 @@ def listtoint(strlist):
 
 def main():
     print("please input your command")
-    print("available commands: res, 3res, bonus, exit")
+    print("available commands: res, 3res, bonus, lt, exit")
     userinput = input()
     if userinput.strip() == "":
         print("\nempty input\n")
@@ -217,6 +232,11 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 threeres(arglist)
+        case "lt":
+            if argcount < 1 or argcount > 2:
+                print("\ninvalid arguments\n")
+            else:
+                lt(arglist)
         case "bonus":
             if argcount < 1 or argcount > 5:
                 print("\ninvalid arguments\n")
