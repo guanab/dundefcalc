@@ -8,7 +8,7 @@ I made this app for personal use so I don't need to open Discord each time I wan
 
 ## How to run
 
-Download [dundefcalc.py](https://github.com/guanab/dundefcalc/raw/refs/heads/main/dundefcalc.py) (right click, save as)
+Download latest version from [Releases](https://github.com/guanab/dundefcalc/releases)
 
 **Windows**
 1. install Python (https://www.python.org/downloads/)
@@ -35,7 +35,7 @@ Download [dundefcalc.py](https://github.com/guanab/dundefcalc/raw/refs/heads/mai
 
 **lt**<br>
 `lt stattotal` or `lt tdmg trate`<br>
-- calculates how much tower damage and rate you should aim for lightning towers
+- calculates how much tower damage and rate you should aim for for lightning towers
 - note: this is calculated with a fixed ratio of 1.21 dmg/rate, which is reasonably accurate for endgame stats, but optimizers should check on a dummy<br>
 
 **cat**<br>
