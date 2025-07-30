@@ -1,5 +1,9 @@
-# Dungeon Defenders Calculator v0.1.0
-# Made by Guanab
+"""
+File: dundefcalc.py
+Author: Guanab
+Description: A commandline calculating tool for Dungeon Defenders
+"""
+__version__ = "0.1.0"
 
 import math
 
@@ -47,6 +51,37 @@ class Armor:
             return totalbonus
         else:
             return int(math.ceil(self.mainstat * 1.4))
+
+
+class Cat:
+    boost = 0
+    upgrades = 0
+    range = 0
+
+    def getboost(self):
+        if self.upgrades >= 90:
+            return int(self.boost + math.floor(self.upgrades / 3) - 3)
+        else:
+            return int(self.boost + math.floor(self.upgrades / 3) - (
+                       math.floor(self.upgrades / 30)))
+
+    def getrange(self):
+        range = int(self.range + math.floor(self.upgrades / 5) - math.floor(
+                    self.upgrades / 15))
+        if range >= 90:
+            return 90
+        else:
+            return range
+
+    def gettargets(self):
+        if self.upgrades >= 90:
+            return 4
+        else:
+            return int(math.floor(self.upgrades / 30) + 1)
+
+    def getherostat(self):
+        return int(self.upgrades - math.floor(self.upgrades / 3) - (
+                   self.getrange() - self.range) - 1)
 
 
 def res(arglist):
@@ -147,11 +182,38 @@ def lt(arglist):
         stattotal = arglist[0]
     else:
         stattotal = arglist[0] + arglist[1]
-    rate = int(stattotal / 2.21)
-    dmg = stattotal - rate
+    dmg = int(round(stattotal * 1.21 / 2.21))
+    rate = stattotal - dmg
     print(f"\nwith a stat total of \033[1m{stattotal}\033[0m,")
     print(f"aim for roughly \033[1m{dmg}\033[0m damage and \033[1m{rate}\
 \033[0m rate\n")
+
+
+def cat(arglist):
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    c = Cat()
+    c.boost = arglist[0]
+    c.upgrades = arglist[1]
+    totalboost = c.getboost()
+    targets = c.gettargets()
+    if len(arglist) > 2:
+        c.range = arglist[2]
+        range = c.getrange()
+        hero = c.getherostat()
+        print(f"\nyour cat will reach \033[1m{totalboost}\033[0m boost, \
+\033[1m{range}\033[0m range and \033[1m{targets}\033[0m targets")
+        print(f"you will have {hero} points to spend on hero stats")
+    else:
+        c.range = 0
+        rangeups = c.getrange()
+        hero = c.getherostat()
+        print(f"\nyour cat will reach \033[1m{totalboost}\033[0m boost and \
+\033[1m{targets}\033[0m targets")
+        print(f"you will have {rangeups} points to spend on range and \
+{hero} on hero stats\n")
+    del c
 
 
 def upstomax(resvalue):
@@ -208,7 +270,7 @@ def listtoint(strlist):
 
 def main():
     print("please input your command")
-    print("available commands: res, 3res, bonus, lt, exit")
+    print("available commands: res, 3res, bonus, lt, cat, exit")
     userinput = input()
     if userinput.strip() == "":
         print("\nempty input\n")
@@ -232,16 +294,21 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 threeres(arglist)
-        case "lt":
-            if argcount < 1 or argcount > 2:
-                print("\ninvalid arguments\n")
-            else:
-                lt(arglist)
         case "bonus":
             if argcount < 1 or argcount > 5:
                 print("\ninvalid arguments\n")
             else:
                 bonus(arglist)
+        case "lt":
+            if argcount < 1 or argcount > 2:
+                print("\ninvalid arguments\n")
+            else:
+                lt(arglist)
+        case "cat":
+            if argcount < 2 or argcount > 3:
+                print("\ninvalid arguments\n")
+            else:
+                cat(arglist)
         case "exit":
             print("\nending program\n")
             quit()
@@ -250,5 +317,6 @@ def main():
 
 
 if __name__ == "__main__":
+    print("DunDefCalc v" + __version__)
     while True:
         main()
