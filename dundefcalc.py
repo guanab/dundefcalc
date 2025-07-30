@@ -20,6 +20,10 @@ class Armor:
         return upstomax(self.res1) + upstomax(self.res2) + upstomax(self.res3) \
             + upstomax(self.res4)
 
+    def getthreeresups(self):
+        return upstomax(self.res1) + upstomax(self.res2) + upstomax(self.res3) \
+            + 18
+
     def gettotal(self):
         if self.upgrades > 0:
             return self.mainstat + self.upgrades + self.side1 + self.side2 + \
@@ -73,6 +77,40 @@ to hit max resistances\n")
             totalbonus = a.gettotalbonus()
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
+            print(f"your piece will reach \033[1m{totalstats}\033[0m, \
+or \033[1m{totalbonus}\033[0m with set bonus\n")
+        case _:
+            print("\ninvalid arguments\n")
+    del a
+
+
+def threeres(arglist):
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    a = Armor()
+    a.res1 = arglist[0]
+    a.res2 = arglist[1]
+    a.res3 = arglist[2]
+    upsneeded = a.getthreeresups()
+    match len(arglist):
+        case 3:
+            print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
+to hit 35 res on 3 resistances\n")
+        case 5 | 6 | 7 | 8:
+            a.mainstat = arglist[3]
+            a.upgrades = arglist[4]
+            a.upsonres = upsneeded
+            if len(arglist) > 5:
+                a.side1 = arglist[5]
+            if len(arglist) > 6:
+                a.side2 = arglist[6]
+            if len(arglist) > 7:
+                a.side3 = arglist[7]
+            totalstats = a.gettotal()
+            totalbonus = a.gettotalbonus()
+            print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
+resistances (3 x 35)")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
         case _:
@@ -155,7 +193,7 @@ def listtoint(strlist):
 
 def main():
     print("please input your command")
-    print("available commands: res, bonus, exit")
+    print("available commands: res, 3res, bonus, exit")
     userinput = input()
     if userinput.strip() == "":
         print("\nempty input\n")
@@ -174,6 +212,11 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 res(arglist)
+        case "3res":
+            if argcount < 3 or argcount == 4 or argcount > 8:
+                print("\ninvalid arguments\n")
+            else:
+                threeres(arglist)
         case "bonus":
             if argcount < 1 or argcount > 5:
                 print("\ninvalid arguments\n")
