@@ -21,24 +21,24 @@ Download latest version from [Releases](https://github.com/guanab/dundefcalc/rel
 ## Available commands
 
 **bonus**<br>
-`bonus mainstat upgrades side1 side2 side3`<br>
+`bonus <mainstat> [upgrades] [side1] [side2] [side3]`<br>
 - calculates the stat total your armor will reach when all upgrades are spent on main stat<br>
 
 **res**<br>
-`res res1 res2 res3 res4 mainstat upgrades side1 side2 side3`<br>
+`res <res1> <res2> <res3> <res4> [mainstat] [upgrades] [side1] [side2] [side3]`<br>
 - calculates the stat total your armor will reach when resistances are upgraded to 29 (41 with bonus) and rest of the upgrades are spent on main stat
 - can also be used with only resistance values to calculate amount of upgrades needed to reach max res<br>
 
 **3res**<br>
-`3res res1 res2 res3 mainstat upgrades side1 side2 side3`<br>
+`3res <res1> <res2> <res3> [mainstat] [upgrades] [side1] [side2] [side3]`<br>
 - same as res but calculates upgrades needed to reach 35 res (49 with bonus) on 3 resistances<br>
 
 **lt**<br>
-`lt stattotal` or `lt tdamage trate`<br>
+`lt <stattotal>` or `lt <tdamage> <trate>`<br>
 - calculates how much tower damage and rate you should aim for for lightning towers<br>
 
 **cat**<br>
-`cat boost upgrades range`<br>
+`cat <boost> <upgrades> [range]`<br>
 - calculates how much boost, range and targets your cat will reach<br>
 
 ## Known limitations / issues
