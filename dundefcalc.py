@@ -21,12 +21,25 @@ class Armor:
     upsonres = 0
 
     def getresups(self):
-        return upstomax(self.res1) + upstomax(self.res2) + upstomax(self.res3) \
-            + upstomax(self.res4)
+        self.upsonres = upstomax(self.res1) + upstomax(self.res2) \
+            + upstomax(self.res3) + upstomax(self.res4)
+        return self.upsonres
 
     def getthreeresups(self):
-        return upstomax(self.res1) + upstomax(self.res2) + upstomax(self.res3) \
-            + 18
+        self.upsonres = 0
+        if self.res1 in range(30, 36):
+            self.upsonres += 35 - self.res1
+        else:
+            self.upsonres += upstomax(self.res1) + 6
+        if self.res2 in range(30, 36):
+            self.upsonres += 35 - self.res2
+        else:
+            self.upsonres += upstomax(self.res2) + 6
+        if self.res3 in range(30, 36):
+            self.upsonres += 35 - self.res3
+        else:
+            self.upsonres += upstomax(self.res3) + 6
+        return self.upsonres
 
     def gettotal(self):
         if self.upgrades > 0:
@@ -99,9 +112,12 @@ def res(arglist):
             print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
 to hit max resistances\n")
         case 6 | 7 | 8 | 9:
+            if onlyposvalues(arglist[4:]) is False:
+                print("\nnegative value entered where expecting positive\n")
+                del a
+                return
             a.mainstat = arglist[4]
             a.upgrades = arglist[5]
-            a.upsonres = upsneeded
             if len(arglist) > 6:
                 a.side1 = arglist[6]
             if len(arglist) > 7:
@@ -133,9 +149,12 @@ def threeres(arglist):
             print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
 to hit 35 res on 3 resistances\n")
         case 5 | 6 | 7 | 8:
+            if onlyposvalues(arglist[3:]) is False:
+                print("\nnegative value entered where expecting positive\n")
+                del a
+                return
             a.mainstat = arglist[3]
             a.upgrades = arglist[4]
-            a.upsonres = upsneeded
             if len(arglist) > 5:
                 a.side1 = arglist[5]
             if len(arglist) > 6:
@@ -156,6 +175,9 @@ or \033[1m{totalbonus}\033[0m with set bonus\n")
 def bonus(arglist):
     arglist = listtoint(arglist)
     if type(arglist) is not list:
+        return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
         return
     a = Armor()
     a.mainstat = arglist[0]
@@ -178,6 +200,9 @@ def lt(arglist):
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
+        return
     if len(arglist) == 1:
         stattotal = arglist[0]
     else:
@@ -192,6 +217,9 @@ def lt(arglist):
 def cat(arglist):
     arglist = listtoint(arglist)
     if type(arglist) is not list:
+        return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
         return
     c = Cat()
     c.boost = arglist[0]
@@ -266,6 +294,15 @@ def listtoint(strlist):
         return False
     else:
         return intlist
+
+
+def onlyposvalues(arglist):
+    i = 0
+    while i < len(arglist):
+        if arglist[i] < 0:
+            return False
+        i += 1
+    return True
 
 
 def main():
