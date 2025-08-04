@@ -91,13 +91,14 @@ class StatStick:
             uppedstats.extend(self.sidestat)
         i = 0
         while i < len(uppedstats):
-            uppedstats[i] += remainder
-            if uppedstats[i] > self.cap:
-                remainder = uppedstats[i] - self.cap
-                uppedstats[i] = self.cap
-            else:
-                remainder = 0
-                break
+            if uppedstats[i] < self.cap:
+                uppedstats[i] += remainder
+                if uppedstats[i] > self.cap:
+                    remainder = uppedstats[i] - self.cap
+                    uppedstats[i] = self.cap
+                else:
+                    remainder = 0
+                    break
             i += 1
         uppedstats.append(remainder)
         return uppedstats
@@ -318,6 +319,36 @@ def cap(arglist):
     del s
 
 
+def diamond(arglist):
+    """
+    A command to calculate how many stat caps and total stats diamond will reach
+    Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
+    """
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
+        return
+    s = StatStick()
+    s.mainstat = arglist[0]
+    s.upgrades = arglist[1]
+    if len(arglist) > 2:
+        s.sidestat = arglist[2:]
+    s.cap = 800
+    uppedstats = []
+    uppedstats.extend(s.getuppedstats())
+    total = sum(uppedstats[:-1])
+    remainder = uppedstats[-1]
+    print(f"\nyour diamond will reach \033[1m{total}\033[0m total stats")
+    print(uppedstats[:-1])
+    if remainder > 0:
+        print(f"with {remainder} upgrades to spare\n")
+    else:
+        print("")
+    del s
+
+
 def lt(arglist):
     """
     A command to calculate how much tower damage and rate user should aim for
@@ -517,7 +548,8 @@ def main():
     Loops until 'exit' is inputted
     """
     print("please input your command")
-    print("available commands: res, 3res, bonus, lt, cat, wizard, exit")
+    print("available commands: res, 3res, bonus, cap, diamond, lt, cat, wizard\
+, exit")
     userinput = input()
     if userinput.strip() == "":
         print("\nempty input\n")
@@ -551,6 +583,11 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 cap(arglist)
+        case "diamond":
+            if argcount < 2 or argcount > 5:
+                print("\ninvalid arguments\n")
+            else:
+                diamond(arglist)
         case "lt":
             if argcount < 1 or argcount > 2:
                 print("\ninvalid arguments\n")
