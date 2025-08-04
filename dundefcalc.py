@@ -3,12 +3,18 @@ File: dundefcalc.py
 Author: Guanab
 Description: A commandline calculating tool for Dungeon Defenders
 """
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 import math
 
 
 class Armor:
+    """
+    A class for armor pieces
+    Attributes: res1 (int), res2 (int), res3 (int), res4 (int), mainstat (int),
+        upgrades (int), side1 (int), side2 (int), side3 (int), upsonres (int)
+    Methods: getresup(), getthreeresups(), gettotal(), gettotalbonus()
+    """
     res1 = 0
     res2 = 0
     res3 = 0
@@ -21,8 +27,8 @@ class Armor:
     upsonres = 0
 
     def getresups(self):
-        self.upsonres = upstomax(self.res1) + upstomax(self.res2) \
-            + upstomax(self.res3) + upstomax(self.res4)
+        self.upsonres = upstomaxres(self.res1) + upstomaxres(self.res2) \
+            + upstomaxres(self.res3) + upstomaxres(self.res4)
         return self.upsonres
 
     def getthreeresups(self):
@@ -30,15 +36,15 @@ class Armor:
         if self.res1 in range(30, 36):
             self.upsonres += 35 - self.res1
         else:
-            self.upsonres += upstomax(self.res1) + 6
+            self.upsonres += upstomaxres(self.res1) + 6
         if self.res2 in range(30, 36):
             self.upsonres += 35 - self.res2
         else:
-            self.upsonres += upstomax(self.res2) + 6
+            self.upsonres += upstomaxres(self.res2) + 6
         if self.res3 in range(30, 36):
             self.upsonres += 35 - self.res3
         else:
-            self.upsonres += upstomax(self.res3) + 6
+            self.upsonres += upstomaxres(self.res3) + 6
         return self.upsonres
 
     def gettotal(self):
@@ -67,6 +73,11 @@ class Armor:
 
 
 class Cat:
+    """
+    A class for propeller cat pet
+    Attributes: boost (int), upgrades (int), range (int)
+    Methods: getboost(), getrange(), gettargets(), getherostat()
+    """
     boost = 0
     upgrades = 0
     range = 0
@@ -97,7 +108,46 @@ class Cat:
                    self.getrange() - self.range) - 1)
 
 
+class Pet:
+    """
+    A class for melee and ranged damage pets
+    Attributes: damage (int), damageperup (int), upgrades (int), rate (int),
+        maxrate (int), procount (int), maxprocount (int), prospeed (int)
+    Methods: getdamage()
+    """
+    damage = 0
+    damageperup = 0
+    upgrades = 0
+    rate = 7
+    maxrate = 7
+    procount = 1
+    maxprocount = 1
+    prospeed = 30000
+
+    def getdamage(self):
+        if self.rate >= self.maxrate:
+            upsonrate = 0
+        else:
+            upsonrate = self.maxrate - self.rate
+        if self.procount >= self.maxprocount:
+            upsonprocount = 0
+        else:
+            upsonprocount = self.maxprocount - self.procount
+        if self.prospeed >= 30000:
+            upsonprospeed = 0
+        else:
+            upsonprospeed = upstomaxprospeed(self.prospeed)
+        upsspent = upsonrate + upsonprocount + upsonprospeed
+        return self.damage + (self.damageperup * (self.upgrades - upsspent - 1))
+
+
 def res(arglist):
+    """
+    A command to calculate upgrades needed to maximize resistances on armor and
+    the stat total it reaches after that
+    Expects a list of 4-9 but not 5 numbers
+    [res1, res2, res3, res4, main stat, upgrades, side1, side2, side3]
+    """
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
@@ -136,6 +186,12 @@ or \033[1m{totalbonus}\033[0m with set bonus\n")
 
 
 def threeres(arglist):
+    """
+    A command to calculate upgrades needed to upgrade 3 resistances to 35 on
+    armor and the stat total it reaches after that
+    Expects a list of 3-8 but not 4 numbers
+    [res1, res2, res3, main stat, upgrades, side1, side2, side3]
+    """
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
@@ -173,6 +229,11 @@ or \033[1m{totalbonus}\033[0m with set bonus\n")
 
 
 def bonus(arglist):
+    """
+    A command to calculate what stat total a piece of armor can reach if no
+    upgrades are spent on resistances
+    Expects a list of 1-5 numbers [main stat, upgrades, side1, side2, side3]
+    """
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
@@ -197,6 +258,11 @@ or \033[1m{totalbonus}\033[0m with set bonus\n")
 
 
 def lt(arglist):
+    """
+    A command to calculate how much tower damage and rate user should aim for
+    with a provided stat total
+    Expects a list of 1-2 numbers [stat total] or [tower damage, tower rate]
+    """
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
@@ -215,6 +281,11 @@ def lt(arglist):
 
 
 def cat(arglist):
+    """
+    A command to calculate how much boost, range and targets a propeller cat
+    will reach
+    Expects a list of 2-3 numbers [boost, upgrades, range]
+    """
     arglist = listtoint(arglist)
     if type(arglist) is not list:
         return
@@ -244,7 +315,45 @@ def cat(arglist):
     del c
 
 
-def upstomax(resvalue):
+def wizard(arglist):
+    """
+    A command to calculate how much damage a little wizard pet will reach with
+    capped attack rate and projectile speed
+    Expects a list of 2-4 numbers [damage, upgrades, rate, prospeed]
+    """
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
+        return
+    p = Pet()
+    p.damage = arglist[0]
+    p.upgrades = arglist[1]
+    if len(arglist) > 2:
+        p.rate = arglist[2]
+    else:
+        p.rate = 7
+    p.maxrate = 7
+    if len(arglist) > 3:
+        p.prospeed = arglist[3]
+    else:
+        p.prospeed = 30000
+    p.procount = 1
+    p.maxprocount = 1
+    p.damageperup = 112
+    damage = p.getdamage()
+    print(f"\nyour wizard will reach \033[1m{damage}\033[0m damage\n")
+    del p
+
+
+def upstomaxres(resvalue):
+    """
+    A function to calculate how many upgrades are needed to upgrade a provided
+    resistance value to 29
+    Expects a non-zero number in the range of -18 to 29
+    Returns an integer
+    """
     resvalue = int(resvalue)
     match resvalue:
         case 23 | 24 | 25 | 26 | 27 | 28 | 29:
@@ -278,7 +387,37 @@ def upstomax(resvalue):
             return 0
 
 
+def upstomaxprospeed(prospeed):
+    """
+    A function to calculate how many upgrades are needed to upgrade a provided
+    projectile speed to 30000
+    Expects a number
+    Returns an integer
+    """
+    prospeed = int(prospeed)
+    if prospeed >= 30000:
+        return 0
+    elif prospeed >= 4800:
+        return int(math.ceil((30000 - prospeed) / 1200))
+    else:
+        ups = 0
+        while prospeed < 30000:
+            quarter = int(math.floor(abs(prospeed) * 0.25))
+            if quarter < 100:
+                quarter = 100
+            if quarter > 1200:
+                quarter = 1200
+            prospeed += quarter
+            ups += 1
+        return ups
+
+
 def listtoint(strlist):
+    """
+    A function to convert all provided list values to integers
+    Expects a list of numbers
+    Returns a list of integers or False in case of error
+    """
     if type(strlist) is not list:
         return False
     intlist = []
@@ -297,6 +436,11 @@ def listtoint(strlist):
 
 
 def onlyposvalues(arglist):
+    """
+    A function to check if all values in a provided list are positive
+    Expects a list of numbers
+    Returns a boolean
+    """
     i = 0
     while i < len(arglist):
         if arglist[i] < 0:
@@ -306,8 +450,13 @@ def onlyposvalues(arglist):
 
 
 def main():
+    """
+    Main function
+    Asks the user for input and runs a related command if it exists
+    Loops until 'exit' is inputted
+    """
     print("please input your command")
-    print("available commands: res, 3res, bonus, lt, cat, exit")
+    print("available commands: res, 3res, bonus, lt, cat, wizard, exit")
     userinput = input()
     if userinput.strip() == "":
         print("\nempty input\n")
@@ -346,6 +495,11 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 cat(arglist)
+        case "wizard":
+            if argcount < 2 or argcount > 4:
+                print("\ninvalid arguments\n")
+            else:
+                wizard(arglist)
         case "exit":
             print("\nending program\n")
             quit()
