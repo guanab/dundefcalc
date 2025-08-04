@@ -11,36 +11,43 @@ I made this app for personal use so I don't need to open Discord each time I wan
 Download latest version from [Releases](https://github.com/guanab/dundefcalc/releases)
 
 **Windows**
-1. install Python (https://www.python.org/downloads/)
-2. run dundefcalc.py with Python
+1. Install Python (https://www.python.org/downloads/)
+2. Run dundefcalc.py with Python
 
 **Linux**
-1. install python from your package manager
-2. run `python dundefcalc.py` in terminal
+1. Install python from your package manager
+2. Run `python dundefcalc.py` in terminal
 
 ## Available commands
 
-**bonus**<br>
-`bonus <mainstat> [upgrades] [side1] [side2] [side3]`<br>
-- calculates the stat total your armor will reach when all upgrades are spent on main stat<br>
+**Bonus**<br>
+`bonus <main stat> [upgrades] [side1] [side2] [side3]`<br>
+- Calculates the stat total your armor will reach when all upgrades are spent on main stat
+- Only for ultimate or higher armor<br>
 
-**res**<br>
-`res <res1> <res2> <res3> <res4> [mainstat] [upgrades] [side1] [side2] [side3]`<br>
-- calculates the stat total your armor will reach when resistances are upgraded to 29 (41 with bonus) and rest of the upgrades are spent on main stat
-- can also be used with only resistance values to calculate amount of upgrades needed to reach max res<br>
+**Res**<br>
+`res <res1> <res2> <res3> <res4> [main stat] [upgrades] [side1] [side2] [side3]`<br>
+- Calculates the stat total your armor will reach when resistances are upgraded to 29 (41 with bonus) and rest of the upgrades are spent on main stat
+- Can also be used with only resistance values to calculate amount of upgrades needed to reach max res
+- Only for ultimate or higher armor<br>
 
 **3res**<br>
 `3res <res1> <res2> <res3> [mainstat] [upgrades] [side1] [side2] [side3]`<br>
-- same as res but calculates upgrades needed to reach 35 res (49 with bonus) on 3 resistances<br>
+- Same as res but calculates upgrades needed to reach 35 res (49 with bonus) on 3 resistances<br>
 
-**lt**<br>
-`lt <stattotal>` or `lt <tdamage> <trate>`<br>
-- calculates how much tower damage and rate you should aim for for lightning towers<br>
+**Lt**<br>
+`lt <stat total>` or `lt <tdamage> <trate>`<br>
+- Calculates how much tower damage and rate you should aim for for lightning towers<br>
 
-**cat**<br>
+**Cat**<br>
 `cat <boost> <upgrades> [range]`<br>
-- calculates how much boost, range and targets your cat will reach<br>
+- Calculates how much boost, range and targets your cat will reach<br>
+
+**Wizard**<br>
+`wizard <damage> <upgrades> [attack rate] [projectile speed]`
+- Calculates how much damage your wizard will reach with capped attack rate and projectile speed
+- Only for ultimate or higher wizards<br>
 
 ## Known limitations / issues
-- res commands don't consider filler upgrades when upgrading past 23 and fail to inform user if the piece doesn't have enough total upgrades
-- lt command isn't 100% accurate. it uses a fixed ratio of 1.21 for damage / rate, which is reasonably accurate for endgame stats, but optimizers should check on a dummy
+- Res commands don't consider filler upgrades when upgrading past 23 and fail to inform user if the piece doesn't have enough total upgrades
+- Lt command isn't 100% accurate. It uses a fixed ratio of 1.21 for damage / rate, which is reasonably accurate for endgame stats, but optimizers should check on a dummy
