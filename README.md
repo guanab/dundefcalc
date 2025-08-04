@@ -35,18 +35,26 @@ Download latest version from [Releases](https://github.com/guanab/dundefcalc/rel
 `3res <res1> <res2> <res3> [mainstat] [upgrades] [side1] [side2] [side3]`<br>
 - Same as res but calculates upgrades needed to reach 35 res (49 with bonus) on 3 resistances<br>
 
+**Cap**<br>
+`cap <main stat> <upgrades> [side1] [side2] [side3]`<br>
+- Calculates how many stat caps (999) and total stats your item will reach<br>
+
+**Diamond**<br>
+`diamond <main stat> <upgrades> [side1] [side2] [side3]`<br>
+- Calculates how many stat caps (800) and total stats your Diamond will reach<br>
+
 **Lt**<br>
-`lt <stat total>` or `lt <tdamage> <trate>`<br>
-- Calculates how much tower damage and rate you should aim for for lightning towers<br>
+`lt <stat total>` or `lt <tower damage> <tower rate>`<br>
+- Calculates how much tower damage and rate you should aim for for Lightning Towers<br>
 
 **Cat**<br>
 `cat <boost> <upgrades> [range]`<br>
-- Calculates how much boost, range and targets your cat will reach<br>
+- Calculates how much boost, range and targets your Propeller Cat will reach<br>
 
 **Wizard**<br>
 `wizard <damage> <upgrades> [attack rate] [projectile speed]`
-- Calculates how much damage your wizard will reach with capped attack rate and projectile speed
-- Only for ultimate or higher wizards<br>
+- Calculates how much damage your Little Wizard will reach with capped attack rate and projectile speed
+- Only for ultimate or higher Little Wizards<br>
 
 ## Known limitations / issues
 - Res commands don't consider filler upgrades when upgrading past 23 and fail to inform user if the piece doesn't have enough total upgrades
