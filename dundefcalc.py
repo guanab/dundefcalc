@@ -72,6 +72,37 @@ class Armor:
             return int(math.ceil(self.mainstat * 1.4))
 
 
+class StatStick:
+    """
+    A class for items that are used for raw stats
+    Attributes: mainstat (int), upgrades (int), sidestat (list), cap (int)
+    Methods: getuppedstats()
+    """
+    mainstat = 0
+    upgrades = 0
+    sidestat = []
+    cap = 999
+
+    def getuppedstats(self):
+        remainder = self.upgrades - 1
+        uppedstats = []
+        uppedstats.append(self.mainstat)
+        if len(self.sidestat) > 0:
+            uppedstats.extend(self.sidestat)
+        i = 0
+        while i < len(uppedstats):
+            uppedstats[i] += remainder
+            if uppedstats[i] > self.cap:
+                remainder = uppedstats[i] - self.cap
+                uppedstats[i] = self.cap
+            else:
+                remainder = 0
+                break
+            i += 1
+        uppedstats.append(remainder)
+        return uppedstats
+
+
 class Cat:
     """
     A class for propeller cat pet
@@ -255,6 +286,36 @@ def bonus(arglist):
     print(f"\nyour piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
     del a
+
+
+def cap(arglist):
+    """
+    A command to calculate how many stat caps and total stats an item will reach
+    Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
+    """
+    arglist = listtoint(arglist)
+    if type(arglist) is not list:
+        return
+    if onlyposvalues(arglist) is False:
+        print("\nnegative value entered where expecting positive\n")
+        return
+    s = StatStick()
+    s.mainstat = arglist[0]
+    s.upgrades = arglist[1]
+    if len(arglist) > 2:
+        s.sidestat = arglist[2:]
+    s.cap = 999
+    uppedstats = []
+    uppedstats.extend(s.getuppedstats())
+    total = sum(uppedstats[:-1])
+    remainder = uppedstats[-1]
+    print(f"\nyour item will reach \033[1m{total}\033[0m total stats")
+    print(uppedstats[:-1])
+    if remainder > 0:
+        print(f"with {remainder} upgrades to spare\n")
+    else:
+        print("")
+    del s
 
 
 def lt(arglist):
@@ -485,6 +546,11 @@ def main():
                 print("\ninvalid arguments\n")
             else:
                 bonus(arglist)
+        case "cap":
+            if argcount < 2 or argcount > 5:
+                print("\ninvalid arguments\n")
+            else:
+                cap(arglist)
         case "lt":
             if argcount < 1 or argcount > 2:
                 print("\ninvalid arguments\n")
