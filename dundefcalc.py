@@ -103,20 +103,20 @@ class Cat:
     """
     A class for propeller cat pet
     Attributes: boost (int), upgrades (int), range (int)
-    Methods: getboost(), getrange(), gettargets(), getherostat()
+    Methods: get_upped_boost(), get_upped_range(), get_targets(), get_hero_stat()
     """
     boost = 0  # expected positive integer
     upgrades = 0  # expected positive integer
     range = 0  # expected positive integer
 
-    def getboost(self):
+    def get_upped_boost(self):
         if self.upgrades >= 90:
             return int(self.boost + math.floor(self.upgrades / 3) - 3)
         else:
             return int(self.boost + math.floor(self.upgrades / 3) - (
                        math.floor(self.upgrades / 30)))
 
-    def getrange(self):
+    def get_upped_range(self):
         range = int(self.range + math.floor(self.upgrades / 5) - math.floor(
                     self.upgrades / 15))
         if range >= 90:
@@ -124,23 +124,24 @@ class Cat:
         else:
             return range
 
-    def gettargets(self):
+    def get_targets(self):
         if self.upgrades >= 90:
             return 4
         else:
             return int(math.floor(self.upgrades / 30) + 1)
 
-    def getherostat(self):
+    def get_hero_stat(self):
         return int(self.upgrades - math.floor(self.upgrades / 3) - (
-                   self.getrange() - self.range) - 1)
+                   self.get_upped_range() - self.range) - 1)
 
 
 class Pet:
     """
     A class for melee and ranged damage pets
-    Attributes: damage (int), damageperup (int), upgrades (int), rate (int),
-        max_rate (int), procount (int), max_procount (int), prospeed (int)
-    Methods: get_damage()
+    Attributes: damage (int), damage_per_up (int), upgrades (int), rate (int),
+                max_rate (int), procount (int), max_procount (int),
+                prospeed (int)
+    Methods: get_upped_damage()
     """
     damage = 0  # expected positive integer
     damage_per_up = 0  # expected positive integer
@@ -151,12 +152,17 @@ class Pet:
     max_procount = 1  # expected positive integer
     prospeed = 30000  # expected non-zero integer
 
-    def get_damage(self):
+    def set_damage(self, value):
+        if value <= 0:
+            raise ValueError("damage needs to be positive")
+        self.damage = value
+
+    def get_upped_damage(self):
         if self.rate >= self.max_rate:
             upsonrate = 0
         else:
             upsonrate = self.max_rate - self.rate
-        if self.pro_count >= self.max_procount:
+        if self.procount >= self.max_procount:
             upsonprocount = 0
         else:
             upsonprocount = self.max_procount - self.procount
@@ -177,8 +183,10 @@ def res(arglist):
     Expects a list of 4-9 but not 5 numbers
     [res1, res2, res3, res4, main stat, upgrades, side1, side2, side3]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     a = Armor()
     a.resistance = arglist[0:3]
@@ -214,8 +222,10 @@ def threeres(arglist):
     Expects a list of 3-8 but not 4 numbers
     [res1, res2, res3, main stat, upgrades, side1, side2, side3]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     a = Armor()
     a.resistance = arglist[0:2]
@@ -250,8 +260,10 @@ def bonus(arglist):
     upgrades are spent on resistances
     Expects a list of 1-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -274,8 +286,10 @@ def cap(arglist):
     A command to calculate how many stat caps and total stats an item will reach
     Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -304,8 +318,10 @@ def diamond(arglist):
     A command to calculate how many stat caps and total stats diamond will reach
     Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -335,8 +351,10 @@ def lt(arglist):
     with a provided stat total
     Expects a list of 1-2 numbers [stat total] or [tower damage, tower rate]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -358,8 +376,10 @@ def cat(arglist):
     will reach
     Expects a list of 2-3 numbers [boost, upgrades, range]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -367,19 +387,19 @@ def cat(arglist):
     c = Cat()
     c.boost = arglist[0]
     c.upgrades = arglist[1]
-    totalboost = c.getboost()
-    targets = c.gettargets()
+    totalboost = c.get_upped_boost()
+    targets = c.get_targets()
     if len(arglist) > 2:
         c.range = arglist[2]
-        range = c.getrange()
-        hero = c.getherostat()
+        range = c.get_upped_range()
+        hero = c.get_hero_stat()
         print(f"\nyour cat will reach \033[1m{totalboost}\033[0m boost, \
 \033[1m{range}\033[0m range and \033[1m{targets}\033[0m targets")
         print(f"you will have {hero} points to spend on hero stats")
     else:
         c.range = 0
-        rangeups = c.getrange()
-        hero = c.getherostat()
+        rangeups = c.get_upped_range()
+        hero = c.get_hero_stat()
         print(f"\nyour cat will reach \033[1m{totalboost}\033[0m boost and \
 \033[1m{targets}\033[0m targets")
         print(f"you will have {rangeups} points to spend on range and \
@@ -393,8 +413,10 @@ def wizard(arglist):
     capped attack rate and projectile speed
     Expects a list of 2-4 numbers [damage, upgrades, rate, prospeed]
     """
-    arglist = list_to_int(arglist)
-    if type(arglist) is not list:
+    try:
+        arglist = list_to_int(arglist)
+    except Exception as e:
+        print(f"\nerror: {e}\n")
         return
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
@@ -414,7 +436,7 @@ def wizard(arglist):
     p.procount = 1
     p.max_procount = 1
     p.damage_per_up = 112
-    damage = p.get_damage()
+    damage = p.get_upped_damage()
     print(f"\nyour wizard will reach \033[1m{damage}\033[0m damage\n")
     del p
 
@@ -484,25 +506,24 @@ def ups_to_max_pro_speed(prospeed):
         return ups
 
 
-def list_to_int(strlist):
+def list_to_int(stringlist):
     """
     A function to convert all provided list values to integers
     Expects a list of numbers
-    Returns a list of integers or False in case of error
+    Returns a list of integers
     """
-    if type(strlist) is not list:
-        return False
+    if type(stringlist) is not list:
+        raise TypeError("type is not list")
     intlist = []
     i = 0
-    while i < len(strlist):
+    while i < len(stringlist):
         try:
-            intlist.insert(i, int(strlist[i]))
-        except ValueError:
-            print("\ncannot convert to integer\n")
-            return False
+            intlist.insert(i, int(stringlist[i]))
+        except ValueError as e:
+            raise ValueError("cannot convert to integer") from e
         i += 1
     if len(intlist) == 0:
-        return False
+        raise ValueError("list is empty")
     else:
         return intlist
 
@@ -538,9 +559,7 @@ def main():
     argcount = len(inputlist) - 1
     arglist = []
     if argcount > 0:
-        arglist = list_to_int(inputlist[1:])
-        if type(arglist) is not list:
-            return
+        arglist = inputlist[1:]
 
     match inputlist[0].lower():
         case "res":
