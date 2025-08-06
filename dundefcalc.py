@@ -3,7 +3,7 @@ File: dundefcalc.py
 Author: Guanab
 Description: A commandline calculating tool for Dungeon Defenders
 """
-__version__ = "0.2.0"
+__version__ = "v0.3.0-beta"
 
 import math
 
@@ -11,62 +11,57 @@ import math
 class Armor:
     """
     A class for armor pieces
-    Attributes: res1 (int), res2 (int), res3 (int), res4 (int), mainstat (int),
-        upgrades (int), side1 (int), side2 (int), side3 (int), upsonres (int)
-    Methods: getresup(), getthreeresups(), gettotal(), gettotalbonus()
+    Attributes: resistance (list), mainstat (int), upgrades (int),
+                sidestat (list), ups_on_res (int)
+    Methods: get_res_ups(), get_three_res_ups(), get_total(), get_total_bonus()
     """
-    res1 = 0
-    res2 = 0
-    res3 = 0
-    res4 = 0
-    mainstat = 0
-    upgrades = 0
-    side1 = 0
-    side2 = 0
-    side3 = 0
-    upsonres = 0
+    resistance = []  # expected 3-4 integers in range -18 to 35
+    mainstat = 0  # expected non-zero integer
+    upgrades = 0  # expected positive integer
+    sidestat = []  # expected 0-3 non-zero integers
+    ups_on_res = 0  # expected positive integer
 
-    def getresups(self):
-        self.upsonres = upstomaxres(self.res1) + upstomaxres(self.res2) \
-            + upstomaxres(self.res3) + upstomaxres(self.res4)
-        return self.upsonres
+    def get_res_ups(self):
+        self.ups_on_res = 0
+        i = 0
+        while i < len(self.resistance):
+            self.ups_on_res += ups_to_max_res(self.resistance[i])
+            i += 1
+        return self.ups_on_res
 
-    def getthreeresups(self):
-        self.upsonres = 0
-        if self.res1 in range(30, 36):
-            self.upsonres += 35 - self.res1
-        else:
-            self.upsonres += upstomaxres(self.res1) + 6
-        if self.res2 in range(30, 36):
-            self.upsonres += 35 - self.res2
-        else:
-            self.upsonres += upstomaxres(self.res2) + 6
-        if self.res3 in range(30, 36):
-            self.upsonres += 35 - self.res3
-        else:
-            self.upsonres += upstomaxres(self.res3) + 6
-        return self.upsonres
+    def get_three_res_ups(self):
+        self.ups_on_res = 0
+        i = 0
+        while i < len(self.resistance):
+            if self.resistance[i] > 35:
+                print("\nres value higher than expected, ignoring\n")
+            if self.resistance[i] in range(30, 36):
+                self.ups_on_res += 35 - self.resistance[i]
+            else:
+                self.ups_on_res += ups_to_max_res(self.resistance[i]) + 6
+            i += 1
+        return self.ups_on_res
 
-    def gettotal(self):
+    def get_total(self):
         if self.upgrades > 0:
-            return self.mainstat + self.upgrades + self.side1 + self.side2 + \
-                self.side3 - self.upsonres - 1
+            total = self.mainstat + self.upgrades - 1
+            i = 0
+            while i < len(self.sidestat):
+                total += self.sidestat[i]
+                i += 1
+            return total
         else:
             return self.mainstat
 
-    def gettotalbonus(self):
+    def get_total_bonus(self):
         if self.upgrades > 0:
-            totalstats = self.mainstat + self.upgrades - self.upsonres - 1
-            totalbonus = int(math.ceil(totalstats * 1.4))
-            if self.side1 > 0:
-                totalstats += self.side1
-                totalbonus += int(math.ceil(self.side1 * 1.4))
-            if self.side2 > 0:
-                totalstats += self.side2
-                totalbonus += int(math.ceil(self.side2 * 1.4))
-            if self.side3 > 0:
-                totalstats += self.side3
-                totalbonus += int(math.ceil(self.side3 * 1.4))
+            mainupped = self.mainstat + self.upgrades - self.ups_on_res - 1
+            totalbonus = int(math.ceil(mainupped * 1.4))
+            i = 0
+            while i < len(self.sidestat):
+                if self.sidestat[i] > 0:
+                    totalbonus += int(math.ceil(self.sidestat[i] * 1.4))
+                i += 1
             return totalbonus
         else:
             return int(math.ceil(self.mainstat * 1.4))
@@ -76,14 +71,14 @@ class StatStick:
     """
     A class for items that are used for raw stats
     Attributes: mainstat (int), upgrades (int), sidestat (list), cap (int)
-    Methods: getuppedstats()
+    Methods: get_upped_stats()
     """
-    mainstat = 0
-    upgrades = 0
-    sidestat = []
-    cap = 999
+    mainstat = 0  # expected non-zero integer
+    upgrades = 0  # expected positive integer
+    sidestat = []  # expected 0-3 non-zero integers
+    cap = 999  # expected positive integer
 
-    def getuppedstats(self):
+    def get_upped_stats(self):
         remainder = self.upgrades - 1
         uppedstats = []
         uppedstats.append(self.mainstat)
@@ -110,9 +105,9 @@ class Cat:
     Attributes: boost (int), upgrades (int), range (int)
     Methods: getboost(), getrange(), gettargets(), getherostat()
     """
-    boost = 0
-    upgrades = 0
-    range = 0
+    boost = 0  # expected positive integer
+    upgrades = 0  # expected positive integer
+    range = 0  # expected positive integer
 
     def getboost(self):
         if self.upgrades >= 90:
@@ -144,33 +139,35 @@ class Pet:
     """
     A class for melee and ranged damage pets
     Attributes: damage (int), damageperup (int), upgrades (int), rate (int),
-        maxrate (int), procount (int), maxprocount (int), prospeed (int)
-    Methods: getdamage()
+        max_rate (int), procount (int), max_procount (int), prospeed (int)
+    Methods: get_damage()
     """
-    damage = 0
-    damageperup = 0
-    upgrades = 0
-    rate = 7
-    maxrate = 7
-    procount = 1
-    maxprocount = 1
-    prospeed = 30000
+    damage = 0  # expected positive integer
+    damage_per_up = 0  # expected positive integer
+    upgrades = 0  # expected positive integer
+    rate = 7  # expected positive integer
+    max_rate = 7  # expected positive integer
+    procount = 1  # expected positive integer
+    max_procount = 1  # expected positive integer
+    prospeed = 30000  # expected non-zero integer
 
-    def getdamage(self):
-        if self.rate >= self.maxrate:
+    def get_damage(self):
+        if self.rate >= self.max_rate:
             upsonrate = 0
         else:
-            upsonrate = self.maxrate - self.rate
-        if self.procount >= self.maxprocount:
+            upsonrate = self.max_rate - self.rate
+        if self.pro_count >= self.max_procount:
             upsonprocount = 0
         else:
-            upsonprocount = self.maxprocount - self.procount
+            upsonprocount = self.max_procount - self.procount
         if self.prospeed >= 30000:
             upsonprospeed = 0
         else:
-            upsonprospeed = upstomaxprospeed(self.prospeed)
+            upsonprospeed = ups_to_max_pro_speed(self.prospeed)
         upsspent = upsonrate + upsonprocount + upsonprospeed
-        return self.damage + (self.damageperup * (self.upgrades - upsspent - 1))
+        return self.damage + (
+            self.damage_per_up * (self.upgrades - upsspent - 1)
+        )
 
 
 def res(arglist):
@@ -180,34 +177,27 @@ def res(arglist):
     Expects a list of 4-9 but not 5 numbers
     [res1, res2, res3, res4, main stat, upgrades, side1, side2, side3]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
     a = Armor()
-    a.res1 = arglist[0]
-    a.res2 = arglist[1]
-    a.res3 = arglist[2]
-    a.res4 = arglist[3]
-    upsneeded = a.getresups()
+    a.resistance = arglist[0:3]
+    upsneeded = a.get_res_ups()
     match len(arglist):
         case 4:
             print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
 to hit max resistances\n")
         case 6 | 7 | 8 | 9:
-            if onlyposvalues(arglist[4:]) is False:
+            if only_pos_values(arglist[4:]) is False:
                 print("\nnegative value entered where expecting positive\n")
                 del a
                 return
             a.mainstat = arglist[4]
             a.upgrades = arglist[5]
             if len(arglist) > 6:
-                a.side1 = arglist[6]
-            if len(arglist) > 7:
-                a.side2 = arglist[7]
-            if len(arglist) > 8:
-                a.side3 = arglist[8]
-            totalstats = a.gettotal()
-            totalbonus = a.gettotalbonus()
+                a.sidestat = arglist[6:]
+            totalstats = a.get_total()
+            totalbonus = a.get_total_bonus()
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
@@ -224,33 +214,27 @@ def threeres(arglist):
     Expects a list of 3-8 but not 4 numbers
     [res1, res2, res3, main stat, upgrades, side1, side2, side3]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
     a = Armor()
-    a.res1 = arglist[0]
-    a.res2 = arglist[1]
-    a.res3 = arglist[2]
-    upsneeded = a.getthreeresups()
+    a.resistance = arglist[0:2]
+    upsneeded = a.get_three_res_ups()
     match len(arglist):
         case 3:
             print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
 to hit 35 res on 3 resistances\n")
         case 5 | 6 | 7 | 8:
-            if onlyposvalues(arglist[3:]) is False:
+            if only_pos_values(arglist[3:]) is False:
                 print("\nnegative value entered where expecting positive\n")
                 del a
                 return
             a.mainstat = arglist[3]
             a.upgrades = arglist[4]
             if len(arglist) > 5:
-                a.side1 = arglist[5]
-            if len(arglist) > 6:
-                a.side2 = arglist[6]
-            if len(arglist) > 7:
-                a.side3 = arglist[7]
-            totalstats = a.gettotal()
-            totalbonus = a.gettotalbonus()
+                a.sidestat = arglist[5:]
+            totalstats = a.get_total()
+            totalbonus = a.get_total_bonus()
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances (3 x 35)")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
@@ -266,10 +250,10 @@ def bonus(arglist):
     upgrades are spent on resistances
     Expects a list of 1-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     a = Armor()
@@ -277,11 +261,7 @@ def bonus(arglist):
     if len(arglist) > 1:
         a.upgrades = arglist[1]
     if len(arglist) > 2:
-        a.side1 = arglist[2]
-    if len(arglist) > 3:
-        a.side2 = arglist[3]
-    if len(arglist) > 4:
-        a.side3 = arglist[4]
+        a.sidestat = arglist[2:]
     totalstats = a.gettotal()
     totalbonus = a.gettotalbonus()
     print(f"\nyour piece will reach \033[1m{totalstats}\033[0m, \
@@ -294,10 +274,10 @@ def cap(arglist):
     A command to calculate how many stat caps and total stats an item will reach
     Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     s = StatStick()
@@ -307,7 +287,7 @@ def cap(arglist):
         s.sidestat = arglist[2:]
     s.cap = 999
     uppedstats = []
-    uppedstats.extend(s.getuppedstats())
+    uppedstats.extend(s.get_upped_stats())
     total = sum(uppedstats[:-1])
     remainder = uppedstats[-1]
     print(f"\nyour item will reach \033[1m{total}\033[0m total stats")
@@ -324,10 +304,10 @@ def diamond(arglist):
     A command to calculate how many stat caps and total stats diamond will reach
     Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     s = StatStick()
@@ -337,7 +317,7 @@ def diamond(arglist):
         s.sidestat = arglist[2:]
     s.cap = 800
     uppedstats = []
-    uppedstats.extend(s.getuppedstats())
+    uppedstats.extend(s.get_upped_stats())
     total = sum(uppedstats[:-1])
     remainder = uppedstats[-1]
     print(f"\nyour diamond will reach \033[1m{total}\033[0m total stats")
@@ -355,10 +335,10 @@ def lt(arglist):
     with a provided stat total
     Expects a list of 1-2 numbers [stat total] or [tower damage, tower rate]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     if len(arglist) == 1:
@@ -378,10 +358,10 @@ def cat(arglist):
     will reach
     Expects a list of 2-3 numbers [boost, upgrades, range]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     c = Cat()
@@ -413,10 +393,10 @@ def wizard(arglist):
     capped attack rate and projectile speed
     Expects a list of 2-4 numbers [damage, upgrades, rate, prospeed]
     """
-    arglist = listtoint(arglist)
+    arglist = list_to_int(arglist)
     if type(arglist) is not list:
         return
-    if onlyposvalues(arglist) is False:
+    if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
     p = Pet()
@@ -426,20 +406,20 @@ def wizard(arglist):
         p.rate = arglist[2]
     else:
         p.rate = 7
-    p.maxrate = 7
+    p.max_rate = 7
     if len(arglist) > 3:
         p.prospeed = arglist[3]
     else:
         p.prospeed = 30000
     p.procount = 1
-    p.maxprocount = 1
-    p.damageperup = 112
-    damage = p.getdamage()
+    p.max_procount = 1
+    p.damage_per_up = 112
+    damage = p.get_damage()
     print(f"\nyour wizard will reach \033[1m{damage}\033[0m damage\n")
     del p
 
 
-def upstomaxres(resvalue):
+def ups_to_max_res(resvalue):
     """
     A function to calculate how many upgrades are needed to upgrade a provided
     resistance value to 29
@@ -479,7 +459,7 @@ def upstomaxres(resvalue):
             return 0
 
 
-def upstomaxprospeed(prospeed):
+def ups_to_max_pro_speed(prospeed):
     """
     A function to calculate how many upgrades are needed to upgrade a provided
     projectile speed to 30000
@@ -504,7 +484,7 @@ def upstomaxprospeed(prospeed):
         return ups
 
 
-def listtoint(strlist):
+def list_to_int(strlist):
     """
     A function to convert all provided list values to integers
     Expects a list of numbers
@@ -527,7 +507,7 @@ def listtoint(strlist):
         return intlist
 
 
-def onlyposvalues(arglist):
+def only_pos_values(arglist):
     """
     A function to check if all values in a provided list are positive
     Expects a list of numbers
@@ -558,7 +538,7 @@ def main():
     argcount = len(inputlist) - 1
     arglist = []
     if argcount > 0:
-        arglist = listtoint(inputlist[1:])
+        arglist = list_to_int(inputlist[1:])
         if type(arglist) is not list:
             return
 
@@ -611,6 +591,6 @@ def main():
 
 
 if __name__ == "__main__":
-    print("DunDefCalc v" + __version__)
+    print("DunDefCalc " + __version__)
     while True:
         main()
