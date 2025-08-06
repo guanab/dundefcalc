@@ -13,13 +13,16 @@ class Armor:
     A class for armor pieces
     Attributes: resistance (list), mainstat (int), upgrades (int),
                 sidestat (list), ups_on_res (int)
-    Methods: get_res_ups(), get_three_res_ups(), get_total(), get_total_bonus()
+    Methods: get_res_ups(), get_three_res_ups(), get_total(), get_total_bonus(),
+             get_upped_stats(), get_upped_bonus()
     """
     resistance = []  # expected 3-4 integers in range -18 to 35
     mainstat = 0  # expected non-zero integer
     upgrades = 0  # expected positive integer
     sidestat = []  # expected 0-3 non-zero integers
     ups_on_res = 0  # expected positive integer
+    statcap = 999  # expected positive integer
+    bonus_multiplier = 1.4  # expected positive float
 
     def get_res_ups(self):
         self.ups_on_res = 0
@@ -44,7 +47,7 @@ class Armor:
 
     def get_total(self):
         if self.upgrades > 0:
-            total = self.mainstat + self.upgrades - 1
+            total = self.mainstat + self.upgrades - self.ups_on_res - 1
             i = 0
             while i < len(self.sidestat):
                 total += self.sidestat[i]
@@ -65,6 +68,38 @@ class Armor:
             return totalbonus
         else:
             return int(math.ceil(self.mainstat * 1.4))
+
+    def get_upped_stats(self):
+        remainder = self.upgrades - self.ups_on_res - 1
+        uppedstats = []
+        uppedstats.append(self.mainstat)
+        if len(self.sidestat) > 0:
+            uppedstats.extend(self.sidestat)
+        i = 0
+        while i < len(uppedstats):
+            if uppedstats[i] < self.statcap:
+                uppedstats[i] += remainder
+                if uppedstats[i] > self.statcap:
+                    remainder = uppedstats[i] - self.statcap
+                    uppedstats[i] = self.statcap
+                else:
+                    remainder = 0
+                    break
+            i += 1
+        uppedstats.append(remainder)
+        return uppedstats
+
+    def get_upped_bonus(self, statlist=None):
+        if statlist is None:
+            statlist = self.get_upped_stats()
+        bonuslist = []
+        i = 0
+        while i < len(statlist[:-1]):
+            bonuslist.append(
+                int(math.ceil(statlist[i] * self.bonus_multiplier))
+            )
+            i += 1
+        return bonuslist
 
 
 class StatStick:
@@ -103,7 +138,8 @@ class Cat:
     """
     A class for propeller cat pet
     Attributes: boost (int), upgrades (int), range (int)
-    Methods: get_upped_boost(), get_upped_range(), get_targets(), get_hero_stat()
+    Methods: get_upped_boost(), get_upped_range(), get_upped_targets(),
+             get_hero_stat()
     """
     boost = 0  # expected positive integer
     upgrades = 0  # expected positive integer
@@ -124,7 +160,7 @@ class Cat:
         else:
             return range
 
-    def get_targets(self):
+    def get_upped_targets(self):
         if self.upgrades >= 90:
             return 4
         else:
@@ -135,7 +171,7 @@ class Cat:
                    self.get_upped_range() - self.range) - 1)
 
 
-class Pet:
+class DamagePet:
     """
     A class for melee and ranged damage pets
     Attributes: damage (int), damage_per_up (int), upgrades (int), rate (int),
@@ -151,11 +187,6 @@ class Pet:
     procount = 1  # expected positive integer
     max_procount = 1  # expected positive integer
     prospeed = 30000  # expected non-zero integer
-
-    def set_damage(self, value):
-        if value <= 0:
-            raise ValueError("damage needs to be positive")
-        self.damage = value
 
     def get_upped_damage(self):
         if self.rate >= self.max_rate:
@@ -174,6 +205,18 @@ class Pet:
         return self.damage + (
             self.damage_per_up * (self.upgrades - upsspent - 1)
         )
+
+
+class Wizard(DamagePet):
+    """
+    A child class for Little Wizard pet
+    """
+
+    def __init__(self):
+        self.damage_per_up = 112
+        self.max_rate = 7
+        self.procount = 1
+        self.max_procount = 1
 
 
 def res(arglist):
@@ -206,10 +249,14 @@ to hit max resistances\n")
                 a.sidestat = arglist[6:]
             totalstats = a.get_total()
             totalbonus = a.get_total_bonus()
+            statlist = a.get_upped_stats()
+            bonuslist = a.get_upped_bonus(statlist)
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
+            print(statlist[:-1])
+            print(bonuslist, "\n")
         case _:
             print("\ninvalid arguments\n")
     del a
@@ -245,10 +292,14 @@ to hit 35 res on 3 resistances\n")
                 a.sidestat = arglist[5:]
             totalstats = a.get_total()
             totalbonus = a.get_total_bonus()
+            statlist = a.get_upped_stats()
+            bonuslist = a.get_upped_bonus(statlist)
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances (3 x 35)")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus\n")
+            print(statlist[:-1])
+            print(bonuslist, "\n")
         case _:
             print("\ninvalid arguments\n")
     del a
@@ -388,7 +439,7 @@ def cat(arglist):
     c.boost = arglist[0]
     c.upgrades = arglist[1]
     totalboost = c.get_upped_boost()
-    targets = c.get_targets()
+    targets = c.get_upped_targets()
     if len(arglist) > 2:
         c.range = arglist[2]
         range = c.get_upped_range()
@@ -421,24 +472,20 @@ def wizard(arglist):
     if only_pos_values(arglist) is False:
         print("\nnegative value entered where expecting positive\n")
         return
-    p = Pet()
-    p.damage = arglist[0]
-    p.upgrades = arglist[1]
+    w = Wizard()
+    w.damage = arglist[0]
+    w.upgrades = arglist[1]
     if len(arglist) > 2:
-        p.rate = arglist[2]
+        w.rate = arglist[2]
     else:
-        p.rate = 7
-    p.max_rate = 7
+        w.rate = 7
     if len(arglist) > 3:
-        p.prospeed = arglist[3]
+        w.prospeed = arglist[3]
     else:
-        p.prospeed = 30000
-    p.procount = 1
-    p.max_procount = 1
-    p.damage_per_up = 112
-    damage = p.get_upped_damage()
+        w.prospeed = 30000
+    damage = w.get_upped_damage()
     print(f"\nyour wizard will reach \033[1m{damage}\033[0m damage\n")
-    del p
+    del w
 
 
 def ups_to_max_res(resvalue):
