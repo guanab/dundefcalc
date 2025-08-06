@@ -25,6 +25,9 @@ class Armor:
     bonus_multiplier = 1.4  # expected positive float
 
     def get_res_ups(self):
+        """
+        Returns amount of upgrades needed to reach 29 on all resistances
+        """
         self.ups_on_res = 0
         i = 0
         while i < len(self.resistance):
@@ -33,6 +36,9 @@ class Armor:
         return self.ups_on_res
 
     def get_three_res_ups(self):
+        """
+        Returns amount of upgrades needed to reach 35 on all resistances
+        """
         self.ups_on_res = 0
         i = 0
         while i < len(self.resistance):
@@ -46,6 +52,9 @@ class Armor:
         return self.ups_on_res
 
     def get_total(self):
+        """
+        Returns stat total after upgrades
+        """
         if self.upgrades > 0:
             total = self.mainstat + self.upgrades - self.ups_on_res - 1
             i = 0
@@ -57,6 +66,9 @@ class Armor:
             return self.mainstat
 
     def get_total_bonus(self):
+        """
+        Return stat total after upgrades and with set bonus applied
+        """
         if self.upgrades > 0:
             mainupped = self.mainstat + self.upgrades - self.ups_on_res - 1
             totalbonus = int(math.ceil(mainupped * 1.4))
@@ -70,9 +82,15 @@ class Armor:
             return int(math.ceil(self.mainstat * 1.4))
 
     def get_upped_stats(self):
+        """
+        Returns a list of stats after upgrading and remaining upgrades
+        """
         remainder = self.upgrades - self.ups_on_res - 1
         uppedstats = []
         uppedstats.append(self.mainstat)
+        if remainder <= 0:
+            uppedstats.append(0)
+            return uppedstats
         if len(self.sidestat) > 0:
             uppedstats.extend(self.sidestat)
         i = 0
@@ -90,6 +108,9 @@ class Armor:
         return uppedstats
 
     def get_upped_bonus(self, statlist=None):
+        """
+        Returns a list of stats after upgrades and with set bonus applied
+        """
         if statlist is None:
             statlist = self.get_upped_stats()
         bonuslist = []
@@ -114,6 +135,9 @@ class StatStick:
     cap = 999  # expected positive integer
 
     def get_upped_stats(self):
+        """
+        Returns a list of stats after upgrading and remaining upgrades
+        """
         remainder = self.upgrades - 1
         uppedstats = []
         uppedstats.append(self.mainstat)
@@ -146,6 +170,9 @@ class Cat:
     range = 0  # expected positive integer
 
     def get_upped_boost(self):
+        """
+        Returns boost stat after upgrading
+        """
         if self.upgrades >= 90:
             return int(self.boost + math.floor(self.upgrades / 3) - 3)
         else:
@@ -153,6 +180,9 @@ class Cat:
                        math.floor(self.upgrades / 30)))
 
     def get_upped_range(self):
+        """
+        Returns range stat after upgrading
+        """
         range = int(self.range + math.floor(self.upgrades / 5) - math.floor(
                     self.upgrades / 15))
         if range >= 90:
@@ -161,12 +191,18 @@ class Cat:
             return range
 
     def get_upped_targets(self):
+        """
+        Returns targets stat after upgrading
+        """
         if self.upgrades >= 90:
             return 4
         else:
             return int(math.floor(self.upgrades / 30) + 1)
 
     def get_hero_stat(self):
+        """
+        Returns amount of hero stat upgrades after upgrading
+        """
         return int(self.upgrades - math.floor(self.upgrades / 3) - (
                    self.get_upped_range() - self.range) - 1)
 
@@ -189,6 +225,9 @@ class DamagePet:
     prospeed = 30000  # expected non-zero integer
 
     def get_upped_damage(self):
+        """
+        Returns damage stat after upgrading
+        """
         if self.rate >= self.max_rate:
             upsonrate = 0
         else:
@@ -247,14 +286,18 @@ to hit max resistances\n")
             a.upgrades = arglist[5]
             if len(arglist) > 6:
                 a.sidestat = arglist[6:]
-            totalstats = a.get_total()
-            totalbonus = a.get_total_bonus()
             statlist = a.get_upped_stats()
             bonuslist = a.get_upped_bonus(statlist)
+            totalstats = sum(statlist[:-1])
+            totalbonus = sum(bonuslist)
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
-or \033[1m{totalbonus}\033[0m with set bonus\n")
+or \033[1m{totalbonus}\033[0m with set bonus")
+            if statlist[-1] > 0:
+                print(f"with {statlist[-1]} upgrades to spare\n")
+            else:
+                print("")
             print(statlist[:-1])
             print(bonuslist, "\n")
         case _:
@@ -290,14 +333,18 @@ to hit 35 res on 3 resistances\n")
             a.upgrades = arglist[4]
             if len(arglist) > 5:
                 a.sidestat = arglist[5:]
-            totalstats = a.get_total()
-            totalbonus = a.get_total_bonus()
             statlist = a.get_upped_stats()
             bonuslist = a.get_upped_bonus(statlist)
+            totalstats = sum(statlist[:-1])
+            totalbonus = sum(bonuslist)
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances (3 x 35)")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
-or \033[1m{totalbonus}\033[0m with set bonus\n")
+or \033[1m{totalbonus}\033[0m with set bonus")
+            if statlist[-1] > 0:
+                print(f"with {statlist[-1]} upgrades to spare\n")
+            else:
+                print("")
             print(statlist[:-1])
             print(bonuslist, "\n")
         case _:
@@ -325,10 +372,18 @@ def bonus(arglist):
         a.upgrades = arglist[1]
     if len(arglist) > 2:
         a.sidestat = arglist[2:]
-    totalstats = a.gettotal()
-    totalbonus = a.gettotalbonus()
+    statlist = a.get_upped_stats()
+    bonuslist = a.get_upped_bonus(statlist)
+    totalstats = sum(statlist[:-1])
+    totalbonus = sum(bonuslist)
     print(f"\nyour piece will reach \033[1m{totalstats}\033[0m, \
-or \033[1m{totalbonus}\033[0m with set bonus\n")
+or \033[1m{totalbonus}\033[0m with set bonus")
+    if statlist[-1] > 0:
+        print(f"with {statlist[-1]} upgrades to spare\n")
+    else:
+        print("")
+    print(statlist[:-1])
+    print(bonuslist, "\n")
     del a
 
 
