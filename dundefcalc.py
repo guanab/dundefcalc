@@ -12,7 +12,8 @@ class Armor:
     """
     A class for armor pieces
     Attributes: resistance (list), mainstat (int), upgrades (int),
-                sidestat (list), ups_on_res (int)
+                sidestat (list), res_goal (int), ups_on_res (int),
+                statcap (int), bonus_multiplier (float)
     Methods: get_res_ups(), get_three_res_ups(), get_total(), get_total_bonus(),
              get_upped_stats(), get_upped_bonus()
     """
@@ -20,35 +21,32 @@ class Armor:
     mainstat = 0  # expected non-zero integer
     upgrades = 0  # expected positive integer
     sidestat = []  # expected 0-3 non-zero integers
+    res_goal = 29  # expects positive integer
     ups_on_res = 0  # expected positive integer
     statcap = 999  # expected positive integer
     bonus_multiplier = 1.4  # expected positive float
 
     def get_res_ups(self):
         """
-        Returns amount of upgrades needed to reach 29 on all resistances
+        Returns amount of upgrades needed to reach res goal on all resistances
         """
         self.ups_on_res = 0
-        i = 0
-        while i < len(self.resistance):
-            self.ups_on_res += ups_to_max_res(self.resistance[i])
-            i += 1
-        return self.ups_on_res
-
-    def get_three_res_ups(self):
-        """
-        Returns amount of upgrades needed to reach 35 on all resistances
-        """
-        self.ups_on_res = 0
-        i = 0
-        while i < len(self.resistance):
-            if self.resistance[i] > 35:
-                print("\nres value higher than expected, ignoring\n")
-            if self.resistance[i] in range(30, 36):
-                self.ups_on_res += 35 - self.resistance[i]
-            else:
-                self.ups_on_res += ups_to_max_res(self.resistance[i]) + 6
-            i += 1
+        if self.res_goal > 29:
+            diff = self.res_goal - 29
+            i = 0
+            while i < len(self.resistance):
+                if self.resistance[i] > self.res_goal:
+                    print("\nres value higher than expected, ignoring\n")
+                elif self.resistance[i] in range(30, self.res_goal + 1):
+                    self.ups_on_res += self.res_goal - self.resistance[i]
+                else:
+                    self.ups_on_res += ups_to_max_res(self.resistance[i]) + diff
+                i += 1
+        else:
+            i = 0
+            while i < len(self.resistance):
+                self.ups_on_res += ups_to_max_res(self.resistance[i])
+                i += 1
         return self.ups_on_res
 
     def get_total(self):
@@ -126,13 +124,13 @@ class Armor:
 class StatStick:
     """
     A class for items that are used for raw stats
-    Attributes: mainstat (int), upgrades (int), sidestat (list), cap (int)
+    Attributes: mainstat (int), upgrades (int), sidestat (list), statcap (int)
     Methods: get_upped_stats()
     """
     mainstat = 0  # expected non-zero integer
     upgrades = 0  # expected positive integer
     sidestat = []  # expected 0-3 non-zero integers
-    cap = 999  # expected positive integer
+    statcap = 999  # expected positive integer
 
     def get_upped_stats(self):
         """
@@ -145,11 +143,11 @@ class StatStick:
             uppedstats.extend(self.sidestat)
         i = 0
         while i < len(uppedstats):
-            if uppedstats[i] < self.cap:
+            if uppedstats[i] < self.statcap:
                 uppedstats[i] += remainder
-                if uppedstats[i] > self.cap:
-                    remainder = uppedstats[i] - self.cap
-                    uppedstats[i] = self.cap
+                if uppedstats[i] > self.statcap:
+                    remainder = uppedstats[i] - self.statcap
+                    uppedstats[i] = self.statcap
                 else:
                     remainder = 0
                     break
@@ -229,20 +227,20 @@ class DamagePet:
         Returns damage stat after upgrading
         """
         if self.rate >= self.max_rate:
-            upsonrate = 0
+            ups_on_rate = 0
         else:
-            upsonrate = self.max_rate - self.rate
+            ups_on_rate = self.max_rate - self.rate
         if self.procount >= self.max_procount:
-            upsonprocount = 0
+            ups_on_procount = 0
         else:
-            upsonprocount = self.max_procount - self.procount
+            ups_on_procount = self.max_procount - self.procount
         if self.prospeed >= 30000:
-            upsonprospeed = 0
+            ups_on_prospeed = 0
         else:
-            upsonprospeed = ups_to_max_pro_speed(self.prospeed)
-        upsspent = upsonrate + upsonprocount + upsonprospeed
+            ups_on_prospeed = ups_to_max_pro_speed(self.prospeed)
+        ups_spent = ups_on_rate + ups_on_procount + ups_on_prospeed
         return self.damage + (
-            self.damage_per_up * (self.upgrades - upsspent - 1)
+            self.damage_per_up * (self.upgrades - ups_spent - 1)
         )
 
 
@@ -258,7 +256,7 @@ class Wizard(DamagePet):
         self.max_procount = 1
 
 
-def res(arglist):
+def res(arglist, cap=999, goal=29):
     """
     A command to calculate upgrades needed to maximize resistances on armor and
     the stat total it reaches after that
@@ -271,7 +269,11 @@ def res(arglist):
         print(f"\nerror: {e}\n")
         return
     a = Armor()
-    a.resistance = arglist[0:3]
+    if arglist[3] == 0:
+        a.resistance = arglist[0:3]
+    else:
+        a.resistance = arglist[0:4]
+    a.res_goal = goal
     upsneeded = a.get_res_ups()
     match len(arglist):
         case 4:
@@ -282,6 +284,7 @@ to hit max resistances\n")
                 print("\nnegative value entered where expecting positive\n")
                 del a
                 return
+            a.statcap = cap
             a.mainstat = arglist[4]
             a.upgrades = arglist[5]
             if len(arglist) > 6:
@@ -292,53 +295,6 @@ to hit max resistances\n")
             totalbonus = sum(bonuslist)
             print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
 resistances")
-            print(f"your piece will reach \033[1m{totalstats}\033[0m, \
-or \033[1m{totalbonus}\033[0m with set bonus")
-            if statlist[-1] > 0:
-                print(f"with {statlist[-1]} upgrades to spare\n")
-            else:
-                print("")
-            print(statlist[:-1])
-            print(bonuslist, "\n")
-        case _:
-            print("\ninvalid arguments\n")
-    del a
-
-
-def threeres(arglist):
-    """
-    A command to calculate upgrades needed to upgrade 3 resistances to 35 on
-    armor and the stat total it reaches after that
-    Expects a list of 3-8 but not 4 numbers
-    [res1, res2, res3, main stat, upgrades, side1, side2, side3]
-    """
-    try:
-        arglist = list_to_int(arglist)
-    except Exception as e:
-        print(f"\nerror: {e}\n")
-        return
-    a = Armor()
-    a.resistance = arglist[0:2]
-    upsneeded = a.get_three_res_ups()
-    match len(arglist):
-        case 3:
-            print(f"\nyour piece will need \033[1m{upsneeded}\033[0m upgrades \
-to hit 35 res on 3 resistances\n")
-        case 5 | 6 | 7 | 8:
-            if only_pos_values(arglist[3:]) is False:
-                print("\nnegative value entered where expecting positive\n")
-                del a
-                return
-            a.mainstat = arglist[3]
-            a.upgrades = arglist[4]
-            if len(arglist) > 5:
-                a.sidestat = arglist[5:]
-            statlist = a.get_upped_stats()
-            bonuslist = a.get_upped_bonus(statlist)
-            totalstats = sum(statlist[:-1])
-            totalbonus = sum(bonuslist)
-            print(f"\nafter spending \033[1m{upsneeded}\033[0m upgrades on \
-resistances (3 x 35)")
             print(f"your piece will reach \033[1m{totalstats}\033[0m, \
 or \033[1m{totalbonus}\033[0m with set bonus")
             if statlist[-1] > 0:
@@ -387,7 +343,7 @@ or \033[1m{totalbonus}\033[0m with set bonus")
     del a
 
 
-def cap(arglist):
+def cap(arglist, cap=999, name="item"):
     """
     A command to calculate how many stat caps and total stats an item will reach
     Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
@@ -405,44 +361,12 @@ def cap(arglist):
     s.upgrades = arglist[1]
     if len(arglist) > 2:
         s.sidestat = arglist[2:]
-    s.cap = 999
+    s.statcap = cap
     uppedstats = []
     uppedstats.extend(s.get_upped_stats())
     total = sum(uppedstats[:-1])
     remainder = uppedstats[-1]
-    print(f"\nyour item will reach \033[1m{total}\033[0m total stats")
-    print(uppedstats[:-1])
-    if remainder > 0:
-        print(f"with {remainder} upgrades to spare\n")
-    else:
-        print("")
-    del s
-
-
-def diamond(arglist):
-    """
-    A command to calculate how many stat caps and total stats diamond will reach
-    Expects a list of 2-5 numbers [main stat, upgrades, side1, side2, side3]
-    """
-    try:
-        arglist = list_to_int(arglist)
-    except Exception as e:
-        print(f"\nerror: {e}\n")
-        return
-    if only_pos_values(arglist) is False:
-        print("\nnegative value entered where expecting positive\n")
-        return
-    s = StatStick()
-    s.mainstat = arglist[0]
-    s.upgrades = arglist[1]
-    if len(arglist) > 2:
-        s.sidestat = arglist[2:]
-    s.cap = 800
-    uppedstats = []
-    uppedstats.extend(s.get_upped_stats())
-    total = sum(uppedstats[:-1])
-    remainder = uppedstats[-1]
-    print(f"\nyour diamond will reach \033[1m{total}\033[0m total stats")
+    print(f"\nyour {name} will reach \033[1m{total}\033[0m total stats")
     print(uppedstats[:-1])
     if remainder > 0:
         print(f"with {remainder} upgrades to spare\n")
@@ -673,7 +597,8 @@ def main():
             if argcount < 3 or argcount == 4 or argcount > 8:
                 print("\ninvalid arguments\n")
             else:
-                threeres(arglist)
+                arglist.insert(3, 0)
+                res(arglist, goal=35)
         case "bonus":
             if argcount < 1 or argcount > 5:
                 print("\ninvalid arguments\n")
@@ -688,7 +613,7 @@ def main():
             if argcount < 2 or argcount > 5:
                 print("\ninvalid arguments\n")
             else:
-                diamond(arglist)
+                cap(arglist, 800, "diamond")
         case "lt":
             if argcount < 1 or argcount > 2:
                 print("\ninvalid arguments\n")
