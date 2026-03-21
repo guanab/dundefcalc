@@ -1,1 +1,1265 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DunDefCalc</title>
+        <meta charset="UTF-8">
+        <style>
+            html * {
+                font-family: sans-serif;
+                font-size: 18px;
+                color: black;
+            }
+            body {
+                background-image: linear-gradient(140deg, #ffffff, #eeeeee);
+                background-attachment: fixed;
+                background-size: cover;
+            }
+            .calculator {
+                line-height: 1.8;
+                background-color: #ddffdd;
+                background-image: linear-gradient(140deg, #f0fff0, #ccffcc);
+                background-attachment: fixed;
+                background-size: cover;
+                width: 600px;
+                padding: 10px;
+                margin: auto;
+                margin-top: 30px;
+                border-style: solid;
+                border-radius: 10px;
+                border-color: #00aa00;
+                border-width: 2px;
+            }
+            .calculator div {
+                margin: auto;
+            }
+            .calculator table {
+                width: 100%;
+            }
+            .select {
+                
+            }
+            .subselect {
+                
+            }
+            .fields {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                line-height: 2;
+            }
+            .result {
+                background-color: #ffffff;
+                line-height: 1.5;
+                padding: 5px 10px;
+            }
+            .log {
+                width: 600px;
+                background-color: #ffffff;
+                padding: 10px;
+                margin: auto;
+                line-height: 1.5;
+            }
+            .logmsg {
+                color: black;
+            }
+            .errormsg {
+                color: red;
+            }
+            input[type=text] {
+                width: 70px;
+                font-size: 16px;
+                vertical-align: middle;
+                height: 22px;
+                border-radius: 4px;
+                border-color: #777777;
+                border-width: 1px;
+            }
+            input[type=checkbox] {
+                width: 14px;
+                height: 14px;
+                vertical-align: middle;
+            }
+            input:disabled {
+                color: #666666;
+                border-color: #dddddd;
+                background-color: #f4f4f4;
+                border-width: 1px;
+            }
+            select {
+                font-size: 16px;
+                background-color: white;
+                height: 24px;
+                vertical-align: middle;
+                border-radius: 4px;
+                margin: 0px;
+                padding: 0px;
+                padding-left: 3px;
+                border-color: #777777;
+                border-width: 1px;
+            }
+            select:disabled {
+                color: #666666;
+                border-color: #dddddd;
+                background-color: #f4f4f4;
+                border-width: 1px;
+            }
+            option {
+                font-size: 16px;
+                background-color: white;
+            }
+            button {
+                font-size: 16px;
+                vertical-align: middle;
+                height: 24px;
+                background-color: #eeeeee;
+                background-image: linear-gradient(140deg, #f2f2f2, #e9e9e9);
+                border-radius: 4px;
+                margin: 0px;
+                padding: 0px;
+                border-color: #777777;
+                border-width: 1px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="calculator">
+            <div class="select">
+                <select id="itemtype" onchange="ChangeItemType(this.value)">
+                    <option value="armor">Armor</option>
+                    <option value="weapon">Weapon</option>
+                    <option value="pet">Pet</option>
+                </select>
+            </div>
+            <div id="subselect" class="subselect"></div>
+            <div id="fields" class="fields"></div>
+            <div id="result" class="result"></div>
+        </div>
+        
+        <br>
+        <div id="log" class="log"></div>
+        
+        <noscript class="errormsg">Sorry, your browser does not support JavaScript!</noscript>
+        
+        <script>
+            function ChangeItemType(text) {
+                ClearResult();
+                ClearLog();
+                
+                switch (text) {
+                    case "armor":
+                        document.getElementById("subselect").innerHTML = '\
+<select id="quality" onchange="ChangeResTarget(this.value)">\n\
+</select><div style="float:right;padding-right:8px">\n\
+Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)">\n\
+<input id="customres" type="text" value="29" disabled></div>';
+                        ChangeFields("armor");
+                        break;
+                    case "weapon":
+                        document.getElementById("subselect").innerHTML = '\
+<select id="itemname" onchange="ChangeFields(this.value)">\n\
+<option value="mm">Mischief Maker</option>\n\
+<option value="wolfstein">Van Wolfstein</option>\n\
+<option value="stick">Stat stick / builder</option>\n\
+</select>\n\
+<select id="quality"></select>';
+                        ChangeFields(document.getElementById("itemname").value);
+                        break;
+                    case "pet":
+                        document.getElementById("subselect").innerHTML = '\
+<select id="itemname" onchange="ChangeFields(this.value)">\n\
+<option value="diamond">Diamond / Heart</option>\n\
+<option value="eyed">Eye of Destruction</option>\n\
+<option value="lilwiz">Little Wizard</option>\n\
+<option value="cupid">Lover\'s Cupid</option>\n\
+<option value="cat">Propeller Cat</option>\n\
+</select>\n\
+<select id="quality"></select>';
+                        ChangeFields(document.getElementById("itemname").value);
+                        break;
+                    default:
+                        PrintLog("selection not recognized");
+                        document.getElementById("subselect").innerHTML = "";
+                        document.getElementById("fields").innerHTML = "";
+                }
+            }
+            
+            function ChangeFields(text) {
+                ClearResult();
+                ClearLog();
+                
+                switch (text) {
+                    case "armor":
+                        SetFields("armor");
+                        SetQualities("godly_ultpp");
+                        break;
+                    case "mm":
+                        SetFields("monksingleprojwep");
+                        SetQualities("myth_ultpp");
+                        break;
+                    case "wolfstein":
+                        SetFields("huntmultiprojwep");
+                        SetQualities("sup_ult");
+                        break;
+                    case "stick":
+                        SetFields("stick");
+                        SetQualities("myth_ultpp");
+                        break;
+                    case "lilwiz":
+                    case "eyed":
+                        SetFields("singleprojpet");
+                        SetQualities("sup_ult");
+                        break;
+                    case "cupid":
+                        SetFields("multiprojpet");
+                        SetQualities("sup_ult");
+                        break;
+                    case "cat":
+                        SetFields("cat");
+                        SetQualities("any");
+                        break;
+                    case "diamond":
+                        SetFields("stick");
+                        SetQualities("any");
+                        break;
+                    default:
+                        PrintLog("selection not recognized");
+                        document.getElementById("fields").innerHTML = "";
+                }
+            }
+            
+            function SetFields(text) {
+                switch (text) {
+                    case "armor":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Res 1 </td><td><input id="res1" type="text"></td>\n\
+<td>Res 2 </td><td><input id="res2" type="text"></td>\n\
+<td>Res 3 </td><td><input id="res3" type="text"></td>\n\
+<td>Res 4 </td><td><input id="res4" type="text"></td></tr>\n\
+<tr><td>Stat 1 </td><td><input id="stat1" type="text"></td>\n\
+<td>Stat 2 </td><td><input id="stat2" type="text"></td>\n\
+<td>Stat 3 </td><td><input id="stat3" type="text"></td>\n\
+<td>Stat 4 </td><td><input id="stat4" type="text"></td></tr>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateArmor()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "monksingleprojwep":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Priority stat </td><td><input id="priostat" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "huntmultiprojwep":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "singleprojpet":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "multiprojpet":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "cat":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Boost </td><td><input id="boost" type="text"></td>\n\
+<td>Range </td><td><input id="range" type="text"></td>\n\
+<td>Targets </td><td><input id="targets" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateCat()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "stick":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Stat 1 </td><td><input id="stat1" type="text"></td>\n\
+<td>Stat 2 </td><td><input id="stat2" type="text"></td>\n\
+<td>Stat 3 </td><td><input id="stat3" type="text"></td>\n\
+<td>Stat 4 </td><td><input id="stat4" type="text"></td></tr>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateStick()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                }
+            }
+            
+            function SetQualities(text) {
+                switch (text) {
+                    case "any":
+                        document.getElementById("quality").innerHTML = '<option value="any">Any quality</option>';
+                        document.getElementById("quality").disabled = true;
+                        break;
+                    case "sup_ult":
+                        document.getElementById("quality").innerHTML = '\
+<option value="ult">Ultimate or higher</option>\n\
+<option value="sup">Supreme or lower</option>';
+                        document.getElementById("quality").disabled = false;
+                        break;
+                    case "godly_ultpp":
+                        document.getElementById("quality").innerHTML = '\
+<option value="ultpp">Ultimate++</option>\n\
+<option value="ultp">Ultimate+</option>\n\
+<option value="ult">Ultimate / Ultimate93</option>\n\
+<option value="sup">Supreme</option>\n\
+<option value="trans">Transcendent</option>\n\
+<option value="myth">Mythical</option>\n\
+<option value="godly">Godly or lower</option>';
+                        document.getElementById("quality").disabled = false;
+                        break;
+                    case "myth_ultpp":
+                        document.getElementById("quality").innerHTML = '\
+<option value="ultpp">Ultimate++</option>\n\
+<option value="ultp">Ultimate+</option>\n\
+<option value="ult">Ultimate / Ultimate93</option>\n\
+<option value="sup">Supreme</option>\n\
+<option value="trans">Transcendent</option>\n\
+<option value="myth">Mythical or lower</option>';
+                        document.getElementById("quality").disabled = false;
+                        break;
+                    case "myth_trans":
+                        document.getElementById("quality").innerHTML = '\
+<option value="trans">Transcendent</option>\n\
+<option value="myth">Mythical or lower</option>';
+                        document.getElementById("quality").disabled = false;
+                        break;
+                }
+            }
+            
+            function ChangeCustomRes(checked) {
+                document.getElementById("customres").disabled = !checked;
+                if (!checked) {
+                    ChangeResTarget(document.getElementById("quality").value);
+                }
+            }
+            
+            function ChangeResTarget(quality) {
+                if (document.getElementById("customres").disabled) {
+                    const restarget = DefaultResTarget(quality);
+                    document.getElementById("customres").value = restarget;
+                }
+            }
+            
+            function ClearAll() {
+                for (const element of document.getElementById("fields").getElementsByTagName("input")) {
+                    element.value = "";
+                }
+            }
+            
+            class Armor {
+                constructor() {
+                    this.resistances = [];
+                    this.stats = [];
+                    this.upgrades = 0;
+                    this.res_target = 29;
+                    this.statcap = 999;
+                    this.bonus_multiplier = 1.4;
+                    this.ups_on_res = 0;
+                    this.spare_ups = 0;
+                    this.upped_res = [];
+                    this.upped_stats = [];
+                    this.calculated = false;
+                }
+                
+                Calculate() {
+                    this.upped_res = this.resistances.slice();
+                    this.upped_res = HighestValueFirst(this.upped_res);
+                    this.upped_stats = this.stats.slice();
+                    this.ups_on_res = 0;
+                    let ups_spent = 0;
+                    let up_count = 0;
+                    let i = 0;
+                    loop:
+                    while (up_count < this.upgrades - 1) {
+                        i = 0;
+                        while (i < this.upped_res.length) {
+                            if (this.upped_res[i] < this.res_target) {
+                                if (this.upped_res[i] >= 23 && ((up_count + 2) % 10) !== 0) {
+                                    i += 1;
+                                    continue;
+                                }
+                                this.upped_res[i] = UpgradeRes(this.upped_res[i]);
+                                ups_spent += 1;
+                                up_count += 1;
+                                this.ups_on_res += 1;
+                                continue loop;
+                            }
+                            i += 1;
+                        }
+                        i = 0;
+                        while (i < this.upped_stats.length) {
+                            if (this.upped_stats[i] < this.statcap) {
+                                this.upped_stats[i] += 1;
+                                ups_spent += 1;
+                                up_count += 1;
+                                continue loop;
+                            }
+                            i += 1;
+                        }
+                        up_count += 1;
+                    }
+                    if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
+                    this.calculated = true;
+                }
+                
+                GetTotal() {
+                    if (!this.calculated) this.Calculate();
+                    return Sum(this.upped_stats);
+                }
+                
+                GetTotalBonus() {
+                    if (!this.calculated) this.Calculate();
+                    let totalbonus = 0;
+                    for (const stat of this.upped_stats) {
+                        totalbonus += Math.ceil(stat * this.bonus_multiplier);
+                    }
+                    return totalbonus;
+                }
+                
+                GetUppedStats() {
+                    if (!this.calculated) this.Calculate();
+                    return this.upped_stats;
+                }
+                
+                GetUppedBonus() {
+                    if (!this.calculated) this.Calculate();
+                    const statlist = this.upped_stats.slice();
+                    let bonuslist = [];
+                    for (const stat of statlist) {
+                        bonuslist.push(Math.ceil(stat * this.bonus_multiplier));
+                    }
+                    return bonuslist;
+                }
+                
+                GetResBonus() {
+                    if (!this.calculated) this.Calculate();
+                    const reslist = this.upped_res.slice();
+                    let bonuslist = [];
+                    for (const res of reslist) {
+                        bonuslist.push(Math.ceil(res * this.bonus_multiplier));
+                    }
+                    return bonuslist;
+                }
+            }
+            
+            class Weapon {
+                constructor() {
+                    this.damage = 0;
+                    this.damage_per_up = 0;
+                    this.rate = 0;
+                    this.max_rate = 0;
+                    this.projcount = 0;
+                    this.max_projcount = 0;
+                    this.projspeed = 0;
+                    this.charge = 0;
+                    this.knockback = 0;
+                    this.max_knockback = 0;
+                    this.priostat = 0;
+                    this.statcap = 0;
+                    this.upgrades = 0;
+                    this.upped_damage = 0;
+                    this.upped_rate = 0;
+                    this.upped_projcount = 0;
+                    this.upped_projspeed = 0;
+                    this.upped_charge = 0;
+                    this.upped_knockback = 0;
+                    this.upped_priostat = 0;
+                    this.spare_ups = 0;
+                    this.calculated = false;
+                }
+                
+                Calculate() {
+                    this.upped_damage = this.damage;
+                    this.upped_rate = this.rate;
+                    this.upped_projcount = this.projcount;
+                    this.upped_projspeed = this.projspeed;
+                    this.upped_charge = this.charge;
+                    this.upped_knockback = this.knockback;
+                    this.upped_priostat = this.priostat;
+                    this.spare_ups = 0;
+                    let ups_spent = 0;
+                    let up_count = 0;
+                    loop:
+                    while (up_count < this.upgrades - 1) {
+                        if (this.upped_projcount > 0 && this.upped_projcount < this.max_projcount && (up_count + 2) % 5 === 0) {
+                            this.upped_projcount += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_rate > 0 && this.upped_rate < this.max_rate && (up_count + 2) % 4 === 0) {
+                            this.upped_rate += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_priostat > 0 && this.upped_priostat < this.statcap) {
+                            this.upped_priostat += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_charge !== 0 && this.upped_charge < 128) {
+                            this.upped_charge = UpgradeCharge(this.upped_charge);
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
+                            this.upped_knockback = UpgradeKnockback(this.upped_knockback);
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_projspeed !== 0 && this.upped_projspeed < 30000) {
+                            this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_damage > 0) {
+                            this.upped_damage += this.damage_per_up;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        up_count += 1;
+                    }
+                    this.upped_damage = Math.floor(this.upped_damage);
+                    if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
+                    this.calculated = true;
+                }
+            }
+            
+            class DamagePet {
+                constructor() {
+                    this.damage = 0;
+                    this.damage_per_up = 0;
+                    this.upgrades = 0;
+                    this.rate = 0;
+                    this.max_rate = 0;
+                    this.projcount = 0;
+                    this.max_projcount = 0;
+                    this.projspeed = 0;
+                    this.knockback = 0;
+                    this.max_knockback = 0;
+                    this.upped_damage = 0;
+                    this.upped_rate = 0;
+                    this.upped_projspeed = 0;
+                    this.upped_projcount = 0;
+                    this.upped_knockback = 0;
+                    this.spare_ups = 0;
+                    this.calculated = false;
+                }
+                
+                Calculate() {
+                    this.upped_damage = this.damage;
+                    this.upped_rate = this.rate;
+                    this.upped_projspeed = this.projspeed;
+                    this.upped_projcount = this.projcount;
+                    this.upped_knockback = this.knockback;
+                    this.spare_ups = 0;
+                    let ups_spent = 0;
+                    let up_count = 0;
+                    loop:
+                    while (up_count < this.upgrades - 1) {
+                        if (this.upped_projcount > 0 && this.upped_projcount < this.max_projcount && (up_count + 2) % 5 === 0) {
+                            this.upped_projcount += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_rate > 0 && this.upped_rate < this.max_rate && (up_count + 2) % 4 === 0) {
+                            this.upped_rate += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_projspeed !== 0 && this.upped_projspeed < 30000) {
+                            this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
+                            this.upped_knockback = UpgradeKnockback(this.upped_knockback);
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_damage > 0) {
+                            this.upped_damage += this.damage_per_up;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        up_count += 1;
+                    }
+                    if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
+                    this.calculated = true;
+                }
+            }
+            
+            class Cat {
+                constructor() {
+                    this.boost = 0;
+                    this.range = 0;
+                    this.max_range = 0;
+                    this.targets = 0;
+                    this.max_targets = 0;
+                    this.upgrades = 0;
+                    this.upped_boost = 0;
+                    this.upped_range = 0;
+                    this.upped_targets = 0;
+                    this.spare_ups = 0;
+                    this.calculated = false;
+                }
+                
+                Calculate() {
+                    this.upped_boost = this.boost;
+                    this.upped_range = this.range;
+                    this.upped_targets = this.targets;
+                    this.spare_ups = 0;
+                    let ups_spent = 0;
+                    let up_count = 0;
+                    loop:
+                    while (up_count < this.upgrades - 1) {
+                        if (this.upped_targets > 0 && this.upped_targets < this.max_targets && (up_count + 2) % 30 === 0) {
+                            this.upped_targets += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_boost > 0 && (up_count + 2) % 3 === 0) {
+                            this.upped_boost += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        if (this.upped_range > 0 && this.upped_range < this.max_range && (up_count + 2) % 5 === 0) {
+                            this.upped_range += 1;
+                            ups_spent += 1;
+                            up_count += 1;
+                            continue loop;
+                        }
+                        up_count += 1;
+                    }
+                    if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
+                    this.calculated = true;
+                }
+            }
+            
+            class StatStick {
+                constructor() {
+                    this.stats = [];
+                    this.statcap = 0;
+                    this.upgrades = 0;
+                    this.upped_stats = [];
+                    this.spare_ups = 0;
+                    this.calculated = false;
+                }
+                
+                Calculate() {
+                    this.upped_stats = this.stats.slice();
+                    this.spare_ups = 0;
+                    let ups_spent = 0;
+                    let up_count = 0;
+                    let i = 0;
+                    loop:
+                    while (up_count < this.upgrades - 1) {
+                        i = 0;
+                        while (i < this.upped_stats.length) {
+                            if (this.upped_stats[i] < this.statcap) {
+                                this.upped_stats[i] += 1;
+                                ups_spent += 1;
+                                up_count += 1;
+                                continue loop;
+                            }
+                            i += 1;
+                        }
+                        up_count += 1;
+                    }
+                    if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
+                    this.calculated = true;
+                }
+            }
+            
+            function CalculateArmor() {
+                ClearLog();
+                ClearResult();
+                
+                const resistances = [];
+                const res1 = parseInt(document.getElementById("res1").value);
+                if (!isNaN(res1) && res1 !== 0) resistances.push(res1);
+                const res2 = parseInt(document.getElementById("res2").value);
+                if (!isNaN(res2) && res2 !== 0) resistances.push(res2);
+                const res3 = parseInt(document.getElementById("res3").value);
+                if (!isNaN(res3) && res3 !== 0) resistances.push(res3);
+                const res4 = parseInt(document.getElementById("res4").value);
+                if (!isNaN(res4) && res4 !== 0) resistances.push(res4);
+                
+                const stats = [];
+                const stat1 = parseInt(document.getElementById("stat1").value);
+                if (!isNaN(stat1) && stat1 !== 0) stats.push(stat1);
+                const stat2 = parseInt(document.getElementById("stat2").value);
+                if (!isNaN(stat2) && stat2 !== 0) stats.push(stat2);
+                const stat3 = parseInt(document.getElementById("stat3").value);
+                if (!isNaN(stat3) && stat3 !== 0) stats.push(stat3);
+                const stat4 = parseInt(document.getElementById("stat4").value);
+                if (!isNaN(stat4) && stat4 !== 0) stats.push(stat4);
+                
+                const ups = parseInt(document.getElementById("upgrades").value);
+                
+                const quality = document.getElementById("quality").value;
+                
+                const armor = new Armor();
+                armor.resistances = resistances;
+                armor.stats = stats;
+                armor.upgrades = ups;
+                
+                if (!document.getElementById("customres").disabled)
+                    armor.res_target = document.getElementById("customres").value;
+                else armor.res_target = DefaultResTarget(quality);
+                
+                if (quality !== "ultpp") {
+                    armor.statcap = StatCap(quality);
+                    armor.bonus_multiplier = BonusMultiplier(quality);
+                }
+                
+                armor.Calculate();
+                
+                const uppedres = armor.upped_res;
+                const uppedstats = armor.upped_stats;
+                const total = armor.GetTotal();
+                const resbonus = armor.GetResBonus();
+                const uppedbonus = armor.GetUppedBonus();
+                const bonus = armor.GetTotalBonus();
+                const upsonres = armor.ups_on_res;
+                const upstospare = armor.spare_ups;
+                
+                let result = "";
+                if (upsonres > 0)
+                    result += "<div>Upgrades spent on resistances: " + upsonres + "</div>";
+                if (uppedres.length > 0) {
+                    result += "<div>Upgraded resistances: " + uppedres.toString() + "</div>";
+                }
+                if (uppedstats.length > 0) {
+                    result += "<div>Upgraded stats: " + uppedstats.toString() + "</div>";
+                    result += "<div>Upgraded total: " + total + "</div>";
+                }
+                if (uppedres.length > 0) {
+                    result += "<div>Resistances with bonus: " + resbonus.toString() + "</div>";
+                }
+                if (uppedstats.length > 0) {
+                    result += "<div>Stats with bonus: " + uppedbonus.toString() + "</div>";
+                    result += "<div>Total with bonus: <b>" + bonus + "</b></div>";
+                }
+                if (upstospare > 0)
+                    result += "<div>Upgrades to spare: " + upstospare + "</div>";
+                
+                PrintResult(result);
+            }
+            
+            function CalculateWeapon() {
+                ClearLog();
+                ClearResult();
+                
+                const itemname = document.getElementById("itemname").value;
+                const quality = document.getElementById("quality").value;
+                
+                const weapon = new Weapon();
+                
+                weapon.statcap = StatCap(quality);
+                
+                switch (itemname) {
+                    case "mm":
+                        weapon.damage_per_up = 27.59;
+                        break;
+                    case "wolfstein":
+                        if (quality === "ult") weapon.damage_per_up = 171.99;
+                        else weapon.damage_per_up = 122.85;
+                        weapon.max_rate = 6;
+                        weapon.max_projcount = 4;
+                        break;
+                    default:
+                        PrintLog("item name not recognized");
+                        return;
+                }
+                
+                if (document.getElementById("damage")) {
+                    const damage = parseInt(document.getElementById("damage").value);
+                    if (!isNaN(damage) && damage !== 0) weapon.damage = damage;
+                }
+                if (document.getElementById("rate")) {
+                    const rate = parseInt(document.getElementById("rate").value);
+                    if (!isNaN(rate) && rate !== 0) weapon.rate = rate;
+                }
+                if (document.getElementById("projspeed")) {
+                    const projspeed = parseInt(document.getElementById("projspeed").value);
+                    if (!isNaN(projspeed) && projspeed !== 0) weapon.projspeed = projspeed;
+                }
+                if (document.getElementById("projcount")) {
+                    const projcount = parseInt(document.getElementById("projcount").value);
+                    if (!isNaN(projcount) && projcount !== 0) weapon.projcount = projcount;
+                }
+                if (document.getElementById("charge")) {
+                    const charge = parseInt(document.getElementById("charge").value);
+                    if (!isNaN(charge) && charge !== 0) weapon.charge = charge;
+                }
+                if (document.getElementById("knockback")) {
+                    const knockback = parseInt(document.getElementById("knockback").value);
+                    if (!isNaN(knockback) && knockback !== 0) weapon.knockback = knockback;
+                }
+                if (document.getElementById("priostat")) {
+                    const priostat = parseInt(document.getElementById("priostat").value);
+                    if (!isNaN(priostat) && priostat !== 0) weapon.priostat = priostat;
+                }
+                if (document.getElementById("upgrades")) {
+                    const upgrades = parseInt(document.getElementById("upgrades").value);
+                    if (!isNaN(upgrades) && upgrades !== 0) weapon.upgrades = upgrades;
+                }
+                
+                weapon.Calculate();
+                
+                let result = "";
+                if (weapon.upped_damage > 0)
+                    result += "<div>Upgraded damage: <b>" + weapon.upped_damage + "</b></div>";
+                if (weapon.upped_rate > 0)
+                    result += "<div>Upgraded attack rate: " + weapon.upped_rate + "</div>";
+                if (weapon.upped_projspeed > 0)
+                    result += "<div>Upgraded projectile speed: " + weapon.upped_projspeed + "</div>";
+                if (weapon.upped_projcount > 0)
+                    result += "<div>Upgraded projectile count: " + weapon.upped_projcount + "</div>";
+                if (weapon.upped_charge > 0)
+                    result += "<div>Upgraded charge speed: " + weapon.upped_charge + "</div>";
+                if (weapon.upped_knockback > 0)
+                    result += "<div>Upgraded knockback: " + weapon.upped_knockback + "</div>";
+                if (weapon.upped_priostat > 0)
+                    result += "<div>Upgraded priority stat: " + weapon.upped_priostat + "</div>";
+                if (weapon.spare_ups > 0)
+                    result += "<div>Upgrades to spare: " + weapon.spare_ups + "</div>";
+                
+                PrintResult(result);
+                
+                PrintLog("<p style='font-size:14px;margin:0px'>note: weapon damage may be inaccurate if the damage values have hidden decimals</p>");
+            }
+            
+            function CalculatePet() {
+                ClearLog();
+                ClearResult();
+                
+                const itemname = document.getElementById("itemname").value;
+                const quality = document.getElementById("quality").value;
+                
+                const pet = new DamagePet();
+                
+                if (itemname === "lilwiz") {
+                    if (quality === "ult") pet.damage_per_up = 112;
+                    else pet.damage_per_up = 64;
+                    pet.max_rate = 7;
+                }
+                else if (itemname === "eyed") {
+                    if (quality === "ult") pet.damage_per_up = 160;
+                    else pet.damage_per_up = 136;
+                    pet.max_rate = 7;
+                }
+                else if (itemname === "cupid") {
+                    if (quality === "ult") pet.damage_per_up = 112;
+                    else pet.damage_per_up = 64;
+                    pet.max_rate = 6;
+                    pet.max_projcount = 7;
+                }
+                else {
+                    PrintLog("item name not recognized");
+                    return;
+                }
+                
+                if (document.getElementById("damage")) {
+                    const damage = parseInt(document.getElementById("damage").value);
+                    if (!isNaN(damage) && damage !== 0) pet.damage = damage;
+                }
+                if (document.getElementById("rate")) {
+                    const rate = parseInt(document.getElementById("rate").value);
+                    if (!isNaN(rate) && rate !== 0) pet.rate = rate;
+                }
+                if (document.getElementById("projspeed")) {
+                    const projspeed = parseInt(document.getElementById("projspeed").value);
+                    if (!isNaN(projspeed) && projspeed !== 0) pet.projspeed = projspeed;
+                }
+                if (document.getElementById("projcount")) {
+                    const projcount = parseInt(document.getElementById("projcount").value);
+                    if (!isNaN(projcount) && projcount !== 0) pet.projcount = projcount;
+                }
+                if (document.getElementById("upgrades")) {
+                    const upgrades = parseInt(document.getElementById("upgrades").value);
+                    if (!isNaN(upgrades) && upgrades !== 0) pet.upgrades = upgrades;
+                }
+                
+                pet.Calculate();
+                
+                let result = "";
+                if (pet.upped_damage > 0)
+                    result += "<div>Upgraded damage: <b>" + pet.upped_damage + "</b></div>";
+                if (pet.upped_rate > 0)
+                    result += "<div>Upgraded attack rate: " + pet.upped_rate + "</div>";
+                if (pet.upped_projspeed > 0)
+                    result += "<div>Upgraded projectile speed: " + pet.upped_projspeed + "</div>";
+                if (pet.upped_projcount > 0)
+                    result += "<div>Upgraded projectile count: " + pet.upped_projcount + "</div>";
+                if (pet.spare_ups > 0)
+                    result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
+                
+                PrintResult(result);
+            }
+            
+            function CalculateCat() {
+                ClearLog();
+                ClearResult();
+                
+                const itemname = document.getElementById("itemname").value;
+                const quality = document.getElementById("quality").value;
+                
+                const pet = new Cat();
+                
+                if (itemname === "cat") {
+                    pet.max_range = 90;
+                    pet.max_targets = 4;
+                }
+                else {
+                    PrintLog("item name not recognized");
+                    return;
+                }
+                
+                if (document.getElementById("boost")) {
+                    const boost = parseInt(document.getElementById("boost").value);
+                    if (!isNaN(boost) && boost !== 0) pet.boost = boost;
+                }
+                if (document.getElementById("range")) {
+                    const range = parseInt(document.getElementById("range").value);
+                    if (!isNaN(range) && range !== 0) pet.range = range;
+                }
+                if (document.getElementById("targets")) {
+                    const targets = parseInt(document.getElementById("targets").value);
+                    if (!isNaN(targets) && targets !== 0) pet.targets = targets;
+                }
+                if (document.getElementById("upgrades")) {
+                    const upgrades = parseInt(document.getElementById("upgrades").value);
+                    if (!isNaN(upgrades) && upgrades !== 0) pet.upgrades = upgrades;
+                }
+                
+                pet.Calculate();
+                
+                let result = "";
+                if (pet.upped_boost > 0)
+                    result += "<div>Upgraded boost: <b>" + pet.upped_boost + "</b></div>";
+                if (pet.upped_range > 0)
+                    result += "<div>Upgraded range: " + pet.upped_range + "</div>";
+                if (pet.upped_targets > 0)
+                    result += "<div>Upgraded targets: " + pet.upped_targets + "</div>";
+                if (pet.spare_ups > 0)
+                    result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
+                
+                PrintResult(result);
+            }
+            
+            function CalculateStick() {
+                ClearLog();
+                ClearResult();
+                
+                const itemname = document.getElementById("itemname").value;
+                const quality = document.getElementById("quality").value;
+                
+                const stick = new StatStick();
+                
+                switch (itemname) {
+                    case "stick":
+                        stick.statcap = StatCap(quality);
+                        break;
+                    case "diamond":
+                        stick.statcap = 800;
+                        break;
+                    default:
+                        PrintLog("item name not recognized");
+                        return;
+                }
+                
+                const stats = [];
+                const stat1 = parseInt(document.getElementById("stat1").value);
+                if (!isNaN(stat1) && stat1 !== 0) stats.push(stat1);
+                const stat2 = parseInt(document.getElementById("stat2").value);
+                if (!isNaN(stat2) && stat2 !== 0) stats.push(stat2);
+                const stat3 = parseInt(document.getElementById("stat3").value);
+                if (!isNaN(stat3) && stat3 !== 0) stats.push(stat3);
+                const stat4 = parseInt(document.getElementById("stat4").value);
+                if (!isNaN(stat4) && stat4 !== 0) stats.push(stat4);
+                
+                stick.stats = stats;
+                
+                const upgrades = parseInt(document.getElementById("upgrades").value);
+                if (!isNaN(upgrades) && upgrades !== 0) stick.upgrades = upgrades;
+                
+                stick.Calculate();
+                
+                let result = "";
+                if (stick.upped_stats.length > 0) {
+                    result += "<div>Upgraded stats: " + stick.upped_stats.toString() + "</div>";
+                    result += "<div>Upgraded total: <b>" + Sum(stick.upped_stats) + "</b></div>";
+                }
+                if (stick.spare_ups > 0)
+                    result += "<div>Upgrades to spare: " + stick.spare_ups + "</div>";
+                
+                PrintResult(result);
+            }
+            
+            function UpgradeRes(res) {
+                //todo convert to res *= 1.15
+                res = parseInt(res);
+                if (res === 0 || isNaN(res)) {
+                    PrintLog("res value 0, cannot upgrade");
+                    return NaN;
+                }
+                if (res >= 23) return res + 1;
+                if (res >= 20) return res + 3;
+                if (res >= 14) return res + 2;
+                if (res >= 1) return res + 1;
+                if (res === -1) return 1;
+                if (res >= -13) return res + 1;
+                if (res >= -19) return res + 2;
+                if (res >= -25) return res + 3;
+                else return res + 4;
+            }
 
+            function UpsToMaxRes(res) {
+                switch(res) {
+                    case 23: case 24: case 25: case 26: case 27: case 28: case 29:
+                        return 29 - res;
+                    case 20: case 21: case 22:
+                        return 29 - res - 2;
+                    case 19:
+                        return 7;
+                    case 17: case 18:
+                        return 8;
+                    case 15: case 16:
+                        return 9;
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                    case 9: case 10: case 11: case 12: case 13: case 14:
+                        return 14 - res + 10;
+                    case 0:
+                        PrintLog("res value 0, cannot upgrade");
+                        return 0;
+                    case -1: case -2: case -3: case -4: case -5: case -6: case -7:
+                    case -8: case -9: case -10: case -11: case -12:
+                        return 23 - res;
+                    case -13: case -14:
+                        return 36;
+                    case -15: case -16:
+                        return 37;
+                    case -17: case -18:
+                        return 38;
+                }
+                PrintLog("res value outside expected range, ignoring");
+                return 0;
+            }
+            
+            function UpgradeCharge(charge) {
+                if (charge >= 128) {
+                    PrintLog("charge speed over 128, cannot upgrade");
+                    return charge;
+                }
+                if (charge === -1) return 1;
+                let quarter = Math.floor(Math.abs(charge) * 0.25);
+                if (quarter <= 1) quarter = 1;
+                if (quarter >= 4) quarter = 4;
+                if (charge + quarter >= 128) return 128;
+                else return charge + quarter;
+            }
+            
+            function UpgradeKnockback(knockback) {
+                if (knockback >= 128) {
+                    PrintLog("knockback over 128, cannot upgrade");
+                    return knockback;
+                }
+                if (knockback === -1) return 1;
+                let quarter = Math.floor(Math.abs(knockback) * 0.25);
+                if (quarter <= 1) quarter = 1;
+                if (quarter >= 4) quarter = 4;
+                if (knockback + quarter >= 128) return 128;
+                else return knockback + quarter;
+            }
+            
+            function UpgradeProjSpeed(projspeed) {
+                if (projspeed >= 30000) {
+                    PrintLog("projectile speed over 30k, cannot upgrade");
+                    return projspeed;
+                }
+                if (projspeed === -100) return 1;
+                let quarter = Math.floor(Math.abs(projspeed) * 0.25);
+                if (quarter <= 100) return projspeed + 100;
+                if (quarter >= 1200) return projspeed + 1200;
+                return projspeed + quarter;
+            }
+            
+            function UpsToMaxProjSpeed(projspeed) {
+                if (projspeed >= 30000) return 0;
+                if (projspeed >= 4800) return Math.ceil((30000 - projspeed) / 1200);
+                let ups = 0;
+                let quarter = 0;
+                while (projspeed < 30000) {
+                    quarter = Math.floor(Math.abs(projspeed) * 0.25);
+                    if (quarter < 100) quarter = 100;
+                    if (quarter > 1200) quarter = 1200;
+                    projspeed += quarter;
+                    ups += 1;
+                }
+                return ups;
+            }
+            
+            function DefaultResTarget(quality) {
+                switch (quality) {
+                    case "ultpp":
+                    case "ultp":
+                    case "ult":
+                        return 29;
+                    case "sup":
+                        return 30;
+                    case "trans":
+                    case "myth":
+                        return 31;
+                    case "godly":
+                        return 33;
+                }
+                return 0;
+            }
+            
+            function BonusMultiplier(quality) {
+                switch (quality) {
+                    case "ultpp":
+                    case "ultp":
+                    case "ult":
+                        return 1.4;
+                    case "sup":
+                        return 1.36;
+                    case "trans":
+                        return 1.33;
+                    case "myth":
+                        return 1.3;
+                    case "godly":
+                        return 1.25;
+                }
+                return 1;
+            }
+            
+            function StatCap(quality) {
+                switch (quality) {
+                    case "ultpp":
+                        return 999;
+                    case "ultp":
+                        return 700;
+                    case "ult":
+                        return 600;
+                    case "sup":
+                        return 500;
+                    case "trans":
+                        return 420;
+                    case "myth":
+                    case "godly":
+                        return 360;
+                    default:
+                        return 360;
+                }
+                return 0;
+            }
+
+            function Sum(array) {
+                let sum = 0;
+                for (const element of array) {
+                    sum += parseInt(element);
+                }
+                return sum;
+            }
+            
+            function HighestValueFirst(array) {
+                const max = Math.max(...array);
+                let spliced = [];
+                
+                for (let i = 0; i < array.length; i++) {
+                    if (array[i] === max) {
+                        spliced = array.splice(i, 1);
+                        array.unshift(spliced[0]);
+                        break;
+                    }
+                }
+                return array;
+            }
+            
+            function PrintResult(text) {
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").innerHTML = text;
+            }
+            
+            function PrintLog(text) {
+                document.getElementById("log").style.display = "block";
+                document.getElementById("log").innerHTML += "<div class=\"logmsg\">" + text + "</div>\n";
+            }
+            
+            function PrintError(text) {
+                document.getElementById("log").style.display = "block";
+                document.getElementById("log").innerHTML += "<div class=\"errormsg\">" + text + "</div>\n";
+            }
+            
+            function ClearLog() {
+                document.getElementById("log").innerHTML = "";
+                document.getElementById("log").style.display = "none";
+            }
+            
+            function ClearResult() {
+                document.getElementById("result").innerHTML = "";
+                document.getElementById("result").style.display = "none";
+            }
+            
+            document.getElementById("itemtype").value = "armor";
+            ChangeItemType("armor");
+            //PrintLog("I am log message");
+            //PrintError("I am error message");
+        </script>
+    </body>
+</html>
