@@ -157,6 +157,9 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                         document.getElementById("subselect").innerHTML = '\
 <select id="itemname" onchange="ChangeFields(this.value)">\n\
 <option value="ccane">Crystal Cane</option>\n\
+<option value="elderstaff">Elder Staff</option>\n\
+<option value="embersceptre">Ember Sceptre</option>\n\
+<option value="stafffrost">Staff of Frost</option>\n\
 <option value="mm">Mischief Maker</option>\n\
 <option value="wolfstein">Van Wolfstein</option>\n\
 <option value="stick">Stat stick / builder</option>\n\
@@ -168,9 +171,11 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                         document.getElementById("subselect").innerHTML = '\
 <select id="itemname" onchange="ChangeFields(this.value)">\n\
 <option value="diamond">Diamond / Heart</option>\n\
+<option value="eancient">Etherian Ancient</option>\n\
 <option value="eyed">Eye of Destruction</option>\n\
 <option value="lilwiz">Little Wizard</option>\n\
 <option value="cupid">Lover\'s Cupid</option>\n\
+<option value="mrowl">Mr. Owl</option>\n\
 <option value="cat">Propeller Cat</option>\n\
 <option value="zmount">Zamira\'s Mount</option>\n\
 </select>\n\
@@ -195,7 +200,13 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                         SetQualities("godly_ultpp");
                         break;
                     case "ccane":
+                    case "stafffrost":
                         SetFields("appmultiprojdualwep");
+                        SetQualities("sup_ult");
+                        break;
+                    case "elderstaff":
+                    case "embersceptre":
+                        SetFields("appsingleprojwep");
                         SetQualities("sup_ult");
                         break;
                     case "wolfstein":
@@ -209,6 +220,11 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                     case "stick":
                         SetFields("stick");
                         SetQualities("myth_ultpp");
+                        break;
+                    case "eancient":
+                    case "mrowl":
+                        SetFields("meleepet");
+                        SetQualities("sup_ult");
                         break;
                     case "lilwiz":
                     case "eyed":
@@ -254,6 +270,18 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
 </table>';
                         break;
+                    case "appsingleprojwep":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Charge </td><td><input id="charge" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
                     case "appmultiprojdualwep":
                         document.getElementById("fields").innerHTML = '\
 <table>\n\
@@ -290,6 +318,18 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
+</table>';
+                        break;
+                    case "meleepet":
+                        document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Knockback </td><td><input id="knockback" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearAll()">Clear</button></td></tr>\n\
 </table>';
                         break;
@@ -685,6 +725,7 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                         }
                         up_count += 1;
                     }
+                    this.upped_damage = Math.floor(this.upped_damage);
                     if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
                     this.calculated = true;
                 }
@@ -857,15 +898,24 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                 
                 switch (itemname) {
                     case "ccane":
+                    case "stafffrost":
                         if (quality === "ult") {
                             weapon.damage_per_up = 162.6219;
                             weapon.edamage_per_up = 162;
                         }
                         else {
-                            weapon.damage_per_up = 156.2901;
+                            weapon.damage_per_up = 156.2831;
                             weapon.edamage_per_up = 162;
                         }
                         weapon.max_projcount = 5;
+                        break;
+                    case "elderstaff":
+                        if (quality === "ult") weapon.damage_per_up = 151.2;
+                        else weapon.damage_per_up = 108;
+                        break;
+                    case "embersceptre":
+                        if (quality === "ult") weapon.damage_per_up = 134.3945;
+                        else weapon.damage_per_up = 96;
                         break;
                     case "mm":
                         weapon.damage_per_up = 27.5990;
@@ -962,6 +1012,13 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                         else pet.damage_per_up = 64;
                         pet.max_rate = 7;
                         break;
+                    case "eancient":
+                    case "mrowl":
+                        if (quality === "ult") pet.damage_per_up = 61.6009;
+                        else pet.damage_per_up = 45.7591;
+                        pet.max_rate = 7;
+                        pet.max_knockback = 128;
+                        break;
                     case "eyed":
                         if (quality === "ult") pet.damage_per_up = 160;
                         else pet.damage_per_up = 136;
@@ -992,13 +1049,17 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                     const rate = parseInt(document.getElementById("rate").value);
                     if (!isNaN(rate) && rate !== 0) pet.rate = rate;
                 }
-                if (document.getElementById("projspeed")) {
-                    const projspeed = parseInt(document.getElementById("projspeed").value);
-                    if (!isNaN(projspeed) && projspeed !== 0) pet.projspeed = projspeed;
+                if (document.getElementById("knockback")) {
+                    const knockback = parseInt(document.getElementById("knockback").value);
+                    if (!isNaN(knockback) && knockback !== 0) pet.knockback = knockback;
                 }
                 if (document.getElementById("projcount")) {
                     const projcount = parseInt(document.getElementById("projcount").value);
                     if (!isNaN(projcount) && projcount !== 0) pet.projcount = projcount;
+                }
+                if (document.getElementById("projspeed")) {
+                    const projspeed = parseInt(document.getElementById("projspeed").value);
+                    if (!isNaN(projspeed) && projspeed !== 0) pet.projspeed = projspeed;
                 }
                 if (document.getElementById("upgrades")) {
                     const upgrades = parseInt(document.getElementById("upgrades").value);
@@ -1012,10 +1073,12 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
                     result += "<div>Upgraded damage: <b>" + pet.upped_damage + "</b></div>";
                 if (pet.upped_rate > 0)
                     result += "<div>Upgraded attack rate: " + pet.upped_rate + "</div>";
-                if (pet.upped_projspeed > 0)
-                    result += "<div>Upgraded projectile speed: " + pet.upped_projspeed + "</div>";
+                if (pet.upped_knockback > 0)
+                    result += "<div>Upgraded knockback: " + pet.upped_knockback + "</div>";
                 if (pet.upped_projcount > 0)
                     result += "<div>Upgraded projectile count: " + pet.upped_projcount + "</div>";
+                if (pet.upped_projspeed > 0)
+                    result += "<div>Upgraded projectile speed: " + pet.upped_projspeed + "</div>";
                 if (pet.spare_ups > 0)
                     result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
                 
