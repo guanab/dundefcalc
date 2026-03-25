@@ -144,6 +144,7 @@ button {
         <option value="armor">Armor</option>
         <option value="weapon">Weapon</option>
         <option value="pet">Pet</option>
+        <option disabled>---</option>
         <option value="about">About</option>
     </select>
 </div>
@@ -201,10 +202,13 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
         case "pet":
             document.getElementById("subselect").innerHTML = '\
 <select id="itemname" onchange="ChangeFields(this.value)">\n\
+<option value="cowboymonkey">Cowboy Monkey</option>\n\
 <option value="diamond">Diamond / Heart</option>\n\
 <option value="dice">Dice</option>\n\
+<option value="emberpony">Ember Pony</option>\n\
 <option value="etherianancient">Etherian Ancient</option>\n\
 <option value="eyeofdestruction">Eye of Destruction</option>\n\
+<option value="genie">Genie</option>\n\
 <option value="littlewizard">Little Wizard</option>\n\
 <option value="loverscupid">Lover\'s Cupid</option>\n\
 <option value="mrowl">Mr. Owl / Peckers</option>\n\
@@ -264,21 +268,30 @@ function ChangeFields(itemname) {
             SetFields("statstick");
             SetQualities("myth_ultpp");
             break;
+        case "cowboymonkey":
+        case "littlewizard":
+        case "eyeofdestruction":
+            SetFields("singleprojpet");
+            SetQualities("sup_ult");
+            break;
         case "dice":
         case "etherianancient":
         case "mrowl":
             SetFields("meleepet");
             SetQualities("sup_ult");
             break;
-        case "littlewizard":
-        case "eyeofdestruction":
-            SetFields("singleprojpet");
-            SetQualities("sup_ult");
+        case "emberpony":
+            SetFields("multiprojpet");
+            SetQualities("any");
             break;
         case "loverscupid":
         case "zamirasmount":
             SetFields("multiprojpet");
             SetQualities("sup_ult");
+            break;
+        case "genie":
+            SetFields("genie");
+            SetQualities("myth_ultpp");
             break;
         case "propellercat":
             SetFields("cat");
@@ -415,6 +428,18 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
+        case "genie":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Damage target </td><td><input id="damagetarget" type="text"></td>\n\
+<td>Stat </td><td><input id="stat" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
         case "cat":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
@@ -446,9 +471,14 @@ function SetFields(layout) {
 <div>DunDefCalc is a calculating tool for Dungeon Defenders<br>\n\
 Made with javascript by Guanab</div>\n\
 <br>\n\
+<div>This tool can calculate what stats your piece would end up with after fully upgrading. \n\
+Note that some weapons' and pets' damage calculations may be slightly off due to the values having hidden decimals.</div>\n\
+<br>\n\
 <div>If you would like an item added, you can find me at DDRnG with the same name. \n\
 Please provide necessary upgrade information, such as stat caps and damage per upgrade for ult and non-ult (with as many decimals as you can). \n\
 Or trade me suitable items on open.</div>\n\
+<br>\n\
+<div>Hint: You can bookmark this page in Steam overlay browser for easy access.</div>\n\
 </div>";
             break;
         default:
@@ -563,11 +593,22 @@ function SetUpgradeValues(item, itemname, quality) {
     if (item instanceof DamagePet) {
         console.log("SetUpgradeValues: item type damagepet");
         switch (itemname) {
+            case "cowboymonkey":
+                if (quality.includes("ult")) item.damage_per_up = 263.1980;
+                else item.damage_per_up = 150.4020;
+                item.max_rate = 6;
+                break;
             case "dice":
                 if (quality.includes("ult")) item.damage_per_up = 112;
                 else item.damage_per_up = 88;
                 item.max_rate = 6;
                 item.max_knockback = 60;
+                break;
+            case "emberpony":
+                if (quality.includes("ult")) item.damage_per_up = 112;
+                else item.damage_per_up = 112;
+                item.max_rate = 6;
+                item.max_projcount = 2;
                 break;
             case "etherianancient":
             case "mrowl":
@@ -580,6 +621,10 @@ function SetUpgradeValues(item, itemname, quality) {
                 if (quality.includes("ult")) item.damage_per_up = 160;
                 else item.damage_per_up = 136;
                 item.max_rate = 7;
+                break;
+            case "genie":
+                if (quality.includes("ult")) item.damage_per_up = 140;
+                else item.damage_per_up = 80;
                 break;
             case "littlewizard":
                 if (quality.includes("ult")) item.damage_per_up = 112;
@@ -875,6 +920,7 @@ class DamagePet {
     constructor() {
         this.damage = 0;
         this.damage_per_up = 0;
+        this.damage_target = 0;
         this.upgrades = 0;
         this.rate = 0;
         this.max_rate = 0;
@@ -883,11 +929,14 @@ class DamagePet {
         this.projspeed = 0;
         this.knockback = 0;
         this.max_knockback = 0;
+        this.stat = 0;
+        this.statcap = 0;
         this.upped_damage = 0;
         this.upped_rate = 0;
         this.upped_projspeed = 0;
         this.upped_projcount = 0;
         this.upped_knockback = 0;
+        this.upped_stat = 0;
         this.spare_ups = 0;
         this.calculated = false;
     }
@@ -898,6 +947,7 @@ class DamagePet {
         this.upped_projspeed = this.projspeed;
         this.upped_projcount = this.projcount;
         this.upped_knockback = this.knockback;
+        this.upped_stat = this.stat;
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -927,8 +977,14 @@ class DamagePet {
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_damage > 0) {
+            if (this.upped_damage > 0 && (this.upped_damage < this.damage_target || this.damage_target === 0)) {
                 this.upped_damage += this.damage_per_up;
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_stat > 0 && this.upped_stat < this.statcap) {
+                this.upped_stat += 1;
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
@@ -1177,8 +1233,6 @@ function CalculateWeapon() {
         result += "<div>Upgrades to spare: " + weapon.spare_ups + "</div>";
 
     PrintResult(result);
-
-    PrintLog("<p style='font-size:14px;margin:0px'>note: weapon damage may be inaccurate if the damage values have hidden decimals</p>");
 }
 
 function CalculatePet() {
@@ -1192,11 +1246,17 @@ function CalculatePet() {
 
     const pet = new DamagePet();
     
+    pet.statcap = StatCap(quality);
+    
     if (!SetUpgradeValues(pet, itemname, quality)) return;
 
     if (document.getElementById("damage")) {
         const damage = parseInt(document.getElementById("damage").value);
         if (!isNaN(damage) && damage !== 0) pet.damage = damage;
+    }
+    if (document.getElementById("damagetarget")) {
+        const damagetarget = parseInt(document.getElementById("damagetarget").value);
+        if (!isNaN(damagetarget) && damagetarget !== 0) pet.damage_target = damagetarget;
     }
     if (document.getElementById("rate")) {
         const rate = parseInt(document.getElementById("rate").value);
@@ -1213,6 +1273,10 @@ function CalculatePet() {
     if (document.getElementById("projspeed")) {
         const projspeed = parseInt(document.getElementById("projspeed").value);
         if (!isNaN(projspeed) && projspeed !== 0) pet.projspeed = projspeed;
+    }
+    if (document.getElementById("stat")) {
+        const stat = parseInt(document.getElementById("stat").value);
+        if (!isNaN(stat) && stat !== 0) pet.stat = stat;
     }
     if (document.getElementById("upgrades")) {
         const upgrades = parseInt(document.getElementById("upgrades").value);
@@ -1232,6 +1296,8 @@ function CalculatePet() {
         result += "<div>Upgraded projectile count: " + pet.upped_projcount + "</div>";
     if (pet.upped_projspeed > 0)
         result += "<div>Upgraded projectile speed: " + pet.upped_projspeed + "</div>";
+    if (pet.upped_stat > 0)
+        result += "<div>Upgraded stat: " + pet.upped_stat + "</div>";
     if (pet.spare_ups > 0)
         result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
 
@@ -1343,6 +1409,7 @@ function UpgradeRes(res) {
 }
 
 function UpsToMaxRes(res) {
+    //beautiful
     switch(res) {
         case 23: case 24: case 25: case 26: case 27: case 28: case 29:
             return 29 - res;
@@ -1439,6 +1506,7 @@ function DefaultResTarget(quality) {
         case "myth":
             return 31;
         case "godly":
+        case "any":
             return 33;
         default:
             PrintError("DefaultResTarget: quality name not recognized");
@@ -1459,6 +1527,7 @@ function BonusMultiplier(quality) {
         case "myth":
             return 1.3;
         case "godly":
+        case "any":
             return 1.25;
         default:
             PrintError("BonusMultiplier: quality name not recognized");
@@ -1480,6 +1549,7 @@ function StatCap(quality) {
             return 420;
         case "myth":
         case "godly":
+        case "any":
             return 360;
         default:
             PrintError("StatCap: quality name not recognized");
