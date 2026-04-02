@@ -50,6 +50,10 @@ body {
     padding-bottom: 10px;
     line-height: 2;
 }
+.fields td {
+    height: 36px;
+    line-height: 1;
+}
 .result {
     background-color: #ffffff;
     line-height: 1.5;
@@ -183,14 +187,20 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <option value="crystalcane">Crystal Cane</option>\n\
 <option value="elderstaff">Elder Staff</option>\n\
 <option value="embersceptre">Ember Sceptre</option>\n\
+<option value="enchantedbishop">Enchanted Bishop</option>\n\
 <option value="lavaslingerrl">Lava Slinger RL</option>\n\
+<option value="obsidianclava">Obsidian Clava</option>\n\
 <option value="staffoffrost">Staff of Frost</option>\n\
+<option value="staffofhearts">Staff of Hearts</option>\n\
 </optgroup>\n\
 <optgroup label="Huntress">\n\
 <option value="egganator2000">Egganator 2000</option>\n\
 <option value="vanwolfsteinrl">Van Wolfstein RL</option>\n\
 </optgroup>\n\
 <optgroup label="Monk">\n\
+<option value="candycane">Candy Cane</option>\n\
+<option value="embercrescent">Ember Crescent</option>\n\
+<option value="madnessboulderthrower">Madness Boulder Thrower</option>\n\
 <option value="mischiefmaker">Mischief Maker</option>\n\
 </optgroup>\n\
 <optgroup label="Squire">\n\
@@ -241,8 +251,13 @@ function ChangeFields(itemname) {
             SetFields("armor");
             SetQualities("godly_ultpp");
             break;
+        /*
+         * APPRENTICE
+         */
         case "crystalcane":
+        case "enchantedbishop":
         case "lavaslingerrl":
+        case "obsidianclava":
         case "staffoffrost":
             SetFields("appmultiprojdualwep");
             SetQualities("sup_ult");
@@ -252,6 +267,13 @@ function ChangeFields(itemname) {
             SetFields("appsingleprojwep");
             SetQualities("sup_ult");
             break;
+        case "staffofhearts":
+            SetFields("appmultiprojwep");
+            SetQualities("sup_ult");
+            break;
+        /*
+         * HUNTRESS
+         */
         case "egganator2000":
             SetFields("huntsingleprojwep");
             SetQualities("sup_ult");
@@ -260,14 +282,29 @@ function ChangeFields(itemname) {
             SetFields("huntmultiprojwep");
             SetQualities("sup_ult");
             break;
+        /*
+         * MONK
+         */
+        case "candycane":
+        case "embercrescent":
+            SetFields("monkmultiprojwep");
+            SetQualities("sup_ult");
+            break;
+        case "madnessboulderthrower":
+            SetFields("monktbwep");
+            SetQualities("myth_ultpp");
+            break;
         case "mischiefmaker":
             SetFields("monksingleprojwep");
             SetQualities("myth_ultpp");
             break;
-        case "statstick":
-            SetFields("statstick");
-            SetQualities("myth_ultpp");
-            break;
+        /*
+         * SQUIRE
+         */
+        
+        /*
+         * DAMAGE PET
+         */
         case "cowboymonkey":
         case "littlewizard":
         case "eyeofdestruction":
@@ -284,22 +321,32 @@ function ChangeFields(itemname) {
             SetFields("multiprojpet");
             SetQualities("any");
             break;
+        case "genie":
+            SetFields("genie");
+            SetQualities("myth_ultpp");
+            break;
         case "loverscupid":
         case "zamirasmount":
             SetFields("multiprojpet");
             SetQualities("sup_ult");
             break;
-        case "genie":
-            SetFields("genie");
-            SetQualities("myth_ultpp");
-            break;
+        /*
+         * BOOST PET
+         */
         case "propellercat":
             SetFields("cat");
             SetQualities("any");
             break;
+        /*
+         * STAT STICK
+         */
         case "diamond":
             SetFields("statstick");
             SetQualities("any");
+        case "statstick":
+            SetFields("statstick");
+            SetQualities("myth_ultpp");
+            break;
             break;
         default:
             PrintError("ChangeFields: item name not recognized");
@@ -340,16 +387,29 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
+        case "appmultiprojwep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<td>Charge </td><td><input id="charge" type="text"></td>\n\
+<td>Projectile count </td><td><input id="projcount" type="text"></td>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
         case "appmultiprojdualwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
 <tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
-<td style="line-height:1">Elem damage </td><td><input id="edamage" type="text"></td>\n\
-<td>Charge </td><td><input id="charge" type="text"></td>\n\
-<td style="line-height:1">Proj count </td><td><input id="projcount" type="text"></td>\n\
-<tr><td style="line-height:1">Proj speed </td><td><input id="projspeed" type="text"></td>\n\
-<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
-<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<td>Elem damage </td><td><input id="edamage" type="text"></td>\n\
+<td>Charge </td><td><input id="charge" type="text"></td></tr>\n\
+<tr><td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -387,6 +447,32 @@ function SetFields(layout) {
 <td>Priority stat </td><td><input id="priostat" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "monkmultiprojwep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Ranged damage </td><td><input id="damage" type="text"></td>\n\
+<td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "monktbwep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Ranged dmg </td><td><input id="damage" type="text"></td>\n\
+<td>Dmg target </td><td><input id="damagetarget" type="text"></td>\n\
+<td>Proj count </td><td><input id="projcount" type="text"></td></tr>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Stat </td><td><input id="stat" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -471,7 +557,7 @@ function SetFields(layout) {
 <div>DunDefCalc is a calculating tool for Dungeon Defenders<br>\n\
 Made with javascript by Guanab</div>\n\
 <br>\n\
-<div>This tool can calculate what stats your piece would end up with after fully upgrading. \n\
+<div>This tool can calculate what stats your piece of gear would end up with after fully upgrading. \n\
 Note that some weapons' and pets' damage calculations may be slightly off due to the values having hidden decimals.</div>\n\
 <br>\n\
 <div>If you would like an item added, you can find me at DDRnG with the same name. \n\
@@ -536,11 +622,16 @@ function SetQualities(qualityrange) {
 }
 
 function SetUpgradeValues(item, itemname, quality) {
+    /*
+     * WEAPON
+     */
     if (item instanceof Weapon) {
         console.log("SetUpgradeValues: item type weapon");
         switch (itemname) {
+            /*
+             * APPRENTICE
+             */
             case "crystalcane":
-            case "staffoffrost":
                 if (quality.includes("ult")) {
                     item.damage_per_up = 162.6219;
                     item.edamage_per_up = 162;
@@ -551,6 +642,10 @@ function SetUpgradeValues(item, itemname, quality) {
                 }
                 item.max_projcount = 5;
                 break;
+            case "dragonstaff":
+                if (quality.includes("ult")) item.edamage_per_up = 91.7246;
+                else item.edamage_per_up = 91.7246;
+                break;
             case "elderstaff":
                 if (quality.includes("ult")) item.damage_per_up = 151.2;
                 else item.damage_per_up = 108;
@@ -558,6 +653,39 @@ function SetUpgradeValues(item, itemname, quality) {
             case "embersceptre":
                 if (quality.includes("ult")) item.damage_per_up = 134.3945;
                 else item.damage_per_up = 96;
+                break;
+            case "enchantedbishop":
+                if (quality.includes("ult")) {
+                    item.damage_per_up = 163.2958;
+                    item.edamage_per_up = 163.1994;
+                }
+                else {
+                    item.damage_per_up = 145.8034;
+                    item.edamage_per_up = 163.1994;
+                }
+                item.max_projcount = 5;
+                break;
+            case "eternianstaffnm":
+                if (quality.includes("ult")) {
+                    item.damage_per_up = 134.4027;
+                    item.edamage_per_up = 144;
+                }
+                else {
+                    item.damage_per_up = 127.6338;
+                    item.edamage_per_up = 144;
+                }
+                item.max_projcount = 5;
+                break;
+            case "lavaslingernm":
+                if (quality.includes("ult")) {
+                    item.damage_per_up = 67.2;
+                    item.edamage_per_up = 144;
+                }
+                else {
+                    item.damage_per_up = 48.9589;
+                    item.edamage_per_up = 144;
+                }
+                item.max_projcount = 5;
                 break;
             case "lavaslingerrl":
                 if (quality.includes("ult")) {
@@ -570,9 +698,41 @@ function SetUpgradeValues(item, itemname, quality) {
                 }
                 item.max_projcount = 5;
                 break;
-            case "mischiefmaker":
-                item.damage_per_up = 27.5990;
+            case "obsidianclava":
+                if (quality.includes("ult")) {
+                    item.damage_per_up = 150.5291;
+                    item.edamage_per_up = 149.9124;
+                }
+                else {
+                    item.damage_per_up = 150.5291;
+                    item.edamage_per_up = 149.9124;
+                }
+                item.max_projcount = 5;
                 break;
+            case "staffoffrost":
+                if (quality.includes("ult")) {
+                    item.damage_per_up = 162.6219;
+                    item.edamage_per_up = 162;
+                }
+                else {
+                    item.damage_per_up = 156.2831;
+                    item.edamage_per_up = 162;
+                }
+                item.max_projcount = 5;
+                break;
+            case "staffofhearts":
+                if (quality.includes("ult")) item.damage_per_up = 163.2939;
+                else item.damage_per_up = 163.2939;
+                item.max_projcount = 5;
+                break;
+            case "thenorthpole":
+                if (quality.includes("ult")) item.damage_per_up = 120.9625; //nm?
+                else item.damage_per_up = 139.4814; //rl?
+                item.max_projcount = 5;
+                break;
+            /*
+             * HUNTRESS
+             */
             case "egganator2000":
                 if (quality.includes("ult")) item.damage_per_up = 591.9211;
                 else item.damage_per_up = 493.9243;
@@ -584,12 +744,44 @@ function SetUpgradeValues(item, itemname, quality) {
                 item.max_rate = 6;
                 item.max_projcount = 4;
                 break;
+            /*
+             * MONK
+             */
+            case "candycane":
+                if (quality.includes("ult")) item.damage_per_up = 158.6846; //range
+                else item.damage_per_up = 158.6846;
+                item.max_projcount = 5;
+                break;
+            case "embercrescent":
+                if (quality.includes("ult")) item.damage_per_up = 179.9838; //range
+                else item.damage_per_up = 179.9838;
+                item.max_projcount = 2;
+                break;
+            case "eternianspearnm":
+                if (quality.includes("ult")) item.damage_per_up = 413.4084; //melee
+                else item.damage_per_up = 295.2897;
+                break;
+            case "madnessboulderthrower":
+                if (quality.includes("ult")) item.damage_per_up = 72; //range
+                else item.damage_per_up = 72;
+                item.max_projcount = 4;
+                break;
+            case "mischiefmaker":
+                if (quality.includes("ult")) item.damage_per_up = 27.5990; //range
+                else item.damage_per_up = 27.5990;
+                break;
+            /*
+             * SQUIRE
+             */
             default:
                 PrintError("SetUpgradeValues: item name not recognized");
                 return false;
         }
         return true;
     }
+    /*
+     * DAMAGE PET
+     */
     if (item instanceof DamagePet) {
         console.log("SetUpgradeValues: item type damagepet");
         switch (itemname) {
@@ -649,6 +841,9 @@ function SetUpgradeValues(item, itemname, quality) {
         }
         return true;
     }
+    /*
+     * BOOST PET
+     */
     if (item instanceof Cat) {
         console.log("SetUpgradeValues: item type cat");
         switch (itemname) {
@@ -662,6 +857,9 @@ function SetUpgradeValues(item, itemname, quality) {
         }
         return true;
     }
+    /*
+     * STAT STICK
+     */
     if (item instanceof StatStick) {
         console.log("SetUpgradeValues: item type statstick");
         switch (itemname) {
@@ -813,6 +1011,7 @@ class Weapon {
         this.edamage = 0;
         this.damage_per_up = 0;
         this.edamage_per_up = 0;
+        this.damage_target = 0;
         this.rate = 0;
         this.max_rate = 0;
         this.projcount = 0;
@@ -821,6 +1020,7 @@ class Weapon {
         this.charge = 0;
         this.knockback = 0;
         this.max_knockback = 0;
+        this.stat = 0;
         this.priostat = 0;
         this.statcap = 0;
         this.upgrades = 0;
@@ -831,6 +1031,7 @@ class Weapon {
         this.upped_projspeed = 0;
         this.upped_charge = 0;
         this.upped_knockback = 0;
+        this.upped_stat = 0;
         this.upped_priostat = 0;
         this.spare_ups = 0;
         this.calculated = false;
@@ -844,6 +1045,7 @@ class Weapon {
         this.upped_projspeed = this.projspeed;
         this.upped_charge = this.charge;
         this.upped_knockback = this.knockback;
+        this.upped_stat = this.stat;
         this.upped_priostat = this.priostat;
         this.spare_ups = 0;
         let ups_spent = 0;
@@ -887,21 +1089,35 @@ class Weapon {
                 continue loop;
             }
             if (this.upped_damage > 0 && this.upped_edamage > 0) {
-                if (this.upped_damage > this.upped_edamage) 
-                    this.upped_edamage += this.edamage_per_up;
+                //todo make a separate function to upgrade damage
+                if (this.upped_damage > this.upped_edamage) {
+                    if (this.upped_edamage * 0.16 < this.edamage_per_up) this.upped_edamage *= 1.16;
+                    else this.upped_edamage += this.edamage_per_up;
+                }
+                else {
+                    if (this.upped_damage * 0.13 < this.damage_per_up) this.upped_damage *= 1.13;
+                    else this.upped_damage += this.damage_per_up;
+                }
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_damage > 0 && (this.upped_damage < this.damage_target || this.damage_target === 0)) {
+                if (this.upped_damage * 0.13 < this.damage_per_up) this.upped_damage *= 1.13;
                 else this.upped_damage += this.damage_per_up;
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_damage > 0) {
-                this.upped_damage += this.damage_per_up;
+            if (this.upped_edamage > 0) {
+                if (this.upped_edamage * 0.16 < this.edamage_per_up) this.upped_edamage *= 1.16;
+                else this.upped_edamage += this.edamage_per_up;
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_edamage > 0) {
-                this.upped_edamage += this.edamage_per_up;
+            if (this.upped_stat > 0 && this.upped_stat < this.statcap) {
+                this.upped_stat += 1;
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
@@ -1179,6 +1395,10 @@ function CalculateWeapon() {
         const edamage = parseInt(document.getElementById("edamage").value);
         if (!isNaN(edamage) && edamage !== 0) weapon.edamage = edamage;
     }
+    if (document.getElementById("damagetarget")) {
+        const damagetarget = parseInt(document.getElementById("damagetarget").value);
+        if (!isNaN(damagetarget) && damagetarget !== 0) weapon.damage_target = damagetarget;
+    }
     if (document.getElementById("rate")) {
         const rate = parseInt(document.getElementById("rate").value);
         if (!isNaN(rate) && rate !== 0) weapon.rate = rate;
@@ -1198,6 +1418,10 @@ function CalculateWeapon() {
     if (document.getElementById("projspeed")) {
         const projspeed = parseInt(document.getElementById("projspeed").value);
         if (!isNaN(projspeed) && projspeed !== 0) weapon.projspeed = projspeed;
+    }
+    if (document.getElementById("stat")) {
+        const stat = parseInt(document.getElementById("stat").value);
+        if (!isNaN(stat) && stat !== 0) weapon.stat = stat;
     }
     if (document.getElementById("priostat")) {
         const priostat = parseInt(document.getElementById("priostat").value);
@@ -1227,6 +1451,8 @@ function CalculateWeapon() {
         result += "<div>Upgraded projectile count: " + weapon.upped_projcount + "</div>";
     if (weapon.upped_projspeed > 0)
         result += "<div>Upgraded projectile speed: " + weapon.upped_projspeed + "</div>";
+    if (weapon.upped_stat > 0)
+        result += "<div>Upgraded stat: " + weapon.upped_stat + "</div>";
     if (weapon.upped_priostat > 0)
         result += "<div>Upgraded priority stat: " + weapon.upped_priostat + "</div>";
     if (weapon.spare_ups > 0)
@@ -1391,6 +1617,10 @@ function CalculateStick() {
 }
 
 function UpgradeRes(res) {
+    /*
+     * calculates one upgrade to resistance
+     * returns upgraded value
+     */
     //todo convert to res *= 1.15
     res = parseInt(res);
     if (res === 0 || isNaN(res)) {
@@ -1437,11 +1667,15 @@ function UpsToMaxRes(res) {
         case -17: case -18:
             return 38;
     }
-    PrintLog("res value outside expected range, ignoring");
+    PrintLog("res value outside expected range");
     return 0;
 }
 
 function UpgradeCharge(charge) {
+    /*
+     * calculates one upgrade to charge speed
+     * returns upgraded value
+     */
     if (charge >= 128) {
         PrintError("UpgradeCharge: charge speed over 128, cannot upgrade");
         return charge;
@@ -1455,6 +1689,10 @@ function UpgradeCharge(charge) {
 }
 
 function UpgradeKnockback(knockback) {
+    /*
+     * calculates one upgrade to knockback
+     * returns upgraded value
+     */
     if (knockback >= 128) {
         PrintError("UpgradeKnockback: knockback over 128, cannot upgrade");
         return knockback;
@@ -1468,6 +1706,10 @@ function UpgradeKnockback(knockback) {
 }
 
 function UpgradeProjSpeed(projspeed) {
+    /*
+     * calculates one upgrade to projectile speed
+     * returns upgraded value
+     */
     if (projspeed >= 30000) {
         PrintError("UpgradeProjSpeed: projectile speed over 30k, cannot upgrade");
         return projspeed;
@@ -1480,6 +1722,9 @@ function UpgradeProjSpeed(projspeed) {
 }
 
 function UpsToMaxProjSpeed(projspeed) {
+    /*
+     * returns total number of upgrades needed to reach max projectile speed
+     */
     if (projspeed >= 30000) return 0;
     if (projspeed >= 4800) return Math.ceil((30000 - projspeed) / 1200);
     let ups = 0;
@@ -1494,8 +1739,8 @@ function UpsToMaxProjSpeed(projspeed) {
     return ups;
 }
 
-function DefaultResTarget(quality) {
-    switch (quality) {
+function DefaultResTarget(qualityname) {
+    switch (qualityname) {
         case "ultpp":
         case "ultp":
         case "ult":
@@ -1514,8 +1759,8 @@ function DefaultResTarget(quality) {
     }
 }
 
-function BonusMultiplier(quality) {
-    switch (quality) {
+function BonusMultiplier(qualityname) {
+    switch (qualityname) {
         case "ultpp":
         case "ultp":
         case "ult":
@@ -1535,8 +1780,8 @@ function BonusMultiplier(quality) {
     }
 }
 
-function StatCap(quality) {
-    switch (quality) {
+function StatCap(qualityname) {
+    switch (qualityname) {
         case "ultpp":
             return 999;
         case "ultp":
