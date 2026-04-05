@@ -200,10 +200,12 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <optgroup label="Monk">\n\
 <option value="candycane">Candy Cane</option>\n\
 <option value="embercrescent">Ember Crescent</option>\n\
+<option value="eternianspearnm">Eternian Spear NM</option>\n\
 <option value="madnessboulderthrower">Madness Boulder Thrower</option>\n\
 <option value="mischiefmaker">Mischief Maker</option>\n\
 </optgroup>\n\
 <optgroup label="Squire">\n\
+<option value="calamityblade">Calamity Blade</option>\n\
 </optgroup>\n\
 </select>\n\
 <select id="quality"></select>';
@@ -290,6 +292,10 @@ function ChangeFields(itemname) {
             SetFields("monkmultiprojwep");
             SetQualities("sup_ult");
             break;
+        case "eternianspearnm":
+            SetFields("monkmeleewep");
+            SetQualities("sup_ult");
+            break;
         case "madnessboulderthrower":
             SetFields("monktbwep");
             SetQualities("myth_ultpp");
@@ -301,7 +307,10 @@ function ChangeFields(itemname) {
         /*
          * SQUIRE
          */
-        
+        case "calamityblade":
+            SetFields("squiresingleprojwep");
+            SetQualities("sup_ult");
+            break;
         /*
          * DAMAGE PET
          */
@@ -378,7 +387,7 @@ function SetFields(layout) {
         case "appsingleprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Charge </td><td><input id="charge" type="text"></td>\n\
 <td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -390,7 +399,7 @@ function SetFields(layout) {
         case "appmultiprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Charge </td><td><input id="charge" type="text"></td>\n\
 <td>Projectile count </td><td><input id="projcount" type="text"></td>\n\
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
@@ -403,7 +412,7 @@ function SetFields(layout) {
         case "appmultiprojdualwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Elem damage </td><td><input id="edamage" type="text"></td>\n\
 <td>Charge </td><td><input id="charge" type="text"></td></tr>\n\
 <tr><td>Proj count </td><td><input id="projcount" type="text"></td>\n\
@@ -417,7 +426,7 @@ function SetFields(layout) {
         case "huntsingleprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Attack rate </td><td><input id="rate" type="text"></td>\n\
 <td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -429,7 +438,7 @@ function SetFields(layout) {
         case "huntmultiprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Attack rate </td><td><input id="rate" type="text"></td>\n\
 <td>Projectile count </td><td><input id="projcount" type="text"></td>\n\
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
@@ -439,10 +448,20 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
+        case "monkmeleewep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Melee damage </td><td><input id="mdamage" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
         case "monksingleprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Ranged damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Priority stat </td><td><input id="priostat" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -454,7 +473,7 @@ function SetFields(layout) {
         case "monkmultiprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Ranged damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Proj count </td><td><input id="projcount" type="text"></td>\n\
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -466,11 +485,22 @@ function SetFields(layout) {
         case "monktbwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Ranged dmg </td><td><input id="damage" type="text"></td>\n\
-<td>Dmg target </td><td><input id="damagetarget" type="text"></td>\n\
+<tr><td>Ranged dmg </td><td><input id="rdamage" type="text"></td>\n\
+<td>Dmg target </td><td><input id="rdamagetarget" type="text"></td>\n\
 <td>Proj count </td><td><input id="projcount" type="text"></td></tr>\n\
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Stat </td><td><input id="stat" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "squiresingleprojwep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="rdamage" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
 <tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
@@ -633,11 +663,11 @@ function SetUpgradeValues(item, itemname, quality) {
              */
             case "crystalcane":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 162.6219;
+                    item.rdamage_per_up = 162.6219;
                     item.edamage_per_up = 162;
                 }
                 else {
-                    item.damage_per_up = 156.2831;
+                    item.rdamage_per_up = 156.2831;
                     item.edamage_per_up = 162;
                 }
                 item.max_projcount = 5;
@@ -647,100 +677,100 @@ function SetUpgradeValues(item, itemname, quality) {
                 else item.edamage_per_up = 91.7246;
                 break;
             case "elderstaff":
-                if (quality.includes("ult")) item.damage_per_up = 151.2;
-                else item.damage_per_up = 108;
+                if (quality.includes("ult")) item.rdamage_per_up = 151.2;
+                else item.rdamage_per_up = 108;
                 break;
             case "embersceptre":
-                if (quality.includes("ult")) item.damage_per_up = 134.3945;
-                else item.damage_per_up = 96;
+                if (quality.includes("ult")) item.rdamage_per_up = 134.3945;
+                else item.rdamage_per_up = 96;
                 break;
             case "enchantedbishop":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 163.2958;
+                    item.rdamage_per_up = 163.2958;
                     item.edamage_per_up = 163.1994;
                 }
                 else {
-                    item.damage_per_up = 145.8034;
+                    item.rdamage_per_up = 145.8034;
                     item.edamage_per_up = 163.1994;
                 }
                 item.max_projcount = 5;
                 break;
             case "eternianstaffnm":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 134.4027;
+                    item.rdamage_per_up = 134.4027;
                     item.edamage_per_up = 144;
                 }
                 else {
-                    item.damage_per_up = 127.6338;
+                    item.rdamage_per_up = 127.6338;
                     item.edamage_per_up = 144;
                 }
                 item.max_projcount = 5;
                 break;
             case "lavaslingernm":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 67.2;
+                    item.rdamage_per_up = 67.2;
                     item.edamage_per_up = 144;
                 }
                 else {
-                    item.damage_per_up = 48.9589;
+                    item.rdamage_per_up = 48.9589;
                     item.edamage_per_up = 144;
                 }
                 item.max_projcount = 5;
                 break;
             case "lavaslingerrl":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 158.1888;
+                    item.rdamage_per_up = 158.1888;
                     item.edamage_per_up = 156.9578;
                 }
                 else {
-                    item.damage_per_up = 115.2573;
+                    item.rdamage_per_up = 115.2573;
                     item.edamage_per_up = 156.9578;
                 }
                 item.max_projcount = 5;
                 break;
             case "obsidianclava":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 150.5291;
+                    item.rdamage_per_up = 150.5291;
                     item.edamage_per_up = 149.9124;
                 }
                 else {
-                    item.damage_per_up = 150.5291;
+                    item.rdamage_per_up = 150.5291;
                     item.edamage_per_up = 149.9124;
                 }
                 item.max_projcount = 5;
                 break;
             case "staffoffrost":
                 if (quality.includes("ult")) {
-                    item.damage_per_up = 162.6219;
+                    item.rdamage_per_up = 162.6219;
                     item.edamage_per_up = 162;
                 }
                 else {
-                    item.damage_per_up = 156.2831;
+                    item.rdamage_per_up = 156.2831;
                     item.edamage_per_up = 162;
                 }
                 item.max_projcount = 5;
                 break;
             case "staffofhearts":
-                if (quality.includes("ult")) item.damage_per_up = 163.2939;
-                else item.damage_per_up = 163.2939;
+                if (quality.includes("ult")) item.rdamage_per_up = 163.2939;
+                else item.rdamage_per_up = 163.2939;
                 item.max_projcount = 5;
                 break;
             case "thenorthpole":
-                if (quality.includes("ult")) item.damage_per_up = 120.9625; //nm?
-                else item.damage_per_up = 139.4814; //rl?
+                if (quality.includes("ult")) item.rdamage_per_up = 120.9625; //nm?
+                else item.rdamage_per_up = 139.4814; //rl?
                 item.max_projcount = 5;
                 break;
             /*
              * HUNTRESS
              */
             case "egganator2000":
-                if (quality.includes("ult")) item.damage_per_up = 591.9211;
-                else item.damage_per_up = 493.9243;
+                if (quality.includes("ult")) item.rdamage_per_up = 591.9211;
+                else item.rdamage_per_up = 493.9243;
                 item.max_rate = 5;
                 break;
             case "vanwolfsteinrl":
-                if (quality.includes("ult")) item.damage_per_up = 171.9906;
-                else item.damage_per_up = 122.8504;
+                if (quality.includes("ult")) item.rdamage_per_up = 171.9906;
+                else item.rdamage_per_up = 122.8504;
                 item.max_rate = 6;
                 item.max_projcount = 4;
                 break;
@@ -748,31 +778,35 @@ function SetUpgradeValues(item, itemname, quality) {
              * MONK
              */
             case "candycane":
-                if (quality.includes("ult")) item.damage_per_up = 158.6846; //range
-                else item.damage_per_up = 158.6846;
+                if (quality.includes("ult")) item.rdamage_per_up = 158.6846;
+                else item.rdamage_per_up = 158.6846;
                 item.max_projcount = 5;
                 break;
             case "embercrescent":
-                if (quality.includes("ult")) item.damage_per_up = 179.9838; //range
-                else item.damage_per_up = 179.9838;
+                if (quality.includes("ult")) item.rdamage_per_up = 179.9838;
+                else item.rdamage_per_up = 179.9838;
                 item.max_projcount = 2;
                 break;
             case "eternianspearnm":
-                if (quality.includes("ult")) item.damage_per_up = 413.4084; //melee
-                else item.damage_per_up = 295.2897;
+                if (quality.includes("ult")) item.mdamage_per_up = 413.4084;
+                else item.mdamage_per_up = 295.2897;
                 break;
             case "madnessboulderthrower":
-                if (quality.includes("ult")) item.damage_per_up = 72; //range
-                else item.damage_per_up = 72;
+                if (quality.includes("ult")) item.rdamage_per_up = 72;
+                else item.rdamage_per_up = 72;
                 item.max_projcount = 4;
                 break;
             case "mischiefmaker":
-                if (quality.includes("ult")) item.damage_per_up = 27.5990; //range
-                else item.damage_per_up = 27.5990;
+                if (quality.includes("ult")) item.rdamage_per_up = 27.5990;
+                else item.rdamage_per_up = 27.5990;
                 break;
             /*
              * SQUIRE
              */
+            case "calamityblade":
+                if (quality.includes("ult")) item.rdamage_per_up = 190.6280;
+                else item.rdamage_per_up = 151.3733;
+                break;
             default:
                 PrintError("SetUpgradeValues: item name not recognized");
                 return false;
@@ -1007,11 +1041,15 @@ class Armor {
 
 class Weapon {
     constructor() {
-        this.damage = 0;
+        this.mdamage = 0;
+        this.rdamage = 0;
         this.edamage = 0;
-        this.damage_per_up = 0;
+        this.mdamage_per_up = 0;
+        this.rdamage_per_up = 0;
         this.edamage_per_up = 0;
-        this.damage_target = 0;
+        this.mdamage_target = 0;
+        this.rdamage_target = 0;
+        this.edamage_target = 0;
         this.rate = 0;
         this.max_rate = 0;
         this.projcount = 0;
@@ -1024,7 +1062,8 @@ class Weapon {
         this.priostat = 0;
         this.statcap = 0;
         this.upgrades = 0;
-        this.upped_damage = 0;
+        this.upped_mdamage = 0;
+        this.upped_rdamage = 0;
         this.upped_edamage = 0;
         this.upped_rate = 0;
         this.upped_projcount = 0;
@@ -1038,7 +1077,8 @@ class Weapon {
     }
 
     Calculate() {
-        this.upped_damage = this.damage;
+        this.upped_mdamage = this.mdamage;
+        this.upped_rdamage = this.rdamage;
         this.upped_edamage = this.edamage;
         this.upped_rate = this.rate;
         this.upped_projcount = this.projcount;
@@ -1088,28 +1128,35 @@ class Weapon {
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_damage > 0 && this.upped_edamage > 0) {
+            if (this.upped_rdamage > 0 && this.upped_edamage > 0) {
                 //todo make a separate function to upgrade damage
-                if (this.upped_damage > this.upped_edamage) {
+                if (this.upped_rdamage > this.upped_edamage) {
                     if (this.upped_edamage * 0.16 < this.edamage_per_up) this.upped_edamage *= 1.16;
                     else this.upped_edamage += this.edamage_per_up;
                 }
                 else {
-                    if (this.upped_damage * 0.13 < this.damage_per_up) this.upped_damage *= 1.13;
-                    else this.upped_damage += this.damage_per_up;
+                    if (this.upped_rdamage * 0.13 < this.rdamage_per_up) this.upped_rdamage *= 1.13;
+                    else this.upped_rdamage += this.rdamage_per_up;
                 }
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_damage > 0 && (this.upped_damage < this.damage_target || this.damage_target === 0)) {
-                if (this.upped_damage * 0.13 < this.damage_per_up) this.upped_damage *= 1.13;
-                else this.upped_damage += this.damage_per_up;
+            if (this.upped_mdamage > 0 && (this.upped_mdamage < this.mdamage_target || this.mdamage_target === 0)) {
+                if (this.upped_mdamage * 0.13 < this.mdamage_per_up) this.upped_mdamage *= 1.13;
+                else this.upped_mdamage += this.mdamage_per_up;
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_edamage > 0) {
+            if (this.upped_rdamage > 0 && (this.upped_rdamage < this.rdamage_target || this.rdamage_target === 0)) {
+                if (this.upped_rdamage * 0.13 < this.rdamage_per_up) this.upped_rdamage *= 1.13;
+                else this.upped_rdamage += this.rdamage_per_up;
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_edamage > 0 && (this.upped_edamage < this.edamage_target || this.edamage_target === 0)) {
                 if (this.upped_edamage * 0.16 < this.edamage_per_up) this.upped_edamage *= 1.16;
                 else this.upped_edamage += this.edamage_per_up;
                 ups_spent += 1;
@@ -1124,7 +1171,8 @@ class Weapon {
             }
             up_count += 1;
         }
-        this.upped_damage = Math.floor(this.upped_damage);
+        this.upped_mdamage = Math.floor(this.upped_mdamage);
+        this.upped_rdamage = Math.floor(this.upped_rdamage);
         this.upped_edamage = Math.floor(this.upped_edamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
@@ -1387,17 +1435,29 @@ function CalculateWeapon() {
     
     if (!SetUpgradeValues(weapon, itemname, quality)) return;
 
-    if (document.getElementById("damage")) {
-        const damage = parseInt(document.getElementById("damage").value);
-        if (!isNaN(damage) && damage !== 0) weapon.damage = damage;
+    if (document.getElementById("mdamage")) {
+        const mdamage = parseInt(document.getElementById("mdamage").value);
+        if (!isNaN(mdamage) && mdamage !== 0) weapon.mdamage = mdamage;
+    }
+    if (document.getElementById("rdamage")) {
+        const rdamage = parseInt(document.getElementById("rdamage").value);
+        if (!isNaN(rdamage) && rdamage !== 0) weapon.rdamage = rdamage;
     }
     if (document.getElementById("edamage")) {
         const edamage = parseInt(document.getElementById("edamage").value);
         if (!isNaN(edamage) && edamage !== 0) weapon.edamage = edamage;
     }
-    if (document.getElementById("damagetarget")) {
-        const damagetarget = parseInt(document.getElementById("damagetarget").value);
-        if (!isNaN(damagetarget) && damagetarget !== 0) weapon.damage_target = damagetarget;
+    if (document.getElementById("mdamagetarget")) {
+        const mdamagetarget = parseInt(document.getElementById("mdamagetarget").value);
+        if (!isNaN(mdamagetarget) && mdamagetarget !== 0) weapon.mdamage_target = mdamagetarget;
+    }
+    if (document.getElementById("rdamagetarget")) {
+        const rdamagetarget = parseInt(document.getElementById("rdamagetarget").value);
+        if (!isNaN(rdamagetarget) && rdamagetarget !== 0) weapon.rdamage_target = rdamagetarget;
+    }
+    if (document.getElementById("edamagetarget")) {
+        const edamagetarget = parseInt(document.getElementById("edamagetarget").value);
+        if (!isNaN(edamagetarget) && edamagetarget !== 0) weapon.edamage_target = edamagetarget;
     }
     if (document.getElementById("rate")) {
         const rate = parseInt(document.getElementById("rate").value);
@@ -1435,12 +1495,14 @@ function CalculateWeapon() {
     weapon.Calculate();
 
     let result = "";
-    if (weapon.upped_damage > 0)
-        result += "<div>Upgraded damage: <b>" + weapon.upped_damage + "</b></div>";
+    if (weapon.upped_mdamage > 0)
+        result += "<div>Upgraded melee damage: <b>" + weapon.upped_mdamage + "</b></div>";
+    if (weapon.upped_rdamage > 0)
+        result += "<div>Upgraded ranged damage: <b>" + weapon.upped_rdamage + "</b></div>";
     if (weapon.upped_edamage > 0)
         result += "<div>Upgraded elemental damage: <b>" + weapon.upped_edamage + "</b></div>";
-    if (weapon.upped_damage > 0 && weapon.upped_edamage > 0)
-        result += "<div>Upgraded total damage: <b>" + (weapon.upped_damage + weapon.upped_edamage) + "</b></div>";
+    if (weapon.upped_rdamage > 0 && weapon.upped_edamage > 0)
+        result += "<div>Upgraded total damage: <b>" + (weapon.upped_rdamage + weapon.upped_edamage) + "</b></div>";
     if (weapon.upped_rate > 0)
         result += "<div>Upgraded attack rate: " + weapon.upped_rate + "</div>";
     if (weapon.upped_knockback > 0)
