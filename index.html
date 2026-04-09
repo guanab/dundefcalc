@@ -165,6 +165,9 @@ button {
 <script>
 
 function ChangeItemType(itemtype) {
+    /*
+     * prints html content on the subselect div based on provided item type
+     */
     ClearResult();
     ClearLog();
     
@@ -245,6 +248,9 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 }
 
 function ChangeFields(itemname) {
+    /*
+     * calls SetFields and SetQualities functions based on provided item name
+     */
     ClearResult();
     ClearLog();
     
@@ -319,7 +325,7 @@ function ChangeFields(itemname) {
             SetQualities("sup_ult");
             break;
         /*
-         * DAMAGE PET
+         * PET
          */
         case "cowboymonkey":
         case "littlewizard":
@@ -346,12 +352,9 @@ function ChangeFields(itemname) {
             SetFields("multiprojpet");
             SetQualities("sup_ult");
             break;
-        /*
-         * BOOST PET
-         */
         case "propellercat":
             SetFields("cat");
-            SetQualities("any");
+            SetQualities("myth_trans");
             break;
         /*
          * STAT STICK
@@ -372,6 +375,9 @@ function ChangeFields(itemname) {
 }
 
 function SetFields(layout) {
+    /*
+     * prints html content on the fields div based on provided layout name
+     */
     console.log("SetFields: layout name " + layout);
     switch (layout) {
         case "armor":
@@ -527,7 +533,7 @@ function SetFields(layout) {
         case "meleepet":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
 <td>Attack rate </td><td><input id="rate" type="text"></td>\n\
 <td>Knockback </td><td><input id="knockback" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -539,7 +545,7 @@ function SetFields(layout) {
         case "singleprojpet":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
 <td>Attack rate </td><td><input id="rate" type="text"></td>\n\
 <td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -551,7 +557,7 @@ function SetFields(layout) {
         case "multiprojpet":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
 <td>Attack rate </td><td><input id="rate" type="text"></td>\n\
 <td>Projectile count </td><td><input id="projcount" type="text"></td>\n\
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
@@ -564,7 +570,7 @@ function SetFields(layout) {
         case "genie":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Damage </td><td><input id="damage" type="text"></td>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
 <td>Damage target </td><td><input id="damagetarget" type="text"></td>\n\
 <td>Stat </td><td><input id="stat" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
@@ -579,9 +585,10 @@ function SetFields(layout) {
 <tr><td>Boost </td><td><input id="boost" type="text"></td>\n\
 <td>Range </td><td><input id="range" type="text"></td>\n\
 <td>Targets </td><td><input id="targets" type="text"></td>\n\
-<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
-<td colspan="4" style="text-align:right;padding-right:7px">\n\
-<button style="width:100px" onclick="CalculateCat()">Calculate</button>\n\
+<tr><td>Stat </td><td><input id="stat" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
@@ -622,6 +629,9 @@ Or trade me suitable items on open.</div>\n\
 }
 
 function SetQualities(qualityrange) {
+    /*
+     * prints option tags into the quality selection dropdown box based on provided quality range
+     */
     switch (qualityrange) {
         case "any":
             document.getElementById("quality").innerHTML = '<option value="any">Any quality</option>';
@@ -669,6 +679,10 @@ function SetQualities(qualityrange) {
 }
 
 function SetUpgradeValues(item, itemname, quality) {
+    /*
+     * sets upgrade values into a provided instance of Item class
+     * todo move this stuff into an xml file along with a parser
+     */
     /*
      * WEAPON
      */
@@ -841,74 +855,62 @@ function SetUpgradeValues(item, itemname, quality) {
     /*
      * DAMAGE PET
      */
-    if (item instanceof DamagePet) {
-        console.log("SetUpgradeValues: item type damagepet");
+    if (item instanceof Pet) {
+        console.log("SetUpgradeValues: item type pet");
         switch (itemname) {
             case "cowboymonkey":
-                if (quality.includes("ult")) item.damage_per_up = 263.1980;
-                else item.damage_per_up = 150.4020;
+                if (quality.includes("ult")) item.bdamage_per_up = 263.1980;
+                else item.bdamage_per_up = 150.4020;
                 item.max_rate = 6;
                 break;
             case "dice":
-                if (quality.includes("ult")) item.damage_per_up = 112;
-                else item.damage_per_up = 88;
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 88;
                 item.max_rate = 6;
                 item.max_knockback = 60;
                 break;
             case "emberpony":
-                if (quality.includes("ult")) item.damage_per_up = 112;
-                else item.damage_per_up = 112;
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 112;
                 item.max_rate = 6;
                 item.max_projcount = 2;
                 break;
             case "etherianancient":
             case "mrowl":
-                if (quality.includes("ult")) item.damage_per_up = 61.6009;
-                else item.damage_per_up = 45.7591;
+                if (quality.includes("ult")) item.bdamage_per_up = 61.6009;
+                else item.bdamage_per_up = 45.7591;
                 item.max_rate = 7;
                 item.max_knockback = 128;
                 break;
             case "eyeofdestruction":
-                if (quality.includes("ult")) item.damage_per_up = 160;
-                else item.damage_per_up = 136;
+                if (quality.includes("ult")) item.bdamage_per_up = 160;
+                else item.bdamage_per_up = 136;
                 item.max_rate = 7;
                 break;
             case "genie":
-                if (quality.includes("ult")) item.damage_per_up = 140;
-                else item.damage_per_up = 80;
+                if (quality.includes("ult")) item.bdamage_per_up = 140;
+                else item.bdamage_per_up = 80;
                 break;
             case "littlewizard":
-                if (quality.includes("ult")) item.damage_per_up = 112;
-                else item.damage_per_up = 64;
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 64;
                 item.max_rate = 7;
                 break;
             case "loverscupid":
-                if (quality.includes("ult")) item.damage_per_up = 112;
-                else item.damage_per_up = 64;
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 64;
                 item.max_rate = 6;
                 item.max_projcount = 7;
                 break;
-            case "zamirasmount":
-                if (quality.includes("ult")) item.damage_per_up = 112;
-                else item.damage_per_up = 64;
-                item.max_rate = 6;
-                item.max_projcount = 3;
-                break;
-            default:
-                PrintError("SetUpgradeValues: item name not recognized");
-                return false;
-        }
-        return true;
-    }
-    /*
-     * BOOST PET
-     */
-    if (item instanceof Cat) {
-        console.log("SetUpgradeValues: item type cat");
-        switch (itemname) {
             case "propellercat":
                 item.max_range = 90;
                 item.max_targets = 4;
+                break;
+            case "zamirasmount":
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 64;
+                item.max_rate = 6;
+                item.max_projcount = 3;
                 break;
             default:
                 PrintError("SetUpgradeValues: item name not recognized");
@@ -939,6 +941,10 @@ function SetUpgradeValues(item, itemname, quality) {
 }
 
 function ChangeCustomRes(checked) {
+    /*
+     * toggles the disabled status of input id "customres" based on provided checkbox value
+     * also sets res target to the default value if customres is disabled
+     */
     document.getElementById("customres").disabled = !checked;
     if (!checked) {
         ChangeResTarget(document.getElementById("quality").value);
@@ -946,6 +952,9 @@ function ChangeCustomRes(checked) {
 }
 
 function ChangeResTarget(quality) {
+    /*
+     * sets the value of input id "customres" to the default value of the provided quality
+     */
     if (document.getElementById("customres").disabled) {
         const restarget = DefaultResTarget(quality);
         document.getElementById("customres").value = restarget;
@@ -953,6 +962,9 @@ function ChangeResTarget(quality) {
 }
 
 function ClearFields() {
+    /*
+     * clears all input elements inside the fields div
+     */
     for (const element of document.getElementById("fields").getElementsByTagName("input")) {
         element.value = "";
     }
@@ -960,6 +972,10 @@ function ClearFields() {
 }
 
 function AllFieldsEmpty() {
+    /*
+     * checks if all input elements inside the fields div are empty
+     * returns a boolean
+     */
     for (const element of document.getElementById("fields").getElementsByTagName("input")) {
         if (element.value !== "") return false;
     }
@@ -967,19 +983,151 @@ function AllFieldsEmpty() {
     return true;
 }
 
-class Armor {
+class Item {
+    /*
+     * base class for all items
+     * holds common variables and upgrade methods
+     */
     constructor() {
+        this.itemname = "";
+        this.quality = "";
+        this.bdamage = 0;
+        this.rdamage = 0;
+        this.edamage = 0;
+        this.bdamage_per_up = 0;
+        this.rdamage_per_up = 0;
+        this.edamage_per_up = 0;
+        this.bdamage_target = 0;
+        this.rdamage_target = 0;
+        this.edamage_target = 0;
+        this.rate = 0;
+        this.max_rate = 0;
+        this.knockback = 0;
+        this.max_knockback = 60;
+        this.charge = 0;
+        this.max_charge = 128;
+        this.charge_target = 0;
+        this.projcount = 0;
+        this.max_projcount = 0;
+        this.projspeed = 0;
+        this.max_projspeed = 30000;
+        this.stat = 0;
+        this.priostat = 0;
+        this.statcap = 999;
+        this.upgrades = 0;
+        this.upped_bdamage = 0;
+        this.upped_rdamage = 0;
+        this.upped_edamage = 0;
+        this.upped_rate = 0;
+        this.upped_projcount = 0;
+        this.upped_projspeed = 0;
+        this.upped_charge = 0;
+        this.upped_knockback = 0;
+        this.upped_stat = 0;
+        this.upped_priostat = 0;
+        this.spare_ups = 0;
+        this.calculated = false;
+    }
+    
+    UpgradeBaseDamage() {
+        let up_amount = 0;
+        if (this.upped_bdamage * 0.15 < this.bdamage_per_up) up_amount = Math.floor(this.upped_bdamage * 0.15);
+        else {
+            this.upped_bdamage += this.bdamage_per_up;
+            return;
+        }
+        if (up_amount < 1) this.upped_bdamage += 1;
+        else this.upped_bdamage += up_amount;
+    }
+    
+    UpgradeRangedDamage() {
+        let up_amount = 0;
+        if (this.upped_rdamage * 0.13 < this.rdamage_per_up) up_amount = Math.floor(this.upped_rdamage * 0.13);
+        else {
+            this.upped_rdamage += this.rdamage_per_up;
+            return;
+        }
+        if (up_amount < 1) this.upped_rdamage += 1;
+        else this.upped_rdamage += up_amount;
+    }
+    
+    UpgradeElemDamage() {
+        let up_amount = 0;
+        if (this.upped_edamage * 0.16 < this.edamage_per_up) up_amount = Math.floor(this.upped_edamage * 0.16);
+        else {
+            this.upped_edamage += this.edamage_per_up;
+            return;
+        }
+        if (up_amount < 1) this.upped_edamage += 1;
+        else this.upped_edamage += up_amount;
+    }
+    
+    UpgradeCharge() {
+        if (this.upped_charge >= 128) {
+            PrintError("UpgradeCharge: charge speed over 128, cannot upgrade");
+            return;
+        }
+        else if (this.upped_charge === 0) {
+            PrintError("UpgradeCharge: charge speed 0, cannot upgrade");
+            return;
+        }
+        else if (this.upped_charge === -1) {
+            this.upped_charge = 1;
+            return;
+        }
+        let up_amount = Math.floor(Math.abs(this.upped_charge) * 0.25);
+        if (up_amount <= 1) up_amount = 1;
+        else if (up_amount >= 4) up_amount = 4;
+        if (this.upped_charge + up_amount >= 128) this.upped_charge = 128;
+        else this.upped_charge += up_amount;
+    }
+    
+    UpgradeKnockback() {
+        if (this.upped_knockback >= 128) {
+            PrintError("UpgradeKnockback: knockback over 128, cannot upgrade");
+            return;
+        }
+        else if (this.upped_knockback === 0) {
+            PrintError("UpgradeKnockback: knockback 0, cannot upgrade");
+            return;
+        }
+        else if (this.upped_knockback === -1) {
+            this.upped_knockback = 1;
+            return;
+        }
+        let up_amount = Math.floor(Math.abs(this.upped_knockback) * 0.25);
+        if (up_amount <= 1) up_amount = 1;
+        else if (up_amount >= 4) up_amount = 4;
+        if (this.upped_knockback + up_amount >= 128) this.upped_knockback = 128;
+        else this.upped_knockback += up_amount;
+    }
+    
+    UpgradeProjSpeed() {
+        if (this.upped_projspeed === 0) {
+            PrintError("UpgradeProjSpeed: projectile speed 0, cannot upgrade");
+            return;
+        }
+        else if (this.upped_projspeed === -100) {
+            this.upped_projspeed = 1;
+            return;
+        }
+        let up_amount = Math.floor(Math.abs(this.upped_projspeed) * 0.25);
+        if (up_amount <= 100) this.upped_projspeed += 100;
+        else if (up_amount >= 1200) this.upped_projspeed += 1200;
+        else this.upped_projspeed += up_amount;
+    }
+}
+
+class Armor extends Item {
+    constructor() {
+        super();
         this.resistances = [];
         this.stats = [];
-        this.upgrades = 0;
         this.res_target = 29;
-        this.statcap = 999;
         this.bonus_multiplier = 1.4;
         this.ups_on_res = 0;
-        this.spare_ups = 0;
         this.upped_res = [];
         this.upped_stats = [];
-        this.calculated = false;
     }
 
     Calculate() {
@@ -1064,41 +1212,9 @@ class Armor {
     }
 }
 
-class Weapon {
+class Weapon extends Item {
     constructor() {
-        this.bdamage = 0;
-        this.rdamage = 0;
-        this.edamage = 0;
-        this.bdamage_per_up = 0;
-        this.rdamage_per_up = 0;
-        this.edamage_per_up = 0;
-        this.bdamage_target = 0;
-        this.rdamage_target = 0;
-        this.edamage_target = 0;
-        this.rate = 0;
-        this.max_rate = 0;
-        this.projcount = 0;
-        this.max_projcount = 0;
-        this.projspeed = 0;
-        this.charge = 0;
-        this.knockback = 0;
-        this.max_knockback = 0;
-        this.stat = 0;
-        this.priostat = 0;
-        this.statcap = 0;
-        this.upgrades = 0;
-        this.upped_bdamage = 0;
-        this.upped_rdamage = 0;
-        this.upped_edamage = 0;
-        this.upped_rate = 0;
-        this.upped_projcount = 0;
-        this.upped_projspeed = 0;
-        this.upped_charge = 0;
-        this.upped_knockback = 0;
-        this.upped_stat = 0;
-        this.upped_priostat = 0;
-        this.spare_ups = 0;
-        this.calculated = false;
+        super();
     }
 
     Calculate() {
@@ -1135,47 +1251,53 @@ class Weapon {
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_charge !== 0 && this.upped_charge < 128) {
-                this.upped_charge = UpgradeCharge(this.upped_charge);
+            if (this.upped_charge !== 0 && this.upped_charge < this.max_charge && (this.upped_charge < this.charge_target || this.charge_target === 0)) {
+                //this.upped_charge = UpgradeCharge(this.upped_charge);
+                this.UpgradeCharge();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
-                this.upped_knockback = UpgradeKnockback(this.upped_knockback);
+                //this.upped_knockback = UpgradeKnockback(this.upped_knockback);
+                this.UpgradeKnockback();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_projspeed !== 0 && this.upped_projspeed < 30000) {
-                this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
+            if (this.upped_projspeed !== 0 && this.upped_projspeed < this.max_projspeed) {
+                //this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
+                this.UpgradeProjSpeed();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_bdamage > 0 && this.upped_edamage > 0) {
                 if (this.upped_bdamage > this.upped_edamage)
-                    this.upped_edamage = UpgradeElemDamage(this.upped_edamage, this.edamage_per_up);
+                    this.UpgradeElemDamage();
                 else
-                    this.upped_bdamage = UpgradeBaseDamage(this.upped_bdamage, this.bdamage_per_up);
+                    this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
-                this.upped_bdamage = UpgradeBaseDamage(this.upped_bdamage, this.bdamage_per_up);
+                //this.upped_bdamage = UpgradeBaseDamage(this.upped_bdamage, this.bdamage_per_up);
+                this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_rdamage > 0 && (this.upped_rdamage < this.rdamage_target || this.rdamage_target === 0)) {
-                this.upped_rdamage = UpgradeRangedDamage(this.upped_rdamage, this.rdamage_per_up);
+                //this.upped_rdamage = UpgradeRangedDamage(this.upped_rdamage, this.rdamage_per_up);
+                this.UpgradeRangedDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_edamage > 0 && (this.upped_edamage < this.edamage_target || this.edamage_target === 0)) {
-                this.upped_edamage = UpgradeElemDamage(this.upped_edamage, this.edamage_per_up);
+                //this.upped_edamage = UpgradeElemDamage(this.upped_edamage, this.edamage_per_up);
+                this.UpgradeElemDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
@@ -1197,107 +1319,29 @@ class Weapon {
     }
 }
 
-class DamagePet {
+class Pet extends Item {
     constructor() {
-        this.damage = 0;
-        this.damage_per_up = 0;
-        this.damage_target = 0;
-        this.upgrades = 0;
-        this.rate = 0;
-        this.max_rate = 0;
-        this.projcount = 0;
-        this.max_projcount = 0;
-        this.projspeed = 0;
-        this.knockback = 0;
-        this.max_knockback = 0;
-        this.stat = 0;
-        this.statcap = 0;
-        this.upped_damage = 0;
-        this.upped_rate = 0;
-        this.upped_projspeed = 0;
-        this.upped_projcount = 0;
-        this.upped_knockback = 0;
-        this.upped_stat = 0;
-        this.spare_ups = 0;
-        this.calculated = false;
-    }
-
-    Calculate() {
-        this.upped_damage = this.damage;
-        this.upped_rate = this.rate;
-        this.upped_projspeed = this.projspeed;
-        this.upped_projcount = this.projcount;
-        this.upped_knockback = this.knockback;
-        this.upped_stat = this.stat;
-        this.spare_ups = 0;
-        let ups_spent = 0;
-        let up_count = 0;
-        loop:
-        while (up_count < this.upgrades - 1) {
-            if (this.upped_projcount > 0 && this.upped_projcount < this.max_projcount && (up_count + 2) % 5 === 0) {
-                this.upped_projcount += 1;
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            if (this.upped_rate > 0 && this.upped_rate < this.max_rate && (up_count + 2) % 4 === 0) {
-                this.upped_rate += 1;
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            if (this.upped_projspeed !== 0 && this.upped_projspeed < 30000) {
-                this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
-                this.upped_knockback = UpgradeKnockback(this.upped_knockback);
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            if (this.upped_damage > 0 && (this.upped_damage < this.damage_target || this.damage_target === 0)) {
-                this.upped_damage += this.damage_per_up;
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            if (this.upped_stat > 0 && this.upped_stat < this.statcap) {
-                this.upped_stat += 1;
-                ups_spent += 1;
-                up_count += 1;
-                continue loop;
-            }
-            up_count += 1;
-        }
-        this.upped_damage = Math.floor(this.upped_damage);
-        if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
-        this.calculated = true;
-        console.log("damagepet upgrades calculated");
-    }
-}
-
-class Cat {
-    constructor() {
+        super();
         this.boost = 0;
         this.range = 0;
         this.max_range = 0;
         this.targets = 0;
         this.max_targets = 0;
-        this.upgrades = 0;
         this.upped_boost = 0;
         this.upped_range = 0;
         this.upped_targets = 0;
-        this.spare_ups = 0;
-        this.calculated = false;
     }
 
     Calculate() {
         this.upped_boost = this.boost;
         this.upped_range = this.range;
         this.upped_targets = this.targets;
+        this.upped_bdamage = this.bdamage;
+        this.upped_rate = this.rate;
+        this.upped_projspeed = this.projspeed;
+        this.upped_projcount = this.projcount;
+        this.upped_knockback = this.knockback;
+        this.upped_stat = this.stat;
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -1321,22 +1365,59 @@ class Cat {
                 up_count += 1;
                 continue loop;
             }
+            if (this.upped_projcount > 0 && this.upped_projcount < this.max_projcount && (up_count + 2) % 5 === 0) {
+                this.upped_projcount += 1;
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_rate > 0 && this.upped_rate < this.max_rate && (up_count + 2) % 4 === 0) {
+                this.upped_rate += 1;
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_projspeed !== 0 && this.upped_projspeed < this.max_projspeed) {
+                //this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
+                this.UpgradeProjSpeed();
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
+                //this.upped_knockback = UpgradeKnockback(this.upped_knockback);
+                this.UpgradeKnockback();
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
+                //this.upped_bdamage += this.bdamage_per_up;
+                this.UpgradeBaseDamage();
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
+            if (this.upped_stat > 0 && this.upped_stat < this.statcap) {
+                this.upped_stat += 1;
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
             up_count += 1;
         }
+        this.upped_bdamage = Math.floor(this.upped_bdamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
-        console.log("cat upgrades calculated");
+        console.log("pet upgrades calculated");
     }
 }
 
-class StatStick {
+class StatStick extends Item {
     constructor() {
+        super();
         this.stats = [];
-        this.statcap = 0;
-        this.upgrades = 0;
         this.upped_stats = [];
-        this.spare_ups = 0;
-        this.calculated = false;
     }
 
     Calculate() {
@@ -1549,15 +1630,27 @@ function CalculatePet() {
     const itemname = document.getElementById("itemname").value;
     const quality = document.getElementById("quality").value;
 
-    const pet = new DamagePet();
+    const pet = new Pet();
     
     pet.statcap = StatCap(quality);
     
     if (!SetUpgradeValues(pet, itemname, quality)) return;
 
-    if (document.getElementById("damage")) {
-        const damage = parseInt(document.getElementById("damage").value);
-        if (!isNaN(damage) && damage !== 0) pet.damage = damage;
+    if (document.getElementById("boost")) {
+        const boost = parseInt(document.getElementById("boost").value);
+        if (!isNaN(boost) && boost !== 0) pet.boost = boost;
+    }
+    if (document.getElementById("range")) {
+        const range = parseInt(document.getElementById("range").value);
+        if (!isNaN(range) && range !== 0) pet.range = range;
+    }
+    if (document.getElementById("targets")) {
+        const targets = parseInt(document.getElementById("targets").value);
+        if (!isNaN(targets) && targets !== 0) pet.targets = targets;
+    }
+    if (document.getElementById("bdamage")) {
+        const bdamage = parseInt(document.getElementById("bdamage").value);
+        if (!isNaN(bdamage) && bdamage !== 0) pet.bdamage = bdamage;
     }
     if (document.getElementById("damagetarget")) {
         const damagetarget = parseInt(document.getElementById("damagetarget").value);
@@ -1591,8 +1684,14 @@ function CalculatePet() {
     pet.Calculate();
 
     let result = "";
-    if (pet.upped_damage > 0)
-        result += "<div>Upgraded damage: <b>" + pet.upped_damage + "</b></div>";
+    if (pet.upped_boost > 0)
+        result += "<div>Upgraded boost: <b>" + pet.upped_boost + "</b></div>";
+    if (pet.upped_range > 0)
+        result += "<div>Upgraded range: " + pet.upped_range + "</div>";
+    if (pet.upped_targets > 0)
+        result += "<div>Upgraded targets: " + pet.upped_targets + "</div>";
+    if (pet.upped_bdamage > 0)
+        result += "<div>Upgraded damage: <b>" + pet.upped_bdamage + "</b></div>";
     if (pet.upped_rate > 0)
         result += "<div>Upgraded attack rate: " + pet.upped_rate + "</div>";
     if (pet.upped_knockback > 0)
@@ -1603,51 +1702,6 @@ function CalculatePet() {
         result += "<div>Upgraded projectile speed: " + pet.upped_projspeed + "</div>";
     if (pet.upped_stat > 0)
         result += "<div>Upgraded stat: " + pet.upped_stat + "</div>";
-    if (pet.spare_ups > 0)
-        result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
-
-    PrintResult(result);
-}
-
-function CalculateCat() {
-    ClearLog();
-    ClearResult();
-    
-    if (AllFieldsEmpty()) return;
-
-    const itemname = document.getElementById("itemname").value;
-    const quality = document.getElementById("quality").value;
-
-    const pet = new Cat();
-    
-    if (!SetUpgradeValues(pet, itemname, quality)) return;
-
-    if (document.getElementById("boost")) {
-        const boost = parseInt(document.getElementById("boost").value);
-        if (!isNaN(boost) && boost !== 0) pet.boost = boost;
-    }
-    if (document.getElementById("range")) {
-        const range = parseInt(document.getElementById("range").value);
-        if (!isNaN(range) && range !== 0) pet.range = range;
-    }
-    if (document.getElementById("targets")) {
-        const targets = parseInt(document.getElementById("targets").value);
-        if (!isNaN(targets) && targets !== 0) pet.targets = targets;
-    }
-    if (document.getElementById("upgrades")) {
-        const upgrades = parseInt(document.getElementById("upgrades").value);
-        if (!isNaN(upgrades) && upgrades !== 0) pet.upgrades = upgrades;
-    }
-
-    pet.Calculate();
-
-    let result = "";
-    if (pet.upped_boost > 0)
-        result += "<div>Upgraded boost: <b>" + pet.upped_boost + "</b></div>";
-    if (pet.upped_range > 0)
-        result += "<div>Upgraded range: " + pet.upped_range + "</div>";
-    if (pet.upped_targets > 0)
-        result += "<div>Upgraded targets: " + pet.upped_targets + "</div>";
     if (pet.spare_ups > 0)
         result += "<div>Upgrades to spare: " + pet.spare_ups + "</div>";
 
@@ -1717,132 +1771,11 @@ function UpgradeRes(res) {
     else return res + 4;
 }
 
-function UpsToMaxRes(res) {
-    //beautiful
-    switch(res) {
-        case 23: case 24: case 25: case 26: case 27: case 28: case 29:
-            return 29 - res;
-        case 20: case 21: case 22:
-            return 29 - res - 2;
-        case 19:
-            return 7;
-        case 17: case 18:
-            return 8;
-        case 15: case 16:
-            return 9;
-        case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-        case 9: case 10: case 11: case 12: case 13: case 14:
-            return 14 - res + 10;
-        case 0:
-            PrintLog("res value 0, cannot upgrade");
-            return 0;
-        case -1: case -2: case -3: case -4: case -5: case -6: case -7:
-        case -8: case -9: case -10: case -11: case -12:
-            return 23 - res;
-        case -13: case -14:
-            return 36;
-        case -15: case -16:
-            return 37;
-        case -17: case -18:
-            return 38;
-    }
-    PrintLog("res value outside expected range");
-    return 0;
-}
-
-function UpgradeBaseDamage(damage, damage_per_up) {
-    let up_amount = 0;
-    if (damage * 0.15 < damage_per_up) up_amount = Math.floor(damage * 0.15);
-        else return damage += damage_per_up;
-    if (up_amount < 1) return damage + 1;
-        else return damage + up_amount;
-}
-
-function UpgradeRangedDamage(damage, damage_per_up) {
-    let up_amount = 0;
-    if (damage * 0.13 < damage_per_up) up_amount = Math.floor(damage * 0.13);
-        else return damage += damage_per_up;
-    if (up_amount < 1) return damage + 1;
-        else return damage + up_amount;
-}
-
-function UpgradeElemDamage(damage, damage_per_up) {
-    let up_amount = 0;
-    if (damage * 0.16 < damage_per_up) up_amount = Math.floor(damage * 0.16);
-        else return damage += damage_per_up;
-    if (up_amount < 1) return damage + 1;
-        else return damage + up_amount;
-}
-
-function UpgradeCharge(charge) {
-    /*
-     * calculates one upgrade to charge speed
-     * returns upgraded value
-     */
-    if (charge >= 128) {
-        PrintError("UpgradeCharge: charge speed over 128, cannot upgrade");
-        return charge;
-    }
-    if (charge === -1) return 1;
-    let quarter = Math.floor(Math.abs(charge) * 0.25);
-    if (quarter <= 1) quarter = 1;
-    if (quarter >= 4) quarter = 4;
-    if (charge + quarter >= 128) return 128;
-    else return charge + quarter;
-}
-
-function UpgradeKnockback(knockback) {
-    /*
-     * calculates one upgrade to knockback
-     * returns upgraded value
-     */
-    if (knockback >= 128) {
-        PrintError("UpgradeKnockback: knockback over 128, cannot upgrade");
-        return knockback;
-    }
-    if (knockback === -1) return 1;
-    let quarter = Math.floor(Math.abs(knockback) * 0.25);
-    if (quarter <= 1) quarter = 1;
-    if (quarter >= 4) quarter = 4;
-    if (knockback + quarter >= 128) return 128;
-    else return knockback + quarter;
-}
-
-function UpgradeProjSpeed(projspeed) {
-    /*
-     * calculates one upgrade to projectile speed
-     * returns upgraded value
-     */
-    if (projspeed >= 30000) {
-        PrintError("UpgradeProjSpeed: projectile speed over 30k, cannot upgrade");
-        return projspeed;
-    }
-    if (projspeed === -100) return 1;
-    let quarter = Math.floor(Math.abs(projspeed) * 0.25);
-    if (quarter <= 100) return projspeed + 100;
-    if (quarter >= 1200) return projspeed + 1200;
-    return projspeed + quarter;
-}
-
-function UpsToMaxProjSpeed(projspeed) {
-    /*
-     * returns total number of upgrades needed to reach max projectile speed
-     */
-    if (projspeed >= 30000) return 0;
-    if (projspeed >= 4800) return Math.ceil((30000 - projspeed) / 1200);
-    let ups = 0;
-    let quarter = 0;
-    while (projspeed < 30000) {
-        quarter = Math.floor(Math.abs(projspeed) * 0.25);
-        if (quarter < 100) quarter = 100;
-        if (quarter > 1200) quarter = 1200;
-        projspeed += quarter;
-        ups += 1;
-    }
-    return ups;
-}
-
 function DefaultResTarget(qualityname) {
+    /*
+     * returns resistance value that's needed to reach resistance cap with set bonus
+     * based on provided quality name
+     */
     switch (qualityname) {
         case "ultpp":
         case "ultp":
@@ -1863,6 +1796,9 @@ function DefaultResTarget(qualityname) {
 }
 
 function BonusMultiplier(qualityname) {
+    /*
+     * returns set bonus multiplier based of provided quality name
+     */
     switch (qualityname) {
         case "ultpp":
         case "ultp":
@@ -1884,6 +1820,9 @@ function BonusMultiplier(qualityname) {
 }
 
 function StatCap(qualityname) {
+    /*
+     * returns stat cap based on provided quality name
+     */
     switch (qualityname) {
         case "ultpp":
             return 999;
@@ -1906,6 +1845,10 @@ function StatCap(qualityname) {
 }
 
 function Sum(array) {
+    /*
+     * calculates the sum of every value in an array
+     * returns the sum
+     */
     let sum = 0;
     for (const element of array) {
         sum += parseInt(element);
@@ -1914,6 +1857,10 @@ function Sum(array) {
 }
 
 function HighestValueFirst(array) {
+    /*
+     * finds the highest value in an array and moves it to the front
+     * returns the updated array
+     */
     const max = Math.max(...array);
     
     if (array[0] === max) return array;
