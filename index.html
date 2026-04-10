@@ -513,8 +513,9 @@ function SetFields(layout) {
             document.getElementById("fields").innerHTML = '\
 <table>\n\
 <tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Block </td><td><input id="block" type="text"></td>\n\
 <td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
-<tr><td colspan="4" style="text-align:right;padding-right:7px">\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -524,8 +525,9 @@ function SetFields(layout) {
 <table>\n\
 <tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
-<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
-<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<td>Block </td><td><input id="block" type="text"></td></tr>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -1004,6 +1006,8 @@ class Item {
         this.max_rate = 0;
         this.knockback = 0;
         this.max_knockback = 60;
+        this.block = 0;
+        this.max_block = 96;
         this.charge = 0;
         this.max_charge = 128;
         this.charge_target = 0;
@@ -1019,6 +1023,7 @@ class Item {
         this.upped_rdamage = 0;
         this.upped_edamage = 0;
         this.upped_rate = 0;
+        this.upped_block = 0;
         this.upped_projcount = 0;
         this.upped_projspeed = 0;
         this.upped_charge = 0;
@@ -1082,6 +1087,18 @@ class Item {
         else this.upped_charge += up_amount;
     }
     
+    UpgradeBlock() {
+        if (this.upped_block === 0) {
+            PrintError("UpgradeBlock: block value 0, cannot upgrade");
+            return;
+        }
+        else if (this.upped_block === -5) {
+            this.upped_block = 1;
+            return;
+        }
+        this.upped_block += 5;
+    }
+    
     UpgradeKnockback() {
         if (this.upped_knockback >= 128) {
             PrintError("UpgradeKnockback: knockback over 128, cannot upgrade");
@@ -1129,6 +1146,24 @@ class Armor extends Item {
         this.upped_res = [];
         this.upped_stats = [];
     }
+    
+    UpgradeResistance(i) {
+        if (this.upped_res[i] === 0) {
+            PrintError("UpgradeResistance: resistance value 0, cannot upgrade");
+            return;
+        }
+        else if (this.upped_res[i] === -1) {
+            this.upped_res[i] = 1;
+            return;
+        }
+        else if (this.upped_res[i] >= 23) {
+            this.upped_res[i] += 1;
+            return;
+        }
+        let up_amount = Math.floor(Math.abs(this.upped_res[i]) * 0.15);
+        if (up_amount < 1) up_amount = 1;
+        this.upped_res[i] += up_amount;
+    }
 
     Calculate() {
         this.upped_res = this.resistances.slice();
@@ -1147,7 +1182,7 @@ class Armor extends Item {
                         i += 1;
                         continue;
                     }
-                    this.upped_res[i] = UpgradeRes(this.upped_res[i]);
+                    this.UpgradeResistance(i);
                     ups_spent += 1;
                     up_count += 1;
                     this.ups_on_res += 1;
@@ -1222,6 +1257,7 @@ class Weapon extends Item {
         this.upped_rdamage = this.rdamage;
         this.upped_edamage = this.edamage;
         this.upped_rate = this.rate;
+        this.upped_block = this.block;
         this.upped_projcount = this.projcount;
         this.upped_projspeed = this.projspeed;
         this.upped_charge = this.charge;
@@ -1252,21 +1288,24 @@ class Weapon extends Item {
                 continue loop;
             }
             if (this.upped_charge !== 0 && this.upped_charge < this.max_charge && (this.upped_charge < this.charge_target || this.charge_target === 0)) {
-                //this.upped_charge = UpgradeCharge(this.upped_charge);
                 this.UpgradeCharge();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
+            if (this.upped_block !== 0 && this.upped_block < this.max_block) {
+                this.UpgradeBlock();
+                ups_spent += 1;
+                up_count += 1;
+                continue loop;
+            }
             if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
-                //this.upped_knockback = UpgradeKnockback(this.upped_knockback);
                 this.UpgradeKnockback();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_projspeed !== 0 && this.upped_projspeed < this.max_projspeed) {
-                //this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
                 this.UpgradeProjSpeed();
                 ups_spent += 1;
                 up_count += 1;
@@ -1565,6 +1604,10 @@ function CalculateWeapon() {
         const knockback = parseInt(document.getElementById("knockback").value);
         if (!isNaN(knockback) && knockback !== 0) weapon.knockback = knockback;
     }
+    if (document.getElementById("block")) {
+        const block = parseInt(document.getElementById("block").value);
+        if (!isNaN(block) && block !== 0) weapon.block = block;
+    }
     if (document.getElementById("charge")) {
         const charge = parseInt(document.getElementById("charge").value);
         if (!isNaN(charge) && charge !== 0) weapon.charge = charge;
@@ -1605,6 +1648,8 @@ function CalculateWeapon() {
         result += "<div>Upgraded attack rate: " + weapon.upped_rate + "</div>";
     if (weapon.upped_knockback > 0)
         result += "<div>Upgraded knockback: " + weapon.upped_knockback + "</div>";
+    if (weapon.upped_block > 0)
+        result += "<div>Upgraded block: " + weapon.upped_block + "</div>";
     if (weapon.upped_charge > 0)
         result += "<div>Upgraded charge speed: " + weapon.upped_charge + "</div>";
     if (weapon.upped_projcount > 0)
@@ -1747,28 +1792,6 @@ function CalculateStick() {
         result += "<div>Upgrades to spare: " + stick.spare_ups + "</div>";
 
     PrintResult(result);
-}
-
-function UpgradeRes(res) {
-    /*
-     * calculates one upgrade to resistance
-     * returns upgraded value
-     */
-    //todo convert to res *= 1.15
-    res = parseInt(res);
-    if (res === 0 || isNaN(res)) {
-        PrintLog("res value 0, cannot upgrade");
-        return NaN;
-    }
-    if (res >= 23) return res + 1;
-    if (res >= 20) return res + 3;
-    if (res >= 14) return res + 2;
-    if (res >= 1) return res + 1;
-    if (res === -1) return 1;
-    if (res >= -13) return res + 1;
-    if (res >= -19) return res + 2;
-    if (res >= -25) return res + 3;
-    else return res + 4;
 }
 
 function DefaultResTarget(qualityname) {
