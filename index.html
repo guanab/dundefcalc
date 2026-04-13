@@ -193,11 +193,13 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <option value="enchantedbishop">Enchanted Bishop</option>\n\
 <option value="lavaslingerrl">Lava Slinger RL</option>\n\
 <option value="obsidianclava">Obsidian Clava</option>\n\
+<option value="opticstaff">Optic Staff</option>\n\
 <option value="staffoffrost">Staff of Frost</option>\n\
 <option value="staffofhearts">Staff of Hearts</option>\n\
 </optgroup>\n\
 <optgroup label="Huntress">\n\
 <option value="egganator2000">Egganator 2000</option>\n\
+<option value="minigun">Minigun</option>\n\
 <option value="vanwolfsteinrl">Van Wolfstein RL</option>\n\
 </optgroup>\n\
 <optgroup label="Monk">\n\
@@ -225,6 +227,8 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <option value="emberpony">Ember Pony</option>\n\
 <option value="etherianancient">Etherian Ancient</option>\n\
 <option value="eyeofdestruction">Eye of Destruction</option>\n\
+<option value="eyeoffirestorm">Eye of Firestorm</option>\n\
+<option value="eyeofhaste">Eye of Haste</option>\n\
 <option value="genie">Genie</option>\n\
 <option value="littlewizard">Little Wizard</option>\n\
 <option value="loverscupid">Lover\'s Cupid</option>\n\
@@ -268,6 +272,7 @@ function ChangeFields(itemname) {
         case "enchantedbishop":
         case "lavaslingerrl":
         case "obsidianclava":
+        case "opticstaff":
         case "staffoffrost":
             SetFields("appmultiprojdualwep");
             SetQualities("sup_ult");
@@ -286,6 +291,10 @@ function ChangeFields(itemname) {
          */
         case "egganator2000":
             SetFields("huntsingleprojwep");
+            SetQualities("sup_ult");
+            break;
+        case "minigun":
+            SetFields("huntsingleprojwepnorate");
             SetQualities("sup_ult");
             break;
         case "vanwolfsteinrl":
@@ -330,6 +339,7 @@ function ChangeFields(itemname) {
         case "cowboymonkey":
         case "littlewizard":
         case "eyeofdestruction":
+        case "eyeofhaste":
             SetFields("singleprojpet");
             SetQualities("sup_ult");
             break;
@@ -342,6 +352,10 @@ function ChangeFields(itemname) {
         case "emberpony":
             SetFields("multiprojpet");
             SetQualities("any");
+            break;
+        case "eyeoffirestorm":
+            SetFields("singleprojpetnorate");
+            SetQualities("sup_ult");
             break;
         case "genie":
             SetFields("genie");
@@ -448,6 +462,17 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
+        case "huntsingleprojwepnorate":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
         case "huntmultiprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
@@ -524,8 +549,8 @@ function SetFields(layout) {
             document.getElementById("fields").innerHTML = '\
 <table>\n\
 <tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
-<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
-<td>Block </td><td><input id="block" type="text"></td></tr>\n\
+<td>Block </td><td><input id="block" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td></tr>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
@@ -552,6 +577,17 @@ function SetFields(layout) {
 <td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "singleprojpetnorate":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Projectile speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -772,6 +808,17 @@ function SetUpgradeValues(item, itemname, quality) {
                 }
                 item.max_projcount = 5;
                 break;
+            case "opticstaff":
+                if (quality.includes("ult")) {
+                    item.bdamage_per_up = 174.1061;
+                    item.edamage_per_up = 174.1061;
+                }
+                else {
+                    item.bdamage_per_up = 174.1061;
+                    item.edamage_per_up = 174.1061;
+                }
+                item.max_projcount = 6;
+                break;
             case "staffoffrost":
                 if (quality.includes("ult")) {
                     item.bdamage_per_up = 162.6219;
@@ -800,6 +847,11 @@ function SetUpgradeValues(item, itemname, quality) {
                 if (quality.includes("ult")) item.bdamage_per_up = 591.9211;
                 else item.bdamage_per_up = 493.9243;
                 item.max_rate = 5;
+                break;
+            case "minigun":
+                if (quality.includes("ult")) item.bdamage_per_up = 640;
+                else item.bdamage_per_up = 160;
+                item.max_projspeed = 40000;
                 break;
             case "vanwolfsteinrl":
                 if (quality.includes("ult")) item.bdamage_per_up = 171.9906;
@@ -855,7 +907,7 @@ function SetUpgradeValues(item, itemname, quality) {
         return true;
     }
     /*
-     * DAMAGE PET
+     * PET
      */
     if (item instanceof Pet) {
         console.log("SetUpgradeValues: item type pet");
@@ -888,6 +940,15 @@ function SetUpgradeValues(item, itemname, quality) {
                 if (quality.includes("ult")) item.bdamage_per_up = 160;
                 else item.bdamage_per_up = 136;
                 item.max_rate = 7;
+                break;
+            case "eyeoffirestorm":
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 64;
+                break;
+            case "eyeofhaste":
+                if (quality.includes("ult")) item.bdamage_per_up = 33.6;
+                else item.bdamage_per_up = 29.6;
+                item.max_rate = 14;
                 break;
             case "genie":
                 if (quality.includes("ult")) item.bdamage_per_up = 140;
@@ -1036,7 +1097,7 @@ class Item {
     
     UpgradeBaseDamage() {
         let up_amount = 0;
-        if (this.upped_bdamage * 0.15 < this.bdamage_per_up) up_amount = Math.floor(this.upped_bdamage * 0.15);
+        if (this.upped_bdamage * 0.15 < this.bdamage_per_up) up_amount = Math.round(this.upped_bdamage * 0.15);
         else {
             this.upped_bdamage += this.bdamage_per_up;
             return;
@@ -1047,7 +1108,7 @@ class Item {
     
     UpgradeRangedDamage() {
         let up_amount = 0;
-        if (this.upped_rdamage * 0.13 < this.rdamage_per_up) up_amount = Math.floor(this.upped_rdamage * 0.13);
+        if (this.upped_rdamage * 0.13 < this.rdamage_per_up) up_amount = Math.round(this.upped_rdamage * 0.13);
         else {
             this.upped_rdamage += this.rdamage_per_up;
             return;
@@ -1058,7 +1119,7 @@ class Item {
     
     UpgradeElemDamage() {
         let up_amount = 0;
-        if (this.upped_edamage * 0.16 < this.edamage_per_up) up_amount = Math.floor(this.upped_edamage * 0.16);
+        if (this.upped_edamage * 0.16 < this.edamage_per_up) up_amount = Math.round(this.upped_edamage * 0.16);
         else {
             this.upped_edamage += this.edamage_per_up;
             return;
@@ -1349,9 +1410,9 @@ class Weapon extends Item {
             }
             up_count += 1;
         }
-        this.upped_bdamage = Math.floor(this.upped_bdamage);
-        this.upped_rdamage = Math.floor(this.upped_rdamage);
-        this.upped_edamage = Math.floor(this.upped_edamage);
+        this.upped_bdamage = Math.round(this.upped_bdamage);
+        this.upped_rdamage = Math.round(this.upped_rdamage);
+        this.upped_edamage = Math.round(this.upped_edamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("weapon upgrades calculated");
@@ -1445,7 +1506,7 @@ class Pet extends Item {
             }
             up_count += 1;
         }
-        this.upped_bdamage = Math.floor(this.upped_bdamage);
+        this.upped_bdamage = Math.round(this.upped_bdamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("pet upgrades calculated");
