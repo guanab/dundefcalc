@@ -107,8 +107,10 @@ select {
     margin: 0px;
     padding: 0px;
     padding-left: 3px;
+    padding-right: 18px;
     border-color: #777777;
     border-width: 1px;
+    max-width: 200px;
 }
 select:disabled {
     color: #666666;
@@ -187,6 +189,7 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <select id="itemname" onchange="ChangeFields(this.value)">\n\
 <option value="statstick">Stat stick / builder</option>\n\
 <optgroup label="Apprentice">\n\
+<option value="caneofdoomedrelationships">Cane of Doomed Relationships</option>\n\
 <option value="crystalcane">Crystal Cane</option>\n\
 <option value="elderstaff">Elder Staff</option>\n\
 <option value="embersceptre">Ember Sceptre</option>\n\
@@ -199,6 +202,7 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 </optgroup>\n\
 <optgroup label="Huntress">\n\
 <option value="egganator2000">Egganator 2000</option>\n\
+<option value="forestrifle">Forest Rifle</option>\n\
 <option value="minigun">Minigun</option>\n\
 <option value="vanwolfsteinrl">Van Wolfstein RL</option>\n\
 </optgroup>\n\
@@ -208,6 +212,8 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <option value="eternianspearnm">Eternian Spear NM</option>\n\
 <option value="madnessboulderthrower">Madness Boulder Thrower</option>\n\
 <option value="mischiefmaker">Mischief Maker</option>\n\
+<option value="stickhorse">Stick Horse</option>\n\
+<option value="turtleshellpolearm">Turtleshell Polearm</option>\n\
 </optgroup>\n\
 <optgroup label="Squire">\n\
 <option value="anubisssandblade">Anubis\'s Sand Blade</option>\n\
@@ -221,6 +227,7 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
         case "pet":
             document.getElementById("subselect").innerHTML = '\
 <select id="itemname" onchange="ChangeFields(this.value)">\n\
+<option value="chainsawcorgi">Chainsaw Corgi</option>\n\
 <option value="cowboymonkey">Cowboy Monkey</option>\n\
 <option value="diamond">Diamond / Heart</option>\n\
 <option value="dice">Dice</option>\n\
@@ -230,10 +237,13 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 <option value="eyeoffirestorm">Eye of Firestorm</option>\n\
 <option value="eyeofhaste">Eye of Haste</option>\n\
 <option value="genie">Genie</option>\n\
+<option value="kairithebrave">Kairi the Brave</option>\n\
 <option value="littlewizard">Little Wizard</option>\n\
 <option value="loverscupid">Lover\'s Cupid</option>\n\
 <option value="mrowl">Mr. Owl / Peckers</option>\n\
+<option value="mummy">Mummy</option>\n\
 <option value="propellercat">Propeller Cat</option>\n\
+<option value="robochicken">Robo Chicken</option>\n\
 <option value="zamirasmount">Zamira\'s Mount</option>\n\
 </select>\n\
 <select id="quality"></select>';
@@ -271,25 +281,30 @@ function ChangeFields(itemname) {
         case "crystalcane":
         case "enchantedbishop":
         case "lavaslingerrl":
-        case "obsidianclava":
-        case "opticstaff":
         case "staffoffrost":
             SetFields("appmultiprojdualwep");
             SetQualities("sup_ult");
             break;
+        case "caneofdoomedrelationships":
         case "elderstaff":
         case "embersceptre":
             SetFields("appsingleprojwep");
             SetQualities("sup_ult");
             break;
+        case "obsidianclava":
+        case "opticstaff":
+            SetFields("appmultiprojdualwep");
+            SetQualities("any");
+            break;
         case "staffofhearts":
             SetFields("appmultiprojwep");
-            SetQualities("sup_ult");
+            SetQualities("any");
             break;
         /*
          * HUNTRESS
          */
         case "egganator2000":
+        case "forestrifle":
             SetFields("huntsingleprojwep");
             SetQualities("sup_ult");
             break;
@@ -307,7 +322,7 @@ function ChangeFields(itemname) {
         case "candycane":
         case "embercrescent":
             SetFields("monkmultiprojwep");
-            SetQualities("sup_ult");
+            SetQualities("any");
             break;
         case "eternianspearnm":
             SetFields("monkmeleewep");
@@ -318,20 +333,28 @@ function ChangeFields(itemname) {
             SetQualities("myth_ultpp");
             break;
         case "mischiefmaker":
-            SetFields("monksingleprojwep");
+            SetFields("monkmischief");
             SetQualities("myth_ultpp");
+            break;
+        case "stickhorse":
+        case "turtleshellpolearm":
+            SetFields("monkmultiprojwephybrid");
+            SetQualities("sup_ult");
             break;
         /*
          * SQUIRE
          */
         case "anubisssandblade":
             SetFields("squiremeleewep");
-            SetQualities("sup_ult");
+            SetQualities("any");
             break;
         case "calamityblade":
-        case "disasterrapier":
             SetFields("squiresingleprojwep");
             SetQualities("sup_ult");
+            break;
+        case "disasterrapier":
+            SetFields("squiresingleprojwep");
+            SetQualities("any");
             break;
         /*
          * PET
@@ -361,14 +384,24 @@ function ChangeFields(itemname) {
             SetFields("genie");
             SetQualities("myth_ultpp");
             break;
+        case "kairithebrave":
+            SetFields("meleepetnoknockback");
+            SetQualities("sup_ult");
+            break;
         case "loverscupid":
+        case "mummy":
         case "zamirasmount":
             SetFields("multiprojpet");
             SetQualities("sup_ult");
             break;
+        case "chainsawcorgi":
         case "propellercat":
             SetFields("cat");
             SetQualities("myth_trans");
+            break;
+        case "robochicken":
+            SetFields("meleepet");
+            SetQualities("any");
             break;
         /*
          * STAT STICK
@@ -496,7 +529,7 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
-        case "monksingleprojwep":
+        case "monkmischief":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
 <tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
@@ -511,6 +544,20 @@ function SetFields(layout) {
         case "monkmultiprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
+<tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
+<td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "monkmultiprojwephybrid":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>or</td></tr>\n\
 <tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Proj count </td><td><input id="projcount" type="text"></td>\n\
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
@@ -565,6 +612,17 @@ function SetFields(layout) {
 <td>Knockback </td><td><input id="knockback" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "meleepetnoknockback":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -730,20 +788,18 @@ function SetUpgradeValues(item, itemname, quality) {
             /*
              * APPRENTICE
              */
+            case "caneofdoomedrelationships":
+                if (quality.includes("ult")) item.bdamage_per_up = 118.2714;
+                else item.bdamage_per_up = 105.6;
+                break;
             case "crystalcane":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 162.6219;
-                    item.edamage_per_up = 162;
-                }
-                else {
-                    item.bdamage_per_up = 156.2831;
-                    item.edamage_per_up = 162;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 162.6219;
+                else item.bdamage_per_up = 156.2831;
+                item.edamage_per_up = 162;
                 item.max_projcount = 5;
                 break;
             case "dragonstaff":
-                if (quality.includes("ult")) item.edamage_per_up = 91.7246;
-                else item.edamage_per_up = 91.7246;
+                item.edamage_per_up = 91.7246;
                 break;
             case "elderstaff":
                 if (quality.includes("ult")) item.bdamage_per_up = 151.2;
@@ -754,85 +810,47 @@ function SetUpgradeValues(item, itemname, quality) {
                 else item.bdamage_per_up = 96;
                 break;
             case "enchantedbishop":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 163.2958;
-                    item.edamage_per_up = 163.1994;
-                }
-                else {
-                    item.bdamage_per_up = 145.8034;
-                    item.edamage_per_up = 163.1994;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 163.2958;
+                else item.bdamage_per_up = 145.8034;
+                item.edamage_per_up = 163.1994;
                 item.max_projcount = 5;
                 break;
             case "eternianstaffnm":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 134.4027;
-                    item.edamage_per_up = 144;
-                }
-                else {
-                    item.bdamage_per_up = 127.6338;
-                    item.edamage_per_up = 144;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 134.4027;
+                else item.bdamage_per_up = 127.6338;
+                item.edamage_per_up = 144;
                 item.max_projcount = 5;
                 break;
             case "lavaslingernm":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 67.2;
-                    item.edamage_per_up = 144;
-                }
-                else {
-                    item.bdamage_per_up = 48.9589;
-                    item.edamage_per_up = 144;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 67.2;
+                else item.bdamage_per_up = 48.9589;
+                item.edamage_per_up = 144;
                 item.max_projcount = 5;
                 break;
             case "lavaslingerrl":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 158.1888;
-                    item.edamage_per_up = 156.9578;
-                }
-                else {
-                    item.bdamage_per_up = 115.2573;
-                    item.edamage_per_up = 156.9578;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 158.1888;
+                else item.bdamage_per_up = 115.2573;
+                item.edamage_per_up = 156.9578;
                 item.max_projcount = 5;
                 break;
             case "obsidianclava":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 150.5291;
-                    item.edamage_per_up = 149.9124;
-                }
-                else {
-                    item.bdamage_per_up = 150.5291;
-                    item.edamage_per_up = 149.9124;
-                }
+                item.bdamage_per_up = 150.5291;
+                item.edamage_per_up = 149.9124;
                 item.max_projcount = 5;
                 break;
             case "opticstaff":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 174.1061;
-                    item.edamage_per_up = 174.1061;
-                }
-                else {
-                    item.bdamage_per_up = 174.1061;
-                    item.edamage_per_up = 174.1061;
-                }
+                item.bdamage_per_up = 174.1061;
+                item.edamage_per_up = 174.1061;
                 item.max_projcount = 6;
                 break;
             case "staffoffrost":
-                if (quality.includes("ult")) {
-                    item.bdamage_per_up = 162.6219;
-                    item.edamage_per_up = 162;
-                }
-                else {
-                    item.bdamage_per_up = 156.2831;
-                    item.edamage_per_up = 162;
-                }
+                if (quality.includes("ult")) item.bdamage_per_up = 162.6219;
+                else item.bdamage_per_up = 156.2831;
+                item.edamage_per_up = 162;
                 item.max_projcount = 5;
                 break;
             case "staffofhearts":
-                if (quality.includes("ult")) item.bdamage_per_up = 163.2939;
-                else item.bdamage_per_up = 163.2939;
+                item.bdamage_per_up = 163.2939;
                 item.max_projcount = 5;
                 break;
             case "thenorthpole":
@@ -847,6 +865,11 @@ function SetUpgradeValues(item, itemname, quality) {
                 if (quality.includes("ult")) item.bdamage_per_up = 591.9211;
                 else item.bdamage_per_up = 493.9243;
                 item.max_rate = 5;
+                break;
+            case "forestrifle":
+                if (quality.includes("ult")) item.bdamage_per_up = 360;
+                else item.bdamage_per_up = 280;
+                item.max_rate = 3;
                 break;
             case "minigun":
                 if (quality.includes("ult")) item.bdamage_per_up = 640;
@@ -863,13 +886,11 @@ function SetUpgradeValues(item, itemname, quality) {
              * MONK
              */
             case "candycane":
-                if (quality.includes("ult")) item.rdamage_per_up = 158.6846;
-                else item.rdamage_per_up = 158.6846;
+                item.rdamage_per_up = 158.6846;
                 item.max_projcount = 5;
                 break;
             case "embercrescent":
-                if (quality.includes("ult")) item.rdamage_per_up = 179.9838;
-                else item.rdamage_per_up = 179.9838;
+                item.rdamage_per_up = 179.9838;
                 item.max_projcount = 2;
                 break;
             case "eternianspearnm":
@@ -877,28 +898,36 @@ function SetUpgradeValues(item, itemname, quality) {
                 else item.bdamage_per_up = 295.2897;
                 break;
             case "madnessboulderthrower":
-                if (quality.includes("ult")) item.rdamage_per_up = 72;
-                else item.rdamage_per_up = 72;
+                item.rdamage_per_up = 72;
                 item.max_projcount = 4;
                 break;
             case "mischiefmaker":
-                if (quality.includes("ult")) item.rdamage_per_up = 27.5990;
-                else item.rdamage_per_up = 27.5990;
+                item.rdamage_per_up = 27.5990;
+                break;
+            case "stickhorse":
+                if (quality.includes("ult")) item.bdamage_per_up = 460.9514;
+                else item.bdamage_per_up = 329.2464;
+                item.rdamage_per_up = 181.0398;
+                item.max_projcount = 5;
+                break;
+            case "turtleshellpolearm":
+                if (quality.includes("ult")) item.bdamage_per_up = 430.1285;
+                else item.bdamage_per_up = 387.8222;
+                item.rdamage_per_up = 171.0198;
+                item.max_projcount = 2;
                 break;
             /*
              * SQUIRE
              */
             case "anubisssandblade":
-                if (quality.includes("ult")) item.bdamage_per_up = 208.4599;
-                else item.bdamage_per_up = 208.4599;
+                item.bdamage_per_up = 208.4599;
                 break;
             case "calamityblade":
                 if (quality.includes("ult")) item.bdamage_per_up = 190.6280;
                 else item.bdamage_per_up = 151.3733;
                 break;
             case "disasterrapier":
-                if (quality.includes("ult")) item.bdamage_per_up = 166.5194;
-                else item.bdamage_per_up = 166.5194;
+                item.bdamage_per_up = 166.5194;
                 break;
             default:
                 PrintError("SetUpgradeValues: item name not recognized");
@@ -912,6 +941,10 @@ function SetUpgradeValues(item, itemname, quality) {
     if (item instanceof Pet) {
         console.log("SetUpgradeValues: item type pet");
         switch (itemname) {
+            case "chainsawcorgi":
+                item.max_range = 110;
+                item.max_targets = 6;
+                break;
             case "cowboymonkey":
                 if (quality.includes("ult")) item.bdamage_per_up = 263.1980;
                 else item.bdamage_per_up = 150.4020;
@@ -924,8 +957,7 @@ function SetUpgradeValues(item, itemname, quality) {
                 item.max_knockback = 60;
                 break;
             case "emberpony":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 112;
+                item.bdamage_per_up = 112;
                 item.max_rate = 6;
                 item.max_projcount = 2;
                 break;
@@ -954,6 +986,11 @@ function SetUpgradeValues(item, itemname, quality) {
                 if (quality.includes("ult")) item.bdamage_per_up = 140;
                 else item.bdamage_per_up = 80;
                 break;
+            case "kairithebrave":
+                if (quality.includes("ult")) item.bdamage_per_up = 21;
+                else item.bdamage_per_up = 12;
+                item.max_rate = 8;
+                break;
             case "littlewizard":
                 if (quality.includes("ult")) item.bdamage_per_up = 112;
                 else item.bdamage_per_up = 64;
@@ -965,9 +1002,20 @@ function SetUpgradeValues(item, itemname, quality) {
                 item.max_rate = 6;
                 item.max_projcount = 7;
                 break;
+            case "mummy":
+                if (quality.includes("ult")) item.bdamage_per_up = 112;
+                else item.bdamage_per_up = 64;
+                item.max_rate = 6;
+                item.max_projcount = 3;
+                break;
             case "propellercat":
                 item.max_range = 90;
                 item.max_targets = 4;
+                break;
+            case "robochicken":
+                item.bdamage_per_up = 59.2173;
+                item.max_rate = 4;
+                item.max_knockback = 128;
                 break;
             case "zamirasmount":
                 if (quality.includes("ult")) item.bdamage_per_up = 112;
@@ -1194,6 +1242,18 @@ class Item {
         else if (up_amount >= 1200) this.upped_projspeed += 1200;
         else this.upped_projspeed += up_amount;
     }
+    
+    UpgradePrioStat() {
+        if (this.upped_priostat === 0) PrintError("UpgradePrioStat: stat value 0, cannot upgrade");
+        else if (this.upped_priostat === -1) this.upped_priostat = 1;
+        else this.upped_priostat += 1;
+    }
+    
+    UpgradeStat() {
+        if (this.upped_stat === 0) PrintError("UpgradeStat: stat value 0, cannot upgrade");
+        else if (this.upped_stat === -1) this.upped_stat = 1;
+        else this.upped_stat += 1;
+    }
 }
 
 class Armor extends Item {
@@ -1209,6 +1269,10 @@ class Armor extends Item {
     }
     
     UpgradeResistance(i) {
+        if (isNaN(i)) {
+            PrintError("UpgradeResistance: array index is not a number");
+            return;
+        }
         if (this.upped_res[i] === 0) {
             PrintError("UpgradeResistance: resistance value 0, cannot upgrade");
             return;
@@ -1224,6 +1288,20 @@ class Armor extends Item {
         let up_amount = Math.floor(Math.abs(this.upped_res[i]) * 0.15);
         if (up_amount < 1) up_amount = 1;
         this.upped_res[i] += up_amount;
+    }
+    
+    UpgradeStat(i) {
+        if (isNaN(i)) {
+            PrintError("UpgradeStat: array index is not a number");
+            return;
+        }
+        if (this.upped_stats[i] === 0) {
+            PrintError("UpgradeStat: stat value 0, cannot upgrade");
+        }
+        else if (this.upped_stats[i] === -1) {
+            this.upped_stats[i] = 1;
+        }
+        else this.upped_stats[i] += 1;
     }
 
     Calculate() {
@@ -1382,21 +1460,18 @@ class Weapon extends Item {
                 continue loop;
             }
             if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
-                //this.upped_bdamage = UpgradeBaseDamage(this.upped_bdamage, this.bdamage_per_up);
                 this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_rdamage > 0 && (this.upped_rdamage < this.rdamage_target || this.rdamage_target === 0)) {
-                //this.upped_rdamage = UpgradeRangedDamage(this.upped_rdamage, this.rdamage_per_up);
                 this.UpgradeRangedDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_edamage > 0 && (this.upped_edamage < this.edamage_target || this.edamage_target === 0)) {
-                //this.upped_edamage = UpgradeElemDamage(this.upped_edamage, this.edamage_per_up);
                 this.UpgradeElemDamage();
                 ups_spent += 1;
                 up_count += 1;
