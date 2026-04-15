@@ -687,7 +687,7 @@ function SetQualities(qualityrange) {
     switch (qualityrange) {
         case "any":
             document.getElementById("quality").innerHTML = '<option value="any">Any quality</option>';
-            document.getElementById("quality").disabled = true;
+            document.getElementById("quality").disabled = false;
             break;
         case "sup_ult":
             document.getElementById("quality").innerHTML = '\
@@ -807,8 +807,8 @@ function SearchItems() {
         HideSearch();
         return;
     }
-    ShowSearch();
     
+    const searchresults = document.getElementById("searchresults");
     const sorteditems = ITEMS.toSorted((a, b) => a.displayName.localeCompare(b.displayName));
     
     let htmlstring = "";
@@ -821,10 +821,13 @@ function SearchItems() {
         }
     }
     
-    if (resultcount > 10) document.getElementById("searchresults").style.overflowY = "scroll";
-    else document.getElementById("searchresults").style.overflowY = "hidden";
+    if (resultcount > 10) searchresults.style.overflowY = "scroll";
+    else searchresults.style.overflowY = "hidden";
     
-    document.getElementById("searchresults").innerHTML = htmlstring;
+    searchresults.innerHTML = htmlstring;
+    
+    ShowSearch();
+    searchresults.scrollTop = 0;
 }
 
 function SelectSearchResult(itemname) {
