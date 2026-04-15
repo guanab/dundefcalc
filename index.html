@@ -733,7 +733,6 @@ function SetQualities(qualityrange) {
 function SetUpgradeValues(item, itemname, quality) {
     /*
      * sets upgrade values into a provided instance of Item class
-     * todo move this stuff into an xml/json file along with a parser
      */
     for (const obj of ITEMS) {
         if (itemname === obj.name) {
@@ -1988,6 +1987,16 @@ const ITEMS = [
 {
     "type":"weapon",
     "hero":"huntress",
+    "name":"loveblaster",
+    "displayName":"Love Blaster",
+    "ultBaseDamagePerUp":492.7984,
+    "baseDamagePerUp":394,
+    "maxRate":5,
+    "maxProjCount":2
+},
+{
+    "type":"weapon",
+    "hero":"huntress",
     "name":"minigun",
     "displayName":"Minigun",
     "ultBaseDamagePerUp":640,
@@ -2212,6 +2221,25 @@ const ITEMS = [
     "baseDamagePerUp":64,
     "maxRate":6,
     "maxProjCount":7,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"loversnake",
+    "displayName":"Lover Snake",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxRate":6,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"magicscroll",
+    "displayName":"Magic Scroll",
+    "ultBaseDamagePerUp":224,
+    "baseDamagePerUp":200,
+    "maxRate":3,
+    "maxProjCount":3,
     "maxProjSpeed":30000
 },
 {
