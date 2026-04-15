@@ -78,6 +78,35 @@ body {
     padding: 10px;
     font-size: 16px;
 }
+.searchbox {
+    display: inline-block;
+}
+.searchbox input {
+    width: 120px !important;
+}
+.searchresults {
+    display: none;
+    position: absolute;
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: white;
+}
+.searchresults button {
+    width: 100%;
+    height: 30px;
+    text-align: left;
+    background-image: none;
+    background-color: #ffffff !important;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0px;
+    border-width: 0px;
+}
+.searchresults button:hover {
+    background-color: #eeeeee !important;
+}
 input[type=text] {
     width: 70px;
     font-size: 16px;
@@ -107,7 +136,6 @@ select {
     margin: 0px;
     padding: 0px;
     padding-left: 3px;
-    padding-right: 18px;
     border-color: #777777;
     border-width: 1px;
     max-width: 200px;
@@ -153,6 +181,10 @@ button {
         <option disabled>---</option>
         <option value="about">About</option>
     </select>
+    <div class ="searchbox">
+    <div><input id="searchbox" type="text" placeholder="Search..." onkeyup="SearchItems()"></div>
+    <div id="searchresults" class="searchresults"></div>
+    </div>
 </div>
 <div id="subselect" class="subselect"></div>
 <div id="fields" class="fields"></div>
@@ -174,6 +206,8 @@ function ChangeItemType(itemtype) {
     ClearLog();
     
     console.log("ChangeItemType: item type " + itemtype);
+    
+    let htmlstring = "";
 
     switch (itemtype) {
         case "armor":
@@ -185,68 +219,43 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
             ChangeFields("armor");
             break;
         case "weapon":
-            document.getElementById("subselect").innerHTML = '\
-<select id="itemname" onchange="ChangeFields(this.value)">\n\
-<option value="statstick">Stat stick / builder</option>\n\
-<optgroup label="Apprentice">\n\
-<option value="caneofdoomedrelationships">Cane of Doomed Relationships</option>\n\
-<option value="crystalcane">Crystal Cane</option>\n\
-<option value="elderstaff">Elder Staff</option>\n\
-<option value="embersceptre">Ember Sceptre</option>\n\
-<option value="enchantedbishop">Enchanted Bishop</option>\n\
-<option value="lavaslingerrl">Lava Slinger RL</option>\n\
-<option value="obsidianclava">Obsidian Clava</option>\n\
-<option value="opticstaff">Optic Staff</option>\n\
-<option value="staffoffrost">Staff of Frost</option>\n\
-<option value="staffofhearts">Staff of Hearts</option>\n\
-</optgroup>\n\
-<optgroup label="Huntress">\n\
-<option value="egganator2000">Egganator 2000</option>\n\
-<option value="forestrifle">Forest Rifle</option>\n\
-<option value="minigun">Minigun</option>\n\
-<option value="vanwolfsteinrl">Van Wolfstein RL</option>\n\
-</optgroup>\n\
-<optgroup label="Monk">\n\
-<option value="candycane">Candy Cane</option>\n\
-<option value="embercrescent">Ember Crescent</option>\n\
-<option value="eternianspearnm">Eternian Spear NM</option>\n\
-<option value="madnessboulderthrower">Madness Boulder Thrower</option>\n\
-<option value="mischiefmaker">Mischief Maker</option>\n\
-<option value="stickhorse">Stick Horse</option>\n\
-<option value="turtleshellpolearm">Turtleshell Polearm</option>\n\
-</optgroup>\n\
-<optgroup label="Squire">\n\
-<option value="anubisssandblade">Anubis\'s Sand Blade</option>\n\
-<option value="calamityblade">Calamity Blade</option>\n\
-<option value="disasterrapier">Disaster Rapier</option>\n\
-</optgroup>\n\
-</select>\n\
-<select id="quality"></select>';
+            htmlstring += '<select id="itemname" onchange="ChangeFields(this.value)">\n';
+            for (const obj of ITEMS.filter(obj => obj.hero === "any")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '<optgroup label="Apprentice">\n';
+            for (const obj of ITEMS.filter(obj => obj.hero === "apprentice")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '</optgroup><optgroup label="Huntress">\n';
+            for (const obj of ITEMS.filter(obj => obj.hero === "huntress")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '</optgroup><optgroup label="Monk">\n';
+            for (const obj of ITEMS.filter(obj => obj.hero === "monk")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '</optgroup><optgroup label="Squire">\n';
+            for (const obj of ITEMS.filter(obj => obj.hero === "squire")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '</optgroup></select>\n';
+            htmlstring += '<select id="quality"></select>\n';
+            
+            document.getElementById("subselect").innerHTML = htmlstring;
+            
             ChangeFields(document.getElementById("itemname").value);
             break;
         case "pet":
-            document.getElementById("subselect").innerHTML = '\
-<select id="itemname" onchange="ChangeFields(this.value)">\n\
-<option value="chainsawcorgi">Chainsaw Corgi</option>\n\
-<option value="cowboymonkey">Cowboy Monkey</option>\n\
-<option value="diamond">Diamond / Heart</option>\n\
-<option value="dice">Dice</option>\n\
-<option value="emberpony">Ember Pony</option>\n\
-<option value="etherianancient">Etherian Ancient</option>\n\
-<option value="eyeofdestruction">Eye of Destruction</option>\n\
-<option value="eyeoffirestorm">Eye of Firestorm</option>\n\
-<option value="eyeofhaste">Eye of Haste</option>\n\
-<option value="genie">Genie</option>\n\
-<option value="kairithebrave">Kairi the Brave</option>\n\
-<option value="littlewizard">Little Wizard</option>\n\
-<option value="loverscupid">Lover\'s Cupid</option>\n\
-<option value="mrowl">Mr. Owl / Peckers</option>\n\
-<option value="mummy">Mummy</option>\n\
-<option value="propellercat">Propeller Cat</option>\n\
-<option value="robochicken">Robo Chicken</option>\n\
-<option value="zamirasmount">Zamira\'s Mount</option>\n\
-</select>\n\
-<select id="quality"></select>';
+            htmlstring += '<select id="itemname" onchange="ChangeFields(this.value)">\n';
+            for (const obj of ITEMS.filter(obj => obj.type === "pet")) {
+                htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
+            }
+            htmlstring += '</select>\n';
+            htmlstring += '<select id="quality"></select>\n';
+            
+            document.getElementById("subselect").innerHTML = htmlstring;
+            
             ChangeFields(document.getElementById("itemname").value);
             break;
         case "about":
@@ -269,156 +278,90 @@ function ChangeFields(itemname) {
     ClearLog();
     
     console.log("ChangeFields: item name " + itemname);
-
-    switch (itemname) {
-        case "armor":
-            SetFields("armor");
-            SetQualities("godly_ultpp");
-            break;
-        /*
-         * APPRENTICE
-         */
-        case "crystalcane":
-        case "enchantedbishop":
-        case "lavaslingerrl":
-        case "staffoffrost":
-            SetFields("appmultiprojdualwep");
-            SetQualities("sup_ult");
-            break;
-        case "caneofdoomedrelationships":
-        case "elderstaff":
-        case "embersceptre":
-            SetFields("appsingleprojwep");
-            SetQualities("sup_ult");
-            break;
-        case "obsidianclava":
-        case "opticstaff":
-            SetFields("appmultiprojdualwep");
-            SetQualities("any");
-            break;
-        case "staffofhearts":
-            SetFields("appmultiprojwep");
-            SetQualities("any");
-            break;
-        /*
-         * HUNTRESS
-         */
-        case "egganator2000":
-        case "forestrifle":
-            SetFields("huntsingleprojwep");
-            SetQualities("sup_ult");
-            break;
-        case "minigun":
-            SetFields("huntsingleprojwepnorate");
-            SetQualities("sup_ult");
-            break;
-        case "vanwolfsteinrl":
-            SetFields("huntmultiprojwep");
-            SetQualities("sup_ult");
-            break;
-        /*
-         * MONK
-         */
-        case "candycane":
-        case "embercrescent":
-            SetFields("monkmultiprojwep");
-            SetQualities("any");
-            break;
-        case "eternianspearnm":
-            SetFields("monkmeleewep");
-            SetQualities("sup_ult");
-            break;
-        case "madnessboulderthrower":
-            SetFields("monktbwep");
-            SetQualities("myth_ultpp");
-            break;
-        case "mischiefmaker":
-            SetFields("monkmischief");
-            SetQualities("myth_ultpp");
-            break;
-        case "stickhorse":
-        case "turtleshellpolearm":
-            SetFields("monkmultiprojwephybrid");
-            SetQualities("sup_ult");
-            break;
-        /*
-         * SQUIRE
-         */
-        case "anubisssandblade":
-            SetFields("squiremeleewep");
-            SetQualities("any");
-            break;
-        case "calamityblade":
-            SetFields("squiresingleprojwep");
-            SetQualities("sup_ult");
-            break;
-        case "disasterrapier":
-            SetFields("squiresingleprojwep");
-            SetQualities("any");
-            break;
-        /*
-         * PET
-         */
-        case "cowboymonkey":
-        case "littlewizard":
-        case "eyeofdestruction":
-        case "eyeofhaste":
-            SetFields("singleprojpet");
-            SetQualities("sup_ult");
-            break;
-        case "dice":
-        case "etherianancient":
-        case "mrowl":
-            SetFields("meleepet");
-            SetQualities("sup_ult");
-            break;
-        case "emberpony":
-            SetFields("multiprojpet");
-            SetQualities("any");
-            break;
-        case "eyeoffirestorm":
-            SetFields("singleprojpetnorate");
-            SetQualities("sup_ult");
-            break;
-        case "genie":
-            SetFields("genie");
-            SetQualities("myth_ultpp");
-            break;
-        case "kairithebrave":
-            SetFields("meleepetnoknockback");
-            SetQualities("sup_ult");
-            break;
-        case "loverscupid":
-        case "mummy":
-        case "zamirasmount":
-            SetFields("multiprojpet");
-            SetQualities("sup_ult");
-            break;
-        case "chainsawcorgi":
-        case "propellercat":
-            SetFields("cat");
-            SetQualities("myth_trans");
-            break;
-        case "robochicken":
-            SetFields("meleepet");
-            SetQualities("any");
-            break;
-        /*
-         * STAT STICK
-         */
-        case "diamond":
-            SetFields("statstick");
-            SetQualities("any");
-            break;
-        case "statstick":
-            SetFields("statstick");
-            SetQualities("myth_ultpp");
-            break;
-        default:
-            PrintError("ChangeFields: item name not recognized");
-            document.getElementById("fields").innerHTML = "";
-            return;
+    
+    if (itemname === "armor") {
+        SetFields("armor");
+        SetQualities("godly_ultpp");
+        return;
     }
+    
+    const obj = ITEMS.find(obj => obj.name === itemname);
+    
+    const nolayout = "no suitable layout found";
+    
+    //todo write something more elegant :fridge:
+    if (obj.hasOwnProperty("overrideLayout")) SetFields(obj.overrideLayout);
+    else if (obj.type === "weapon") {
+        if (obj.hero === "apprentice") {
+            if (obj.hasOwnProperty("maxProjCount")) {
+                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp"))
+                    SetFields("appmultiprojdualwep");
+                else if (obj.hasOwnProperty("baseDamagePerUp"))
+                    SetFields("appmultiprojwep");
+                else PrintLog(nolayout);
+            }
+            else {
+                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp"))
+                    PrintLog(nolayout);
+                else if (obj.hasOwnProperty("baseDamagePerUp"))
+                    SetFields("appsingleprojwep");
+                else PrintLog(nolayout);
+            }
+        }
+        else if (obj.hero === "huntress") {
+            if (obj.hasOwnProperty("maxProjCount")) {
+                if (obj.hasOwnProperty("maxRate")) SetFields("huntmultiprojwep");
+                else PrintLog(nolayout);
+            }
+            else {
+                if (obj.hasOwnProperty("maxRate")) SetFields("huntsingleprojwep");
+                else SetFields("huntsingleprojwepnorate");
+            }
+        }
+        else if (obj.hero === "monk") {
+            if (obj.hasOwnProperty("baseDamagePerUp")) {
+                if (obj.hasOwnProperty("rangedDamagePerUp")) {
+                    if (obj.hasOwnProperty("maxProjCount"))
+                        SetFields("monkmultiprojwephybrid");
+                    else PrintLog(nolayout);
+                }
+                else SetFields("monkmeleewep");
+            }
+            else if (obj.hasOwnProperty("rangedDamagePerUp")) {
+                if (obj.hasOwnProperty("maxProjCount"))
+                    SetFields("monkmultiprojwep");
+                else PrintLog(nolayout);
+            }
+            else PrintLog(nolayout);
+        }
+        else if (obj.hero === "squire") {
+            if (obj.hasOwnProperty("maxProjSpeed")) SetFields("squiresingleprojwep");
+            else SetFields("squiremeleewep");
+        }
+        else PrintLog(nolayout);
+    }
+    else if (obj.type === "pet") {
+        if (obj.hasOwnProperty("maxProjCount")) {
+            SetFields("multiprojpet");
+        }
+        else {
+            if (obj.hasOwnProperty("maxProjSpeed")) {
+                if (obj.hasOwnProperty("maxRate")) SetFields("singleprojpet");
+                else SetFields("singleprojpetnorate");
+            }
+            else {
+                if (obj.hasOwnProperty("maxKnockback")) SetFields("meleepet");
+                else SetFields("meleepetnoknockback");
+            }
+        }
+    }
+    else {
+        PrintError("ChangeFields: item not recognized");
+    }
+    
+    if (obj.hasOwnProperty("overrideQualityRange")) SetQualities(obj.overrideQualityRange);
+    else if (obj.hasOwnProperty("ultBaseDamagePerUp")) SetQualities("sup_ult");
+    else SetQualities("any");
 }
 
 function SetFields(layout) {
@@ -479,6 +422,19 @@ function SetFields(layout) {
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
 <tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "appmoon":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Elem damage </td><td><input id="edamage" type="text"></td>\n\
+<td>Charge </td><td><input id="charge" type="text"></td>\n\
+<td>Charge target </td><td><input id="chargetarget" type="text"></td></tr>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -777,277 +733,27 @@ function SetQualities(qualityrange) {
 function SetUpgradeValues(item, itemname, quality) {
     /*
      * sets upgrade values into a provided instance of Item class
-     * todo move this stuff into an xml file along with a parser
+     * todo move this stuff into an xml/json file along with a parser
      */
-    /*
-     * WEAPON
-     */
-    if (item instanceof Weapon) {
-        console.log("SetUpgradeValues: item type weapon");
-        switch (itemname) {
-            /*
-             * APPRENTICE
-             */
-            case "caneofdoomedrelationships":
-                if (quality.includes("ult")) item.bdamage_per_up = 118.2714;
-                else item.bdamage_per_up = 105.6;
-                break;
-            case "crystalcane":
-                if (quality.includes("ult")) item.bdamage_per_up = 162.6219;
-                else item.bdamage_per_up = 156.2831;
-                item.edamage_per_up = 162;
-                item.max_projcount = 5;
-                break;
-            case "dragonstaff":
-                item.edamage_per_up = 91.7246;
-                break;
-            case "elderstaff":
-                if (quality.includes("ult")) item.bdamage_per_up = 151.2;
-                else item.bdamage_per_up = 108;
-                break;
-            case "embersceptre":
-                if (quality.includes("ult")) item.bdamage_per_up = 134.3945;
-                else item.bdamage_per_up = 96;
-                break;
-            case "enchantedbishop":
-                if (quality.includes("ult")) item.bdamage_per_up = 163.2958;
-                else item.bdamage_per_up = 145.8034;
-                item.edamage_per_up = 163.1994;
-                item.max_projcount = 5;
-                break;
-            case "eternianstaffnm":
-                if (quality.includes("ult")) item.bdamage_per_up = 134.4027;
-                else item.bdamage_per_up = 127.6338;
-                item.edamage_per_up = 144;
-                item.max_projcount = 5;
-                break;
-            case "lavaslingernm":
-                if (quality.includes("ult")) item.bdamage_per_up = 67.2;
-                else item.bdamage_per_up = 48.9589;
-                item.edamage_per_up = 144;
-                item.max_projcount = 5;
-                break;
-            case "lavaslingerrl":
-                if (quality.includes("ult")) item.bdamage_per_up = 158.1888;
-                else item.bdamage_per_up = 115.2573;
-                item.edamage_per_up = 156.9578;
-                item.max_projcount = 5;
-                break;
-            case "obsidianclava":
-                item.bdamage_per_up = 150.5291;
-                item.edamage_per_up = 149.9124;
-                item.max_projcount = 5;
-                break;
-            case "opticstaff":
-                item.bdamage_per_up = 174.1061;
-                item.edamage_per_up = 174.1061;
-                item.max_projcount = 6;
-                break;
-            case "staffoffrost":
-                if (quality.includes("ult")) item.bdamage_per_up = 162.6219;
-                else item.bdamage_per_up = 156.2831;
-                item.edamage_per_up = 162;
-                item.max_projcount = 5;
-                break;
-            case "staffofhearts":
-                item.bdamage_per_up = 163.2939;
-                item.max_projcount = 5;
-                break;
-            case "thenorthpole":
-                if (quality.includes("ult")) item.bdamage_per_up = 120.9625; //nm?
-                else item.bdamage_per_up = 139.4814; //rl?
-                item.max_projcount = 5;
-                break;
-            /*
-             * HUNTRESS
-             */
-            case "egganator2000":
-                if (quality.includes("ult")) item.bdamage_per_up = 591.9211;
-                else item.bdamage_per_up = 493.9243;
-                item.max_rate = 5;
-                break;
-            case "forestrifle":
-                if (quality.includes("ult")) item.bdamage_per_up = 360;
-                else item.bdamage_per_up = 280;
-                item.max_rate = 3;
-                break;
-            case "minigun":
-                if (quality.includes("ult")) item.bdamage_per_up = 640;
-                else item.bdamage_per_up = 160;
-                item.max_projspeed = 40000;
-                break;
-            case "vanwolfsteinrl":
-                if (quality.includes("ult")) item.bdamage_per_up = 171.9906;
-                else item.bdamage_per_up = 122.8504;
-                item.max_rate = 6;
-                item.max_projcount = 4;
-                break;
-            /*
-             * MONK
-             */
-            case "candycane":
-                item.rdamage_per_up = 158.6846;
-                item.max_projcount = 5;
-                break;
-            case "embercrescent":
-                item.rdamage_per_up = 179.9838;
-                item.max_projcount = 2;
-                break;
-            case "eternianspearnm":
-                if (quality.includes("ult")) item.bdamage_per_up = 413.4084;
-                else item.bdamage_per_up = 295.2897;
-                break;
-            case "madnessboulderthrower":
-                item.rdamage_per_up = 72;
-                item.max_projcount = 4;
-                break;
-            case "mischiefmaker":
-                item.rdamage_per_up = 27.5990;
-                break;
-            case "stickhorse":
-                if (quality.includes("ult")) item.bdamage_per_up = 460.9514;
-                else item.bdamage_per_up = 329.2464;
-                item.rdamage_per_up = 181.0398;
-                item.max_projcount = 5;
-                break;
-            case "turtleshellpolearm":
-                if (quality.includes("ult")) item.bdamage_per_up = 430.1285;
-                else item.bdamage_per_up = 387.8222;
-                item.rdamage_per_up = 171.0198;
-                item.max_projcount = 2;
-                break;
-            /*
-             * SQUIRE
-             */
-            case "anubisssandblade":
-                item.bdamage_per_up = 208.4599;
-                break;
-            case "calamityblade":
-                if (quality.includes("ult")) item.bdamage_per_up = 190.6280;
-                else item.bdamage_per_up = 151.3733;
-                break;
-            case "disasterrapier":
-                item.bdamage_per_up = 166.5194;
-                break;
-            default:
-                PrintError("SetUpgradeValues: item name not recognized");
-                return false;
+    for (const obj of ITEMS) {
+        if (itemname === obj.name) {
+            if (quality.includes("ult") && obj.hasOwnProperty("ultBaseDamagePerUp")) item.bdamage_per_up = obj.ultBaseDamagePerUp;
+            else if (obj.hasOwnProperty("baseDamagePerUp")) item.bdamage_per_up = obj.baseDamagePerUp;
+            if (obj.hasOwnProperty("rangedDamagePerUp")) item.rdamage_per_up = obj.rangedDamagePerUp;
+            if (obj.hasOwnProperty("elemDamagePerUp")) item.edamage_per_up = obj.elemDamagePerUp;
+            if (obj.hasOwnProperty("maxRate")) item.max_rate = obj.maxRate;
+            if (obj.hasOwnProperty("maxKnockback")) item.max_knockback = obj.maxKnockback;
+            if (obj.hasOwnProperty("maxProjCount")) item.max_projcount = obj.maxProjCount;
+            if (obj.hasOwnProperty("maxProjSpeed")) item.max_projspeed = obj.maxProjSpeed;
+            if (obj.hasOwnProperty("maxBoost")) item.max_boost = obj.maxBoost;
+            if (obj.hasOwnProperty("maxRange")) item.max_range = obj.maxRange;
+            if (obj.hasOwnProperty("maxTargets")) item.max_targets = obj.maxTargets;
+            if (obj.hasOwnProperty("statCap")) item.statcap = obj.statCap;
+            else item.statcap = StatCap(quality);
+            console.log("SetUpgradeValues: upgrade values fetched for item " + obj.name);
+            return true;
         }
-        return true;
     }
-    /*
-     * PET
-     */
-    if (item instanceof Pet) {
-        console.log("SetUpgradeValues: item type pet");
-        switch (itemname) {
-            case "chainsawcorgi":
-                item.max_range = 110;
-                item.max_targets = 6;
-                break;
-            case "cowboymonkey":
-                if (quality.includes("ult")) item.bdamage_per_up = 263.1980;
-                else item.bdamage_per_up = 150.4020;
-                item.max_rate = 6;
-                break;
-            case "dice":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 88;
-                item.max_rate = 6;
-                item.max_knockback = 60;
-                break;
-            case "emberpony":
-                item.bdamage_per_up = 112;
-                item.max_rate = 6;
-                item.max_projcount = 2;
-                break;
-            case "etherianancient":
-            case "mrowl":
-                if (quality.includes("ult")) item.bdamage_per_up = 61.6009;
-                else item.bdamage_per_up = 45.7591;
-                item.max_rate = 7;
-                item.max_knockback = 128;
-                break;
-            case "eyeofdestruction":
-                if (quality.includes("ult")) item.bdamage_per_up = 160;
-                else item.bdamage_per_up = 136;
-                item.max_rate = 7;
-                break;
-            case "eyeoffirestorm":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 64;
-                break;
-            case "eyeofhaste":
-                if (quality.includes("ult")) item.bdamage_per_up = 33.6;
-                else item.bdamage_per_up = 29.6;
-                item.max_rate = 14;
-                break;
-            case "genie":
-                if (quality.includes("ult")) item.bdamage_per_up = 140;
-                else item.bdamage_per_up = 80;
-                break;
-            case "kairithebrave":
-                if (quality.includes("ult")) item.bdamage_per_up = 21;
-                else item.bdamage_per_up = 12;
-                item.max_rate = 8;
-                break;
-            case "littlewizard":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 64;
-                item.max_rate = 7;
-                break;
-            case "loverscupid":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 64;
-                item.max_rate = 6;
-                item.max_projcount = 7;
-                break;
-            case "mummy":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 64;
-                item.max_rate = 6;
-                item.max_projcount = 3;
-                break;
-            case "propellercat":
-                item.max_range = 90;
-                item.max_targets = 4;
-                break;
-            case "robochicken":
-                item.bdamage_per_up = 59.2173;
-                item.max_rate = 4;
-                item.max_knockback = 128;
-                break;
-            case "zamirasmount":
-                if (quality.includes("ult")) item.bdamage_per_up = 112;
-                else item.bdamage_per_up = 64;
-                item.max_rate = 6;
-                item.max_projcount = 3;
-                break;
-            default:
-                PrintError("SetUpgradeValues: item name not recognized");
-                return false;
-        }
-        return true;
-    }
-    /*
-     * STAT STICK
-     */
-    if (item instanceof StatStick) {
-        console.log("SetUpgradeValues: item type statstick");
-        switch (itemname) {
-            case "statstick":
-                item.statcap = StatCap(quality);
-                break;
-            case "diamond":
-                item.statcap = 800;
-                break;
-            default:
-                PrintError("SetUpgradeValues: item name not recognized");
-                return false;
-        }
-        return true;
-    }
-    PrintError("SetUpgradeValues: item not a valid type");
     return false;
 }
 
@@ -1092,6 +798,56 @@ function AllFieldsEmpty() {
     }
     console.log("all input fields are empty");
     return true;
+}
+
+function SearchItems() {
+    const searchstring = document.getElementById("searchbox").value.toUpperCase();
+    
+    if (searchstring === "") {
+        HideSearch();
+        return;
+    }
+    ShowSearch();
+    
+    const sorteditems = ITEMS.toSorted((a, b) => a.displayName.localeCompare(b.displayName));
+    
+    let htmlstring = "";
+    let resultcount = 0;
+    
+    for (const obj of sorteditems) {
+        if (obj.displayName.toUpperCase().includes(searchstring)) {
+            htmlstring += '<div><button value="' + obj.name + '" onclick="SelectSearchResult(this.value)">' + obj.displayName + '</button></div>\n';
+            resultcount += 1;
+        }
+    }
+    
+    if (resultcount > 10) document.getElementById("searchresults").style.overflowY = "scroll";
+    else document.getElementById("searchresults").style.overflowY = "hidden";
+    
+    document.getElementById("searchresults").innerHTML = htmlstring;
+}
+
+function SelectSearchResult(itemname) {
+    const obj = ITEMS.find(obj => obj.name === itemname);
+    
+    document.getElementById("itemtype").value = obj.type;
+    ChangeItemType(obj.type);
+    
+    document.getElementById("itemname").value = obj.name;
+    ChangeFields(obj.name);
+    
+    document.getElementById("searchbox").value = "";
+    HideSearch();
+}
+
+function HideSearch() {
+    setTimeout(() => {
+        document.getElementById("searchresults").style.display = "none";
+    }, 50);
+}
+
+function ShowSearch() {
+    document.getElementById("searchresults").style.display = "inline-block";
 }
 
 class Item {
@@ -1553,21 +1309,18 @@ class Pet extends Item {
                 continue loop;
             }
             if (this.upped_projspeed !== 0 && this.upped_projspeed < this.max_projspeed) {
-                //this.upped_projspeed = UpgradeProjSpeed(this.upped_projspeed);
                 this.UpgradeProjSpeed();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_knockback !== 0 && this.upped_knockback < this.max_knockback) {
-                //this.upped_knockback = UpgradeKnockback(this.upped_knockback);
                 this.UpgradeKnockback();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
             if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
-                //this.upped_bdamage += this.bdamage_per_up;
                 this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
@@ -1747,6 +1500,10 @@ function CalculateWeapon() {
     if (document.getElementById("charge")) {
         const charge = parseInt(document.getElementById("charge").value);
         if (!isNaN(charge) && charge !== 0) weapon.charge = charge;
+    }
+    if (document.getElementById("chargetarget")) {
+        const chargetarget = parseInt(document.getElementById("chargetarget").value);
+        if (!isNaN(chargetarget) && chargetarget !== 0) weapon.charge_target = chargetarget;
     }
     if (document.getElementById("projcount")) {
         const projcount = parseInt(document.getElementById("projcount").value);
@@ -2066,10 +1823,446 @@ function ClearResult() {
     document.getElementById("result").style.display = "none";
 }
 
+async function LoadItems() {
+    try {
+        const json = await fetch("./itemdata.json");
+        //import json from "./itemdata.json";
+    }
+    catch(error) {
+        console.log(error);
+        PrintLog("itemdata.json couldn't be loaded");
+    }
+    return json;
+}
+
+//const ITEMS = JSON.parse(LoadItems());
+
+const ITEMS = [
+{
+    "type":"weapon",
+    "hero":"any",
+    "name":"statstick",
+    "displayName":"Stat Stick / Builder",
+    "overrideLayout":"statstick",
+    "overrideQualityRange":"myth_ultpp"
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"caneofdoomedrelationships",
+    "displayName":"Cane of Doomed Relationships",
+    "ultBaseDamagePerUp":118.2714,
+    "baseDamagePerUp":105.6
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"crystalcane",
+    "displayName":"Crystal Cane",
+    "ultBaseDamagePerUp":162.6219,
+    "baseDamagePerUp":156.2831,
+    "elemDamagePerUp":162,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"dragonstaff",
+    "displayName":"Dragon Staff",
+    "elemDamagePerUp":91.7246,
+    "overrideLayout":"appmoon"
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"elderstaff",
+    "displayName":"Elder Staff",
+    "ultBaseDamagePerUp":151.2,
+    "baseDamagePerUp":108
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"embersceptre",
+    "displayName":"Ember Sceptre",
+    "ultBaseDamagePerUp":134.3945,
+    "baseDamagePerUp":96
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"enchantedbishop",
+    "displayName":"Enchanted Bishop",
+    "ultBaseDamagePerUp":163.2958,
+    "baseDamagePerUp":145.8034,
+    "elemDamagePerUp":163.1994,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"eternianstaffnm",
+    "displayName":"Eternian Staff NM",
+    "ultBaseDamagePerUp":134.4027,
+    "baseDamagePerUp":127.6338,
+    "elemDamagePerUp":144,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"lavaslingernm",
+    "displayName":"Lava Slinger NM",
+    "ultBaseDamagePerUp":67.2,
+    "baseDamagePerUp":48.9589,
+    "elemDamagePerUp":144,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"lavaslingerrl",
+    "displayName":"Lava Slinger RL",
+    "ultBaseDamagePerUp":158.1888,
+    "baseDamagePerUp":115.2573,
+    "elemDamagePerUp":156.9578,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"obsidianclava",
+    "displayName":"Obsidian Clava",
+    "baseDamagePerUp":150.5291,
+    "elemDamagePerUp":149.9124,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"opticstaff",
+    "displayName":"Optic Staff",
+    "baseDamagePerUp":174.1061,
+    "elemDamagePerUp":174.1061,
+    "maxProjCount":6
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"staffoffrost",
+    "displayName":"Staff of Frost",
+    "ultBaseDamagePerUp":162.6219,
+    "baseDamagePerUp":156.2831,
+    "elemDamagePerUp":162,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"apprentice",
+    "name":"staffofhearts",
+    "displayName":"Staff of Hearts",
+    "baseDamagePerUp":163.2939,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"huntress",
+    "name":"egganator2000",
+    "displayName":"Egganator 2000",
+    "ultBaseDamagePerUp":591.9211,
+    "baseDamagePerUp":493.9243,
+    "maxRate":5
+},
+{
+    "type":"weapon",
+    "hero":"huntress",
+    "name":"forestrifle",
+    "displayName":"Forest Rifle",
+    "ultBaseDamagePerUp":360,
+    "baseDamagePerUp":280,
+    "maxRate":3
+},
+{
+    "type":"weapon",
+    "hero":"huntress",
+    "name":"minigun",
+    "displayName":"Minigun",
+    "ultBaseDamagePerUp":640,
+    "baseDamagePerUp":160,
+    "maxProjSpeed":40000
+},
+{
+    "type":"weapon",
+    "hero":"huntress",
+    "name":"vanwolfsteinrl",
+    "displayName":"Van Wolfstein RL",
+    "ultBaseDamagePerUp":171.9906,
+    "baseDamagePerUp":122.8504,
+    "maxRate":6,
+    "maxProjCount":4
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"candycane",
+    "displayName":"Candy Cane",
+    "rangedDamagePerUp":158.6846,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"embercrescent",
+    "displayName":"Ember Crescent",
+    "rangedDamagePerUp":179.9838,
+    "maxProjCount":2
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"eternianspearnm",
+    "displayName":"Eternian Spear NM",
+    "ultBaseDamagePerUp":413.4084,
+    "baseDamagePerUp":295.2897
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"madnessboulderthrower",
+    "displayName":"Madness Boulder Thrower",
+    "rangedDamagePerUp":72,
+    "maxProjCount":4,
+    "overrideLayout":"monktbwep",
+    "overrideQualityRange":"myth_ultpp"
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"mischiefmaker",
+    "displayName":"Mischief Maker",
+    "rangedDamagePerUp":27.5990,
+    "overrideLayout":"monkmischief",
+    "overrideQualityRange":"myth_ultpp"
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"stickhorse",
+    "displayName":"Stick Horse",
+    "ultBaseDamagePerUp":460.9514,
+    "baseDamagePerUp":329.2464,
+    "rangedDamagePerUp":181.0398,
+    "maxProjCount":5
+},
+{
+    "type":"weapon",
+    "hero":"monk",
+    "name":"turtleshellpolearm",
+    "displayName":"Turtle Shell Polearm",
+    "ultBaseDamagePerUp":430.1285,
+    "baseDamagePerUp":387.8222,
+    "rangedDamagePerUp":171.0198,
+    "maxProjCount":2
+},
+{
+    "type":"weapon",
+    "hero":"squire",
+    "name":"anubisssandblade",
+    "displayName":"Anubis's Sand Blade",
+    "baseDamagePerUp":208.4599
+},
+{
+    "type":"weapon",
+    "hero":"squire",
+    "name":"calamityblade",
+    "displayName":"Calamity Blade",
+    "ultBaseDamagePerUp":190.6280,
+    "baseDamagePerUp":151.3733,
+    "maxProjSpeed":30000
+},
+{
+    "type":"weapon",
+    "hero":"squire",
+    "name":"disasterrapier",
+    "displayName":"Disaster Rapier",
+    "baseDamagePerUp":166.5194,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"babyancientdragon",
+    "displayName":"Baby Ancient Dragon",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"chainsawcorgi",
+    "displayName":"Chainsaw Corgi",
+    "maxRange":110,
+    "maxTargets":6,
+    "overrideLayout":"cat",
+    "overrideQualityRange":"myth_trans"
+},
+{
+    "type":"pet",
+    "name":"cowboymonkey",
+    "displayName":"Cowboy Monkey",
+    "ultBaseDamagePerUp":263.1980,
+    "baseDamagePerUp":150.4020,
+    "maxRate":6,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"diamond",
+    "displayName":"Diamond / Heart",
+    "statCap":800,
+    "overrideLayout":"statstick",
+    "overrideQualityRange":"any"
+},
+{
+    "type":"pet",
+    "name":"dice",
+    "displayName":"Dice",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":88,
+    "maxRate":6,
+    "maxKnockback":60
+},
+{
+    "type":"pet",
+    "name":"emberpony",
+    "displayName":"Ember Pony",
+    "baseDamagePerUp":112,
+    "maxRate":6,
+    "maxProjCount":2,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"etherianancient",
+    "displayName":"Etherian Ancient",
+    "ultBaseDamagePerUp":61.6009,
+    "baseDamagePerUp":45.7591,
+    "maxRate":7,
+    "maxKnockback":128
+},
+{
+    "type":"pet",
+    "name":"eyeofdestruction",
+    "displayName":"Eye of Destruction",
+    "ultBaseDamagePerUp":160,
+    "baseDamagePerUp":136,
+    "maxRate":7,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"eyeoffirestorm",
+    "displayName":"Eye of Firestorm",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"eyeofhaste",
+    "displayName":"Eye of Haste",
+    "ultBaseDamagePerUp":33.6,
+    "baseDamagePerUp":29.6,
+    "maxRate":14,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"genie",
+    "displayName":"Genie",
+    "ultBaseDamagePerUp":140,
+    "baseDamagePerUp":80,
+    "overrideLayout":"genie",
+    "overrideQualityRange":"myth_ultpp"
+},
+{
+    "type":"pet",
+    "name":"kairithebrave",
+    "displayName":"Kairi the Brave",
+    "ultBaseDamagePerUp":21,
+    "baseDamagePerUp":12,
+    "maxRate":8
+},
+{
+    "type":"pet",
+    "name":"littlewizard",
+    "displayName":"Little Wizard",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxRate":7,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"loverscupid",
+    "displayName":"Lover's Cupid",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxRate":6,
+    "maxProjCount":7,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"mrowl",
+    "displayName":"Mr. Owl / Peckers",
+    "ultBaseDamagePerUp":61.6009,
+    "baseDamagePerUp":45.7591,
+    "maxRate":7,
+    "maxKnockback":128
+},
+{
+    "type":"pet",
+    "name":"mummy",
+    "displayName":"Mummy",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxRate":6,
+    "maxProjCount":3,
+    "maxProjSpeed":30000
+},
+{
+    "type":"pet",
+    "name":"propellercat",
+    "displayName":"Propeller Cat",
+    "maxRange":90,
+    "maxTargets":4,
+    "overrideLayout":"cat",
+    "overrideQualityRange":"myth_trans"
+},
+{
+    "type":"pet",
+    "name":"robochicken",
+    "displayName":"Robo Chicken",
+    "baseDamagePerUp":59.2173,
+    "maxRate":4,
+    "maxKnockback":128
+},
+{
+    "type":"pet",
+    "name":"zamirasmount",
+    "displayName":"Zamira's Mount",
+    "ultBaseDamagePerUp":112,
+    "baseDamagePerUp":64,
+    "maxRate":6,
+    "maxProjCount":3,
+    "maxProjSpeed":30000
+}
+];
+
 document.getElementById("itemtype").value = "armor";
 ChangeItemType("armor");
-//PrintLog("I am log message");
-//PrintError("I am error message");
+
+document.getElementById("searchbox").value = "";
 
 </script>
 
