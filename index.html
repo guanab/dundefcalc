@@ -107,6 +107,22 @@ body {
 .searchresults button:hover {
     background-color: #eeeeee !important;
 }
+.infobox {
+    display: inline-block;
+    cursor: default;
+}
+.infobox div {
+    display: none;
+    background-color: #ffffff;
+    position: absolute;
+    font-size: 14px;
+    max-width: 300px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.infobox:hover div {
+    display: block;
+}
 input[type=text] {
     width: 70px;
     font-size: 16px;
@@ -216,10 +232,10 @@ function ChangeItemType(itemtype) {
 </select><div style="float:right;padding-right:8px">\n\
 Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)">\n\
 <input id="customres" type="text" value="29" disabled></div>';
-            ChangeFields("armor");
+            ChangeItem("armor");
             break;
         case "weapon":
-            htmlstring += '<select id="itemname" onchange="ChangeFields(this.value)">\n';
+            htmlstring += '<select id="itemname" onchange="ChangeItem(this.value)">\n';
             for (const obj of ITEMS.filter(obj => obj.hero === "any")) {
                 htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
             }
@@ -241,22 +257,24 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
             }
             htmlstring += '</optgroup></select>\n';
             htmlstring += '<select id="quality"></select>\n';
+            htmlstring += '<div id="infobox" class="infobox"></div>\n';
             
             document.getElementById("subselect").innerHTML = htmlstring;
             
-            ChangeFields(document.getElementById("itemname").value);
+            ChangeItem(document.getElementById("itemname").value);
             break;
         case "pet":
-            htmlstring += '<select id="itemname" onchange="ChangeFields(this.value)">\n';
+            htmlstring += '<select id="itemname" onchange="ChangeItem(this.value)">\n';
             for (const obj of ITEMS.filter(obj => obj.type === "pet")) {
                 htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
             }
             htmlstring += '</select>\n';
             htmlstring += '<select id="quality"></select>\n';
+            htmlstring += '<div id="infobox" class="infobox"></div>\n';
             
             document.getElementById("subselect").innerHTML = htmlstring;
             
-            ChangeFields(document.getElementById("itemname").value);
+            ChangeItem(document.getElementById("itemname").value);
             break;
         case "about":
             SetFields("about");
@@ -270,14 +288,14 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
     }
 }
 
-function ChangeFields(itemname) {
+function ChangeItem(itemname) {
     /*
      * calls SetFields and SetQualities functions based on provided item name
      */
     ClearResult();
     ClearLog();
     
-    console.log("ChangeFields: item name " + itemname);
+    console.log("ChangeItem: item name " + itemname);
     
     if (itemname === "armor") {
         SetFields("armor");
@@ -289,79 +307,156 @@ function ChangeFields(itemname) {
     
     const nolayout = "no suitable layout found";
     
+    let upgradeorder = "";
+    
     //todo write something more elegant :fridge:
-    if (obj.hasOwnProperty("overrideLayout")) SetFields(obj.overrideLayout);
+    //put the layouts and upgrade orders into json or something
+    if (obj.hasOwnProperty("overrideLayout")) {
+        SetFields(obj.overrideLayout);
+        if (obj.overrideLayout === "appmoon")
+            upgradeorder = "Charge > Proj speed > Elem damage";
+        else if (obj.overrideLayout === "monkmischief")
+            upgradeorder = "Proj speed > Priority stat > Ranged damage";
+        else if (obj.overrideLayout === "monktbwep")
+            upgradeorder = "Proj count > Proj speed > Ranged damage > Stat";
+        else if (obj.overrideLayout === "cat")
+            upgradeorder = "Targets > Boost > Range > Stat";
+        else if (obj.overrideLayout === "genie")
+            upgradeorder = "Base damage > Stat";
+    }
     else if (obj.type === "weapon") {
         if (obj.hero === "apprentice") {
             if (obj.hasOwnProperty("maxProjCount")) {
-                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp"))
+                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp")) {
                     SetFields("appmultiprojdualwep");
-                else if (obj.hasOwnProperty("baseDamagePerUp"))
+                    upgradeorder = "Proj count > Charge > Proj speed > Base damage = Elem damage";
+                }
+                else if (obj.hasOwnProperty("baseDamagePerUp")) {
                     SetFields("appmultiprojwep");
+                    upgradeorder = "Proj count > Charge > Proj speed > Base damage";
+                }
                 else PrintLog(nolayout);
             }
             else {
                 if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp"))
                     PrintLog(nolayout);
-                else if (obj.hasOwnProperty("baseDamagePerUp"))
+                else if (obj.hasOwnProperty("baseDamagePerUp")) {
                     SetFields("appsingleprojwep");
+                    upgradeorder = "Charge > Proj speed > Base damage";
+                }
                 else PrintLog(nolayout);
             }
         }
         else if (obj.hero === "huntress") {
             if (obj.hasOwnProperty("maxProjCount")) {
-                if (obj.hasOwnProperty("maxRate")) SetFields("huntmultiprojwep");
+                if (obj.hasOwnProperty("maxRate")) {
+                    SetFields("huntmultiprojwep");
+                    upgradeorder = "Proj count > Rate > Proj speed > Base damage";
+                }
                 else PrintLog(nolayout);
             }
             else {
-                if (obj.hasOwnProperty("maxRate")) SetFields("huntsingleprojwep");
-                else SetFields("huntsingleprojwepnorate");
+                if (obj.hasOwnProperty("maxRate")) {
+                    SetFields("huntsingleprojwep");
+                    upgradeorder = "Rate > Proj speed > Base damage";
+                }
+                else {
+                    SetFields("huntsingleprojwepnorate");
+                    upgradeorder = "Proj speed > Base damage";
+                }
             }
         }
         else if (obj.hero === "monk") {
             if (obj.hasOwnProperty("baseDamagePerUp")) {
                 if (obj.hasOwnProperty("rangedDamagePerUp")) {
-                    if (obj.hasOwnProperty("maxProjCount"))
+                    if (obj.hasOwnProperty("maxProjCount")) {
                         SetFields("monkmultiprojwephybrid");
+                        upgradeorder = "Proj count > Proj speed > Base damage = Ranged damage";
+                    }
                     else PrintLog(nolayout);
                 }
                 else SetFields("monkmeleewep");
             }
             else if (obj.hasOwnProperty("rangedDamagePerUp")) {
-                if (obj.hasOwnProperty("maxProjCount"))
+                if (obj.hasOwnProperty("maxProjCount")){
                     SetFields("monkmultiprojwep");
+                    upgradeorder = "Proj count > Proj speed > Ranged damage";
+                }
                 else PrintLog(nolayout);
             }
             else PrintLog(nolayout);
         }
         else if (obj.hero === "squire") {
-            if (obj.hasOwnProperty("maxProjSpeed")) SetFields("squiresingleprojwep");
-            else SetFields("squiremeleewep");
+            if (obj.hasOwnProperty("maxProjSpeed")) {
+                SetFields("squiresingleprojwep");
+                upgradeorder = "Block > Proj speed > Base damage";
+            }
+            else {
+                SetFields("squiremeleewep");
+                upgradeorder = "Block > Base damage";
+            }
         }
         else PrintLog(nolayout);
     }
     else if (obj.type === "pet") {
         if (obj.hasOwnProperty("maxProjCount")) {
             SetFields("multiprojpet");
+            upgradeorder = "Proj count > Rate > Proj speed > Base damage";
         }
         else {
             if (obj.hasOwnProperty("maxProjSpeed")) {
-                if (obj.hasOwnProperty("maxRate")) SetFields("singleprojpet");
-                else SetFields("singleprojpetnorate");
+                if (obj.hasOwnProperty("maxRate")) {
+                    SetFields("singleprojpet");
+                    upgradeorder = "Rate > Proj speed > Base damage";
+                }
+                else {
+                    SetFields("singleprojpetnorate");
+                    upgradeorder = "Proj speed > Base damage";
+                }
             }
             else {
-                if (obj.hasOwnProperty("maxKnockback")) SetFields("meleepet");
-                else SetFields("meleepetnoknockback");
+                if (obj.hasOwnProperty("maxKnockback")) {
+                    SetFields("meleepet");
+                    upgradeorder = "Rate > Knockback > Base damage";
+                }
+                else {
+                    SetFields("meleepetnoknockback");
+                    upgradeorder = "Rate > Base damage";
+                }
             }
         }
     }
     else {
-        PrintError("ChangeFields: item not recognized");
+        PrintError("ChangeItem: item not recognized");
     }
     
     if (obj.hasOwnProperty("overrideQualityRange")) SetQualities(obj.overrideQualityRange);
     else if (obj.hasOwnProperty("ultBaseDamagePerUp")) SetQualities("sup_ult");
     else SetQualities("any");
+    
+    let infotext = "";
+    
+    if (upgradeorder !== "") 
+        infotext += "Upgrade order: <br>" + upgradeorder + "<hr>";
+    if (obj.hasOwnProperty("ultBaseDamagePerUp"))
+        infotext += "Ult base damage per up: " + Math.round(obj.ultBaseDamagePerUp * 100) / 100 + "<br>";
+    if (obj.hasOwnProperty("baseDamagePerUp"))
+        infotext += "Base damage per up: " + Math.round(obj.baseDamagePerUp * 100) / 100 + "<br>";
+    if (obj.hasOwnProperty("rangedDamagePerUp"))
+        infotext += "Ranged damage per up: " + Math.round(obj.rangedDamagePerUp * 100) / 100 + "<br>";
+    if (obj.hasOwnProperty("elemDamagePerUp"))
+        infotext += "Elemental damage per up: " + Math.round(obj.elemDamagePerUp * 100) / 100 + "<br>";
+    
+    if (infotext !== "") infotext = infotext.substring(0, infotext.length - 4);
+    
+    SetInfo(infotext);
+}
+
+function SetInfo(text) {
+    if (text === "" || text === null)
+        document.getElementById("infobox").innerHTML = "";
+    else
+        document.getElementById("infobox").innerHTML = "&#9432;<div>" + text + "</div>";
 }
 
 function SetFields(layout) {
@@ -836,7 +931,7 @@ function SelectSearchResult(itemname) {
     ChangeItemType(obj.type);
     
     document.getElementById("itemname").value = obj.name;
-    ChangeFields(obj.name);
+    ChangeItem(obj.name);
     
     document.getElementById("searchbox").value = "";
     HideSearch();
@@ -2321,6 +2416,15 @@ const ITEMS = [
     "maxTargets":4,
     "overrideLayout":"cat",
     "overrideQualityRange":"myth_trans"
+},
+{
+    "type":"pet",
+    "name":"rainbowunicorn",
+    "displayName":"Rainbow Unicorn",
+    "baseDamagePerUp":100.8,
+    "maxRate":6,
+    "maxProjCount":2,
+    "maxProjSpeed":30000
 },
 {
     "type":"pet",
