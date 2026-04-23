@@ -117,8 +117,14 @@ body {
     position: absolute;
     font-size: 14px;
     max-width: 300px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    line-height: 1.6;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 1px;
 }
 .infobox:hover div {
     display: block;
@@ -235,6 +241,12 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
             ChangeItem("armor");
             break;
         case "weapon":
+            if (ITEMS === null) {
+                document.getElementById("subselect").innerHTML = "";
+                document.getElementById("fields").innerHTML = "";
+                PrintLog(noItemsMessage);
+                break;
+            }
             htmlstring += '<select id="itemname" onchange="ChangeItem(this.value)">\n';
             for (const obj of ITEMS.filter(obj => obj.hero === "any")) {
                 htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
@@ -264,6 +276,12 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
             ChangeItem(document.getElementById("itemname").value);
             break;
         case "pet":
+            if (ITEMS === null) {
+                document.getElementById("subselect").innerHTML = "";
+                document.getElementById("fields").innerHTML = "";
+                PrintLog(noItemsMessage);
+                break;
+            }
             htmlstring += '<select id="itemname" onchange="ChangeItem(this.value)">\n';
             for (const obj of ITEMS.filter(obj => obj.type === "pet")) {
                 htmlstring += '<option value="' + obj.name + '">' + obj.displayName + '</option>\n';
@@ -327,7 +345,7 @@ function ChangeItem(itemname) {
     else if (obj.type === "weapon") {
         if (obj.hero === "apprentice") {
             if (obj.hasOwnProperty("maxProjCount")) {
-                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp")) {
+                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp") && obj.hasOwnProperty("elementalDamageScaling")) {
                     SetFields("appmultiprojdualwep");
                     upgradeorder = "Proj count > Charge > Proj speed > Base damage = Elem damage";
                 }
@@ -338,7 +356,7 @@ function ChangeItem(itemname) {
                 else PrintLog(nolayout);
             }
             else {
-                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp"))
+                if (obj.hasOwnProperty("baseDamagePerUp") && obj.hasOwnProperty("elemDamagePerUp") && obj.hasOwnProperty("elementalDamageScaling"))
                     PrintLog(nolayout);
                 else if (obj.hasOwnProperty("baseDamagePerUp")) {
                     SetFields("appsingleprojwep");
@@ -371,7 +389,7 @@ function ChangeItem(itemname) {
                 if (obj.hasOwnProperty("rangedDamagePerUp")) {
                     if (obj.hasOwnProperty("maxProjCount")) {
                         SetFields("monkmultiprojwephybrid");
-                        upgradeorder = "Proj count > Proj speed > Base damage = Ranged damage";
+                        upgradeorder = "Proj count > Proj speed > Base damage > Ranged damage";
                     }
                     else PrintLog(nolayout);
                 }
@@ -435,17 +453,34 @@ function ChangeItem(itemname) {
     else SetQualities("any");
     
     let infotext = "";
+    let ultBasePerUp = GetBaseDamagePerUp(obj, true);
+    let basePerUp = GetBaseDamagePerUp(obj);
+    if (ultBasePerUp < basePerUp) ultBasePerUp = basePerUp;
+    let rangedPerUp = GetRangedDamagePerUp(obj);
+    let elemPerUp = GetElemDamagePerUp(obj);
     
     if (upgradeorder !== "") 
         infotext += "Upgrade order: <br>" + upgradeorder + "<hr>";
-    if (obj.hasOwnProperty("ultBaseDamagePerUp"))
-        infotext += "Ult base damage per up: " + Math.round(obj.ultBaseDamagePerUp * 100) / 100 + "<br>";
-    if (obj.hasOwnProperty("baseDamagePerUp"))
-        infotext += "Base damage per up: " + Math.round(obj.baseDamagePerUp * 100) / 100 + "<br>";
-    if (obj.hasOwnProperty("rangedDamagePerUp"))
-        infotext += "Ranged damage per up: " + Math.round(obj.rangedDamagePerUp * 100) / 100 + "<br>";
-    if (obj.hasOwnProperty("elemDamagePerUp"))
-        infotext += "Elemental damage per up: " + Math.round(obj.elemDamagePerUp * 100) / 100 + "<br>";
+    if (ultBasePerUp > 0)
+        infotext += "Ult base damage per up: " + Math.round(ultBasePerUp * 100) / 100 + "<br>";
+    if (basePerUp > 0)
+        infotext += "Base damage per up: " + Math.round(basePerUp * 100) / 100 + "<br>";
+    if (rangedPerUp > 0)
+        infotext += "Ranged damage per up: " + Math.round(rangedPerUp * 100) / 100 + "<br>";
+    if (elemPerUp > 0)
+        infotext += "Elemental damage per up: " + Math.round(elemPerUp * 100) / 100 + "<br>";
+    if (obj.hasOwnProperty("maxRate"))
+        infotext += "Max rate: " + obj.maxRate + "<br>";
+    if (obj.hasOwnProperty("maxProjCount"))
+        infotext += "Max proj count: " + obj.maxProjCount + "<br>";
+    if (obj.hasOwnProperty("maxProjSpeed"))
+        infotext += "Max proj speed: " + obj.maxProjSpeed + "<br>";
+    if (obj.hasOwnProperty("moveSpeedMultiplier"))
+        infotext += "Movespeed multiplier: " + obj.moveSpeedMultiplier + "<br>";
+    if (obj.hasOwnProperty("gravityMultiplier"))
+        infotext += "Gravity multiplier: " + obj.gravityMultiplier + "<br>";
+    if (obj.hasOwnProperty("elementalDamageScaling"))
+        infotext += "Elemental damage scaling<br>";
     
     if (infotext !== "") infotext = infotext.substring(0, infotext.length - 4);
     
@@ -607,13 +642,12 @@ function SetFields(layout) {
         case "monkmultiprojwephybrid":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
-<tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
-<td>or</td></tr>\n\
-<tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
-<td>Proj count </td><td><input id="projcount" type="text"></td>\n\
-<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
-<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
-<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<tr><td>Base dmg </td><td><input id="bdamage" type="text"></td>\n\
+<td>Ranged dmg </td><td><input id="rdamage" type="text"></td>\n\
+<td>Proj count </td><td><input id="projcount" type="text"></td></tr>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -761,9 +795,7 @@ Made with javascript by Guanab</div>\n\
 <div>This tool can calculate what stats your piece of gear would end up with after fully upgrading. \n\
 Note that some weapons' and pets' damage calculations may be slightly off due to the values having hidden decimals.</div>\n\
 <br>\n\
-<div>If you would like an item added, you can find me at DDRnG with the same name. \n\
-Please provide necessary upgrade information, such as stat caps and damage per upgrade for ult and non-ult (with as many decimals as you can). \n\
-Or trade me suitable items on open.</div>\n\
+<div>If you would like an item added or have a bug report / feedback, you can find me at DDRnG with the same name.</div>\n\
 <br>\n\
 <div>Hint: You can bookmark this page in Steam overlay browser for easy access.</div>\n\
 </div>";
@@ -831,10 +863,21 @@ function SetUpgradeValues(item, itemname, quality) {
      */
     for (const obj of ITEMS) {
         if (itemname === obj.name) {
-            if (quality.includes("ult") && obj.hasOwnProperty("ultBaseDamagePerUp")) item.bdamage_per_up = obj.ultBaseDamagePerUp;
-            else if (obj.hasOwnProperty("baseDamagePerUp")) item.bdamage_per_up = obj.baseDamagePerUp;
+            if (obj.hasOwnProperty("ultBaseDamagePerUp")) item.ult_bdamage_per_up = obj.ultBaseDamagePerUp;
+            if (obj.hasOwnProperty("baseDamagePerUp")) item.bdamage_per_up = obj.baseDamagePerUp;
             if (obj.hasOwnProperty("rangedDamagePerUp")) item.rdamage_per_up = obj.rangedDamagePerUp;
             if (obj.hasOwnProperty("elemDamagePerUp")) item.edamage_per_up = obj.elemDamagePerUp;
+            if (obj.hasOwnProperty("ultBaseDamageUpMultiplier")) item.ult_bdamage_up_multiplier = obj.ultBaseDamageUpMultiplier;
+            if (obj.hasOwnProperty("baseDamageUpMultiplier")) item.bdamage_up_multiplier = obj.baseDamageUpMultiplier;
+            if (obj.hasOwnProperty("rangedDamageUpMultiplier")) item.rdamage_up_multiplier = obj.rangedDamageUpMultiplier;
+            if (obj.hasOwnProperty("elemDamageUpMultiplier")) item.edamage_up_multiplier = obj.elemDamageUpMultiplier;
+            if (obj.hasOwnProperty("baseDamageMultiplier")) item.bdamage_multiplier = obj.baseDamageMultiplier;
+            if (obj.hasOwnProperty("rangedDamageMultiplier")) item.rdamage_multiplier = obj.rangedDamageMultiplier;
+            if (obj.hasOwnProperty("elemDamageMultiplier")) item.edamage_multiplier = obj.elemDamageMultiplier;
+            if (obj.hasOwnProperty("swingSpeedDamageMultiplier")) item.swing_multiplier = obj.swingSpeedDamageMultiplier;
+            if (obj.hasOwnProperty("extraBaseDamageMultiplier")) item.extra_bdamage_multiplier = obj.extraBaseDamageMultiplier;
+            if (obj.hasOwnProperty("damageDisplayMultiplier")) item.damage_display_multiplier = obj.damageDisplayMultiplier;
+            if (obj.hasOwnProperty("rangedDamageDisplayMultiplier")) item.ranged_display_multiplier = obj.rangedDamageDisplayMultiplier;
             if (obj.hasOwnProperty("maxRate")) item.max_rate = obj.maxRate;
             if (obj.hasOwnProperty("maxKnockback")) item.max_knockback = obj.maxKnockback;
             if (obj.hasOwnProperty("maxProjCount")) item.max_projcount = obj.maxProjCount;
@@ -895,6 +938,12 @@ function AllFieldsEmpty() {
 }
 
 function SearchItems() {
+    if (ITEMS === null) {
+        ClearLog();
+        PrintLog(noItemsMessage);
+        return;
+    }
+
     const searchstring = document.getElementById("searchbox").value.toUpperCase();
     
     if (searchstring === "") {
@@ -903,7 +952,7 @@ function SearchItems() {
     }
     
     const searchresults = document.getElementById("searchresults");
-    const sorteditems = ITEMS.toSorted((a, b) => a.displayName.localeCompare(b.displayName));
+    const sorteditems = ITEMS.toSorted((a, b) => {return a.displayName.toUpperCase().indexOf(searchstring) - b.displayName.toUpperCase().indexOf(searchstring);});
     
     let htmlstring = "";
     let resultcount = 0;
@@ -953,17 +1002,31 @@ class Item {
      * holds common variables and upgrade methods
      */
     constructor() {
+        this.itemobj = null;
         this.itemname = "";
         this.quality = "";
         this.bdamage = 0;
         this.rdamage = 0;
         this.edamage = 0;
+        this.ult_bdamage_per_up = 0;
         this.bdamage_per_up = 0;
         this.rdamage_per_up = 0;
         this.edamage_per_up = 0;
+        this.ult_bdamage_up_multiplier = 0.185;
+        this.bdamage_up_multiplier = 0.15;
+        this.rdamage_up_multiplier = 0.13;
+        this.edamage_up_multiplier = 0.16;
         this.bdamage_target = 0;
         this.rdamage_target = 0;
         this.edamage_target = 0;
+        this.bdamage_multiplier = 1;
+        this.rdamage_multiplier = 1;
+        this.edamage_multiplier = 1;
+        this.template_multiplier = 1;
+        this.swing_multiplier = 1;
+        this.extra_bdamage_multiplier = 1;
+        this.damage_display_multiplier = 1;
+        this.ranged_display_multiplier = 1;
         this.rate = 0;
         this.max_rate = 0;
         this.knockback = 0;
@@ -996,13 +1059,37 @@ class Item {
         this.calculated = false;
     }
     
+    InitializeUppedValues() {
+        this.upped_bdamage = Math.ceil(this.bdamage / this.bdamage_multiplier / this.extra_bdamage_multiplier / this.damage_display_multiplier / this.template_multiplier / this.swing_multiplier / 0.8);
+        this.upped_rdamage = Math.ceil(this.rdamage / this.rdamage_multiplier / this.ranged_display_multiplier / 0.8);
+        this.upped_edamage = Math.ceil(this.edamage / this.edamage_multiplier / this.damage_display_multiplier / 0.8);
+        this.bdamage_per_up = Math.floor(this.bdamage_per_up);
+        this.rdamage_per_up = Math.floor(this.rdamage_per_up);
+        this.edamage_per_up = Math.floor(this.edamage_per_up);
+        this.upped_rate = this.rate;
+        this.upped_block = this.block;
+        this.upped_knockback = this.knockback;
+        this.upped_charge = this.charge;
+        this.upped_projcount = this.projcount;
+        this.upped_projspeed = this.projspeed;
+        this.upped_stat = this.stat;
+        this.upped_priostat = this.priostat;
+    }
+    
+    ConvertDamageToDisplayValues() {
+        this.upped_bdamage = Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.extra_bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * 0.8);
+        this.upped_rdamage = Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * 0.8);
+        this.upped_edamage = Math.floor(this.upped_edamage * this.edamage_multiplier * this.damage_display_multiplier * 0.8);
+    }
+    
     UpgradeBaseDamage() {
-        const multiplier = this.quality.includes("ult") ? 0.185 : 0.15;
+        const multiplier = (this.quality.includes("ult") && this.ult_bdamage_up_multiplier >= this.bdamage_up_multiplier) ? this.ult_bdamage_up_multiplier : this.bdamage_up_multiplier;
+        const damage_per_up = (this.quality.includes("ult") && this.ult_bdamage_per_up >= this.bdamage_per_up) ? this.ult_bdamage_per_up : this.bdamage_per_up;
         let up_amount = 0;
-        if (this.upped_bdamage * multiplier < this.bdamage_per_up) 
-            up_amount = this.upped_bdamage * multiplier;
+        if (this.upped_bdamage * multiplier < damage_per_up) 
+            up_amount = Math.floor(this.upped_bdamage * multiplier);
         else {
-            this.upped_bdamage += this.bdamage_per_up;
+            this.upped_bdamage += Math.floor(damage_per_up);
             return;
         }
         if (up_amount < 1) this.upped_bdamage += 1;
@@ -1011,10 +1098,10 @@ class Item {
     
     UpgradeRangedDamage() {
         let up_amount = 0;
-        if (this.upped_rdamage * 0.13 < this.rdamage_per_up) 
-            up_amount = this.upped_rdamage * 0.13;
+        if (this.upped_rdamage * this.rdamage_up_multiplier < this.rdamage_per_up) 
+            up_amount = Math.floor(this.upped_rdamage * this.rdamage_up_multiplier);
         else {
-            this.upped_rdamage += this.rdamage_per_up;
+            this.upped_rdamage += Math.floor(this.rdamage_per_up);
             return;
         }
         if (up_amount < 1) this.upped_rdamage += 1;
@@ -1023,10 +1110,10 @@ class Item {
     
     UpgradeElemDamage() {
         let up_amount = 0;
-        if (this.upped_edamage * 0.16 < this.edamage_per_up) 
-            up_amount = this.upped_edamage * 0.16;
+        if (this.upped_edamage * this.edamage_up_multiplier < this.edamage_per_up) 
+            up_amount = Math.floor(this.upped_edamage * this.edamage_up_multiplier);
         else {
-            this.upped_edamage += this.edamage_per_up;
+            this.upped_edamage += Math.floor(this.edamage_per_up);
             return;
         }
         if (up_amount < 1) this.upped_edamage += 1;
@@ -1249,7 +1336,8 @@ class Weapon extends Item {
     }
 
     Calculate() {
-        this.upped_bdamage = this.bdamage;
+        this.InitializeUppedValues();
+        /*this.upped_bdamage = this.bdamage;
         this.upped_rdamage = this.rdamage;
         this.upped_edamage = this.edamage;
         this.upped_rate = this.rate;
@@ -1259,7 +1347,7 @@ class Weapon extends Item {
         this.upped_charge = this.charge;
         this.upped_knockback = this.knockback;
         this.upped_stat = this.stat;
-        this.upped_priostat = this.priostat;
+        this.upped_priostat = this.priostat;*/
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -1342,9 +1430,10 @@ class Weapon extends Item {
             }
             up_count += 1;
         }
-        this.upped_bdamage = Math.round(this.upped_bdamage);
+        this.ConvertDamageToDisplayValues();
+        /*this.upped_bdamage = Math.round(this.upped_bdamage);
         this.upped_rdamage = Math.round(this.upped_rdamage);
-        this.upped_edamage = Math.round(this.upped_edamage);
+        this.upped_edamage = Math.round(this.upped_edamage);*/
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("weapon upgrades calculated");
@@ -1368,12 +1457,13 @@ class Pet extends Item {
         this.upped_boost = this.boost;
         this.upped_range = this.range;
         this.upped_targets = this.targets;
-        this.upped_bdamage = this.bdamage;
+        this.InitializeUppedValues();
+        /*this.upped_bdamage = this.bdamage;
         this.upped_rate = this.rate;
         this.upped_projspeed = this.projspeed;
         this.upped_projcount = this.projcount;
         this.upped_knockback = this.knockback;
-        this.upped_stat = this.stat;
+        this.upped_stat = this.stat;*/
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -1435,7 +1525,8 @@ class Pet extends Item {
             }
             up_count += 1;
         }
-        this.upped_bdamage = Math.round(this.upped_bdamage);
+        this.ConvertDamageToDisplayValues();
+        //this.upped_bdamage = Math.round(this.upped_bdamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("pet upgrades calculated");
@@ -1796,6 +1887,71 @@ function CalculateStick() {
     PrintResult(result);
 }
 
+function GetBaseDamagePerUp(obj, ult=false) {
+    if (!obj.hasOwnProperty("baseDamagePerUp") || !obj.hasOwnProperty("ultBaseDamagePerUp")) {
+        return 0;
+    }
+    let templateMultiplier = 1;
+    let baseMultiplier = 1;
+    let displayMultiplier = 1;
+    let swingMultiplier = 1;
+    let extraMultiplier = 1;
+    if (obj.hasOwnProperty("templateDamageMultiplier")) {
+        templateMultiplier = obj.templateDamageMultiplier;
+    }
+    if (obj.hasOwnProperty("baseDamageMultiplier")) {
+        baseMultiplier = obj.baseDamageMultiplier;
+    }
+    if (obj.hasOwnProperty("damageDisplayMultiplier")) {
+        displayMultiplier = obj.damageDisplayMultiplier;
+    }
+    if (obj.hasOwnProperty("swingSpeedDamageMultiplier")) {
+        swingMultiplier = obj.swingSpeedDamageMultiplier;
+    }
+    if (obj.hasOwnProperty("extraBaseDamageMultiplier")) {
+        extraMultiplier = obj.extraBaseDamageMultiplier;
+    }
+    let totalMultiplier = templateMultiplier * baseMultiplier * displayMultiplier * swingMultiplier * extraMultiplier * 0.8;
+    if (ult) {
+        return Math.floor(obj.ultBaseDamagePerUp) * totalMultiplier;
+    }
+    else {
+        return Math.floor(obj.baseDamagePerUp) * totalMultiplier;
+    }
+}
+
+function GetRangedDamagePerUp(obj) {
+    if (!obj.hasOwnProperty("rangedDamagePerUp")) {
+        return 0;
+    }
+    let rangedMultiplier = 1;
+    let displayMultiplier = 1;
+    if (obj.hasOwnProperty("rangedDamageMultiplier")) {
+        rangedMultiplier = obj.rangedDamageMultiplier;
+    }
+    if (obj.hasOwnProperty("rangedDamageDisplayMultiplier")) {
+        displayMultiplier = obj.rangedDamageDisplayMultiplier;
+    }
+    let totalMultiplier = rangedMultiplier * displayMultiplier * 0.8;
+    return Math.floor(obj.rangedDamagePerUp) * totalMultiplier;
+}
+
+function GetElemDamagePerUp(obj) {
+    if (!obj.hasOwnProperty("elemDamagePerUp")) {
+        return 0;
+    }
+    let elemMultiplier = 1;
+    let displayMultiplier = 1;
+    if (obj.hasOwnProperty("elemDamageMultiplier")) {
+        elemMultiplier = obj.elemDamageMultiplier;
+    }
+    if (obj.hasOwnProperty("damageDisplayMultiplier")) {
+        displayMultiplier = obj.damageDisplayMultiplier;
+    }
+    let totalMultiplier = elemMultiplier * displayMultiplier * 0.8;
+    return Math.floor(obj.elemDamagePerUp) * totalMultiplier;
+}
+
 function DefaultResTarget(qualityname) {
     /*
      * returns resistance value that's needed to reach resistance cap with set bonus
@@ -1934,520 +2090,26 @@ function ClearResult() {
 
 async function LoadItems() {
     try {
-        const json = await fetch("./itemdata.json");
-        //import json from "./itemdata.json";
+        const result = await fetch("./itemdata.json");
+        await result.json().then((value) => {
+            ITEMS = value.toSorted((a, b) => a.displayName.localeCompare(b.displayName));
+            console.log("LoadItems: itemdata.json loaded");
+        });
     }
     catch(error) {
         console.log(error);
-        PrintLog("itemdata.json couldn't be loaded");
+        PrintLog("itemdata.json couldn't be loaded, weapon and pet calculations won't function");
     }
-    return json;
 }
 
-//const ITEMS = JSON.parse(LoadItems());
+const noItemsMessage = "itemdata.json failed to load or is still loading, weapon and pet calculations won't function";
 
-const ITEMS = [
-{
-    "type":"weapon",
-    "hero":"any",
-    "name":"statstick",
-    "displayName":"Stat Stick / Builder",
-    "overrideLayout":"statstick",
-    "overrideQualityRange":"myth_ultpp"
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"caneofdoomedrelationships",
-    "displayName":"Cane of Doomed Relationships",
-    "ultBaseDamagePerUp":118.2714,
-    "baseDamagePerUp":105.6,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"crystalcane",
-    "displayName":"Crystal Cane",
-    "ultBaseDamagePerUp":162.6219,
-    "baseDamagePerUp":156.2831,
-    "elemDamagePerUp":162,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"dragonstaff",
-    "displayName":"Dragon Staff",
-    "elemDamagePerUp":91.7246,
-    "maxProjSpeed":30000,
-    "overrideLayout":"appmoon"
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"elderstaff",
-    "displayName":"Elder Staff",
-    "ultBaseDamagePerUp":151.2,
-    "baseDamagePerUp":108,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"embersceptre",
-    "displayName":"Ember Sceptre",
-    "ultBaseDamagePerUp":134.3945,
-    "baseDamagePerUp":96,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"enchantedbishop",
-    "displayName":"Enchanted / Tormented Bishop",
-    "ultBaseDamagePerUp":163.2958,
-    "baseDamagePerUp":145.8034,
-    "elemDamagePerUp":163.1994,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"eternianstaffnm",
-    "displayName":"Eternian Staff NM",
-    "ultBaseDamagePerUp":134.4027,
-    "baseDamagePerUp":127.6338,
-    "elemDamagePerUp":144,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"lavaslingernm",
-    "displayName":"Lava Slinger NM",
-    "ultBaseDamagePerUp":67.2,
-    "baseDamagePerUp":48.9589,
-    "elemDamagePerUp":144,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"lavaslingerrl",
-    "displayName":"Lava Slinger RL",
-    "ultBaseDamagePerUp":158.1888,
-    "baseDamagePerUp":115.2573,
-    "elemDamagePerUp":156.9578,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"obsidianclava",
-    "displayName":"Obsidian Clava",
-    "baseDamagePerUp":150.5291,
-    "elemDamagePerUp":149.9124,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"opticstaff",
-    "displayName":"Optic Staff",
-    "baseDamagePerUp":174.1061,
-    "elemDamagePerUp":174.1061,
-    "maxProjCount":6,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"staffoffrost",
-    "displayName":"Staff of Frost",
-    "ultBaseDamagePerUp":162.6219,
-    "baseDamagePerUp":156.2831,
-    "elemDamagePerUp":162,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"apprentice",
-    "name":"staffofhearts",
-    "displayName":"Staff of Hearts",
-    "baseDamagePerUp":163.2939,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"egganator2000",
-    "displayName":"Egganator 2000",
-    "ultBaseDamagePerUp":591.9211,
-    "baseDamagePerUp":493.9243,
-    "maxRate":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"forestrifle",
-    "displayName":"Forest Rifle",
-    "ultBaseDamagePerUp":360,
-    "baseDamagePerUp":280,
-    "maxRate":3,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"loveblaster",
-    "displayName":"Love Blaster",
-    "ultBaseDamagePerUp":492.7984,
-    "baseDamagePerUp":394,
-    "maxRate":5,
-    "maxProjCount":2,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"minigun",
-    "displayName":"Minigun",
-    "ultBaseDamagePerUp":640,
-    "baseDamagePerUp":160,
-    "maxProjSpeed":40000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"pawnshot",
-    "displayName":"Pawn Shot",
-    "ultBaseDamagePerUp":588,
-    "baseDamagePerUp":462,
-    "maxRate":8,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"huntress",
-    "name":"vanwolfsteinrl",
-    "displayName":"Van Wolfstein RL",
-    "ultBaseDamagePerUp":171.9906,
-    "baseDamagePerUp":122.8504,
-    "maxRate":6,
-    "maxProjCount":4,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"candycane",
-    "displayName":"Candy Cane",
-    "rangedDamagePerUp":158.6846,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"embercrescent",
-    "displayName":"Ember Crescent",
-    "rangedDamagePerUp":179.9838,
-    "maxProjCount":2,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"eternianspearnm",
-    "displayName":"Eternian Spear NM",
-    "ultBaseDamagePerUp":413.4084,
-    "baseDamagePerUp":295.2897
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"madnessboulderthrower",
-    "displayName":"Madness Boulder Thrower",
-    "rangedDamagePerUp":72,
-    "maxProjCount":4,
-    "maxProjSpeed":30000,
-    "overrideLayout":"monktbwep",
-    "overrideQualityRange":"myth_ultpp"
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"mischiefmaker",
-    "displayName":"Mischief Maker",
-    "rangedDamagePerUp":27.5990,
-    "maxProjSpeed":30000,
-    "overrideLayout":"monkmischief",
-    "overrideQualityRange":"myth_ultpp"
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"stickhorse",
-    "displayName":"Stick Horse",
-    "ultBaseDamagePerUp":460.9514,
-    "baseDamagePerUp":329.2464,
-    "rangedDamagePerUp":181.0398,
-    "maxProjCount":5,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"monk",
-    "name":"turtleshellpolearm",
-    "displayName":"Turtle Shell Polearm",
-    "ultBaseDamagePerUp":430.1285,
-    "baseDamagePerUp":387.8222,
-    "rangedDamagePerUp":171.0198,
-    "maxProjCount":2,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"squire",
-    "name":"anubisssandblade",
-    "displayName":"Anubis's Sand Blade",
-    "baseDamagePerUp":208.4599
-},
-{
-    "type":"weapon",
-    "hero":"squire",
-    "name":"calamityblade",
-    "displayName":"Calamity Blade",
-    "ultBaseDamagePerUp":190.6280,
-    "baseDamagePerUp":151.3733,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"squire",
-    "name":"disasterrapier",
-    "displayName":"Disaster Rapier",
-    "baseDamagePerUp":166.5194,
-    "maxProjSpeed":30000
-},
-{
-    "type":"weapon",
-    "hero":"squire",
-    "name":"thelightknight",
-    "displayName":"The Light / Dark Knight",
-    "baseDamagePerUp":195.1968
-},
-{
-    "type":"pet",
-    "name":"babyancientdragon",
-    "displayName":"Baby Ancient Dragon",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"chainsawcorgi",
-    "displayName":"Chainsaw Corgi",
-    "maxRange":110,
-    "maxTargets":6,
-    "overrideLayout":"cat",
-    "overrideQualityRange":"myth_trans"
-},
-{
-    "type":"pet",
-    "name":"cowboymonkey",
-    "displayName":"Cowboy Monkey",
-    "ultBaseDamagePerUp":263.1980,
-    "baseDamagePerUp":150.4020,
-    "maxRate":6,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"diamond",
-    "displayName":"Diamond / Heart",
-    "statCap":800,
-    "overrideLayout":"statstick",
-    "overrideQualityRange":"any"
-},
-{
-    "type":"pet",
-    "name":"dice",
-    "displayName":"Dice",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":88,
-    "maxRate":6,
-    "maxKnockback":60
-},
-{
-    "type":"pet",
-    "name":"emberpony",
-    "displayName":"Ember Pony",
-    "baseDamagePerUp":112,
-    "maxRate":6,
-    "maxProjCount":2,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"etherianancient",
-    "displayName":"Etherian Ancient",
-    "ultBaseDamagePerUp":61.6009,
-    "baseDamagePerUp":45.7591,
-    "maxRate":7,
-    "maxKnockback":128
-},
-{
-    "type":"pet",
-    "name":"eyeofdestruction",
-    "displayName":"Eye of Destruction",
-    "ultBaseDamagePerUp":160,
-    "baseDamagePerUp":136,
-    "maxRate":7,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"eyeoffirestorm",
-    "displayName":"Eye of Firestorm",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"eyeofhaste",
-    "displayName":"Eye of Haste",
-    "ultBaseDamagePerUp":33.6,
-    "baseDamagePerUp":29.6,
-    "maxRate":14,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"genie",
-    "displayName":"Genie",
-    "ultBaseDamagePerUp":140,
-    "baseDamagePerUp":80,
-    "overrideLayout":"genie",
-    "overrideQualityRange":"myth_ultpp"
-},
-{
-    "type":"pet",
-    "name":"kairithebrave",
-    "displayName":"Kairi the Brave",
-    "ultBaseDamagePerUp":21,
-    "baseDamagePerUp":12,
-    "maxRate":8
-},
-{
-    "type":"pet",
-    "name":"littlewizard",
-    "displayName":"Little Wizard",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxRate":7,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"loversnake",
-    "displayName":"Lover Snake",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxRate":6,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"loverscupid",
-    "displayName":"Lover's Cupid",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxRate":6,
-    "maxProjCount":7,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"magicscroll",
-    "displayName":"Magic Scroll",
-    "ultBaseDamagePerUp":224,
-    "baseDamagePerUp":200,
-    "maxRate":3,
-    "maxProjCount":3,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"mrowl",
-    "displayName":"Mr. Owl / Peckers",
-    "ultBaseDamagePerUp":61.6009,
-    "baseDamagePerUp":45.7591,
-    "maxRate":7,
-    "maxKnockback":128
-},
-{
-    "type":"pet",
-    "name":"mummy",
-    "displayName":"Mummy",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxRate":6,
-    "maxProjCount":3,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"propellercat",
-    "displayName":"Propeller Cat",
-    "maxRange":90,
-    "maxTargets":4,
-    "overrideLayout":"cat",
-    "overrideQualityRange":"myth_trans"
-},
-{
-    "type":"pet",
-    "name":"rainbowunicorn",
-    "displayName":"Rainbow Unicorn",
-    "baseDamagePerUp":100.8,
-    "maxRate":6,
-    "maxProjCount":2,
-    "maxProjSpeed":30000
-},
-{
-    "type":"pet",
-    "name":"robochicken",
-    "displayName":"Robo Chicken",
-    "baseDamagePerUp":59.2173,
-    "maxRate":4,
-    "maxKnockback":128
-},
-{
-    "type":"pet",
-    "name":"zamirasmount",
-    "displayName":"Zamira's Mount",
-    "ultBaseDamagePerUp":112,
-    "baseDamagePerUp":64,
-    "maxRate":6,
-    "maxProjCount":3,
-    "maxProjSpeed":30000
-}
-];
+let ITEMS = null;
 
 document.getElementById("itemtype").value = "armor";
 ChangeItemType("armor");
+
+LoadItems();
 
 document.getElementById("searchbox").value = "";
 
