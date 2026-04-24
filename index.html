@@ -1417,19 +1417,19 @@ class Weapon extends Item {
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
+            if (this.upped_bdamage > 0 && (this.BaseDamageDisplayValue() < this.bdamage_target || this.bdamage_target === 0)) {
                 this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_rdamage > 0 && (this.upped_rdamage < this.rdamage_target || this.rdamage_target === 0)) {
+            if (this.upped_rdamage > 0 && (this.RangedDamageDisplayValue() < this.rdamage_target || this.rdamage_target === 0)) {
                 this.UpgradeRangedDamage();
                 ups_spent += 1;
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_edamage > 0 && (this.upped_edamage < this.edamage_target || this.edamage_target === 0)) {
+            if (this.upped_edamage > 0 && (this.ElemDamageDisplayValue() < this.edamage_target || this.edamage_target === 0)) {
                 this.UpgradeElemDamage();
                 ups_spent += 1;
                 up_count += 1;
@@ -1524,7 +1524,7 @@ class Pet extends Item {
                 up_count += 1;
                 continue loop;
             }
-            if (this.upped_bdamage > 0 && (this.upped_bdamage < this.bdamage_target || this.bdamage_target === 0)) {
+            if (this.upped_bdamage > 0 && (this.BaseDamageDisplayValue() < this.bdamage_target || this.bdamage_target === 0)) {
                 this.UpgradeBaseDamage();
                 ups_spent += 1;
                 up_count += 1;
