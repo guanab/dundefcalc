@@ -1,6 +1,16 @@
 [
     {
         "type": "pet",
+        "displayName": "Mini Kraken",
+        "name": "MiniKraken",
+        "ultBaseDamagePerUp": 242.0,
+        "baseDamagePerUp": 242.0,
+        "maxRate": 6.0,
+        "maxProjSpeed": 30000,
+        "maxKnockback": 60
+    },
+    {
+        "type": "pet",
         "displayName": "Lover Snake",
         "name": "LoverSnake",
         "ultBaseDamagePerUp": 140.0,
@@ -162,6 +172,17 @@
         "maxProjSpeed": 30000
     },
     {
+        "type": "pet",
+        "displayName": "Baby Goblin Mech",
+        "name": "babygoblinmech",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
+        "maxProjCount": 3.0,
+        "maxProjSpeed": 30000,
+        "maxKnockback": 120
+    },
+    {
         "type": "weapon",
         "hero": "huntress",
         "displayName": "Van Wolfstein RL",
@@ -188,6 +209,15 @@
         "maxProjCount": 5.0,
         "maxProjSpeed": 30000,
         "elementalDamageScaling": true
+    },
+    {
+        "type": "pet",
+        "displayName": "Lil' Pengy",
+        "name": "LilPengy",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
+        "maxProjSpeed": 30000
     },
     {
         "type": "weapon",
@@ -220,6 +250,15 @@
         "maxProjSpeed": 30000,
         "moveSpeedMultiplier": 1.1,
         "elementalDamageScaling": true
+    },
+    {
+        "type": "pet",
+        "displayName": "Flying Pumpkin",
+        "name": "FlyingPumpkin",
+        "ultBaseDamagePerUp": 154.0,
+        "baseDamagePerUp": 130.0,
+        "maxRate": 6.0,
+        "maxProjSpeed": 30000
     },
     {
         "type": "weapon",
@@ -370,6 +409,16 @@
         "maxProjSpeed": 30000
     },
     {
+        "type": "pet",
+        "displayName": "Mini Snowman",
+        "name": "MiniSnowman",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "damageDisplayMultiplier": 1.1799999,
+        "maxRate": 6.0,
+        "maxProjSpeed": 30000
+    },
+    {
         "type": "weapon",
         "hero": "squire",
         "displayName": "Goblin Wrench",
@@ -378,6 +427,16 @@
         "baseDamagePerUp": 230.0,
         "baseDamageMultiplier": 1.1849999,
         "swingSpeedDamageMultiplier": 1.8429166207932752
+    },
+    {
+        "type": "pet",
+        "displayName": "Wasp",
+        "name": "Wasp",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
+        "maxProjSpeed": 30000,
+        "maxKnockback": 120
     },
     {
         "type": "pet",
