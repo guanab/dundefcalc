@@ -397,7 +397,10 @@ function ChangeItem(itemname) {
                         SetFields("monkmultiprojwephybrid");
                         upgradeorder = "Proj count > Proj speed > Base damage > Ranged damage";
                     }
-                    else PrintLog(nolayout);
+                    else {
+                        SetFields("monksingleprojwephybrid");
+                        upgradeorder = "Proj speed > Base damage > Ranged damage";
+                    }
                 }
                 else SetFields("monkmeleewep");
             }
@@ -664,6 +667,18 @@ function SetFields(layout) {
 <tr><td>Ranged damage </td><td><input id="rdamage" type="text"></td>\n\
 <td>Proj count </td><td><input id="projcount" type="text"></td>\n\
 <td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "monksingleprojwephybrid":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Base dmg </td><td><input id="bdamage" type="text"></td>\n\
+<td>Ranged dmg </td><td><input id="rdamage" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td></tr>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
