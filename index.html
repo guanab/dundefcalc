@@ -424,14 +424,26 @@ function ChangeItem(itemname) {
     }
     else if (obj.type === "pet") {
         if (obj.hasOwnProperty("maxProjCount")) {
-            SetFields("multiprojpet");
-            upgradeorder = "Proj count > Rate > Proj speed > Base damage";
+            if (obj.hasOwnProperty("maxKnockback")) {
+                SetFields("hybridmultiprojpet");
+                upgradeorder = "Proj count > Rate > Knockback > Proj speed > Base damage";
+            }
+            else {
+                SetFields("multiprojpet");
+                upgradeorder = "Proj count > Rate > Proj speed > Base damage";
+            }
         }
         else {
             if (obj.hasOwnProperty("maxProjSpeed")) {
                 if (obj.hasOwnProperty("maxRate")) {
-                    SetFields("singleprojpet");
-                    upgradeorder = "Rate > Proj speed > Base damage";
+                    if (obj.hasOwnProperty("maxKnockback")) {
+                        SetFields("hybridsingleprojpet");
+                        upgradeorder = "Rate > Knockback > Proj speed > Base damage";
+                    }
+                    else {
+                        SetFields("singleprojpet");
+                        upgradeorder = "Rate > Proj speed > Base damage";
+                    }
                 }
                 else {
                     SetFields("singleprojpetnorate");
@@ -477,6 +489,8 @@ function ChangeItem(itemname) {
         infotext += "Elemental damage per up: " + Math.round(elemPerUp * 100) / 100 + "<br>";
     if (obj.hasOwnProperty("maxRate"))
         infotext += "Max rate: " + obj.maxRate + "<br>";
+    if (obj.hasOwnProperty("maxKnockback"))
+        infotext += "Max knockback: " + obj.maxKnockback + "<br>";
     if (obj.hasOwnProperty("maxProjCount"))
         infotext += "Max proj count: " + obj.maxProjCount + "<br>";
     if (obj.hasOwnProperty("maxProjSpeed"))
@@ -761,6 +775,33 @@ function SetFields(layout) {
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "hybridsingleprojpet":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Knockback </td><td><input id="knockback" type="text"></td>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "hybridmultiprojpet":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Attack rate </td><td><input id="rate" type="text"></td>\n\
+<td>Knockback </td><td><input id="knockback" type="text"></td></tr>\n\
+<tr><td>Projectile count </td><td><input id="projcount" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculatePet()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
