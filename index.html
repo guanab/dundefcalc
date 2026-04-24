@@ -1083,6 +1083,18 @@ class Item {
         this.upped_edamage = Math.floor(this.upped_edamage * this.edamage_multiplier * this.damage_display_multiplier * 0.8);
     }
     
+    BaseDamageDisplayValue() {
+        return Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.extra_bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * 0.8);
+    }
+    
+    RangedDamageDisplayValue() {
+        return Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * 0.8);
+    }
+    
+    ElemDamageDisplayValue() {
+        return Math.floor(this.upped_edamage * this.edamage_multiplier * this.damage_display_multiplier * 0.8);
+    }
+    
     UpgradeBaseDamage() {
         const multiplier = (this.quality.includes("ult") && this.ult_bdamage_up_multiplier >= this.bdamage_up_multiplier) ? this.ult_bdamage_up_multiplier : this.bdamage_up_multiplier;
         const damage_per_up = (this.quality.includes("ult") && this.ult_bdamage_per_up >= this.bdamage_per_up) ? this.ult_bdamage_per_up : this.bdamage_per_up;
@@ -1397,7 +1409,7 @@ class Weapon extends Item {
                 continue loop;
             }
             if (this.upped_bdamage > 0 && this.upped_edamage > 0) {
-                if (this.upped_bdamage > this.upped_edamage)
+                if (this.BaseDamageDisplayValue() > this.ElemDamageDisplayValue())
                     this.UpgradeElemDamage();
                 else
                     this.UpgradeBaseDamage();
