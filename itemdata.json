@@ -315,12 +315,31 @@
     {
         "type": "weapon",
         "hero": "huntress",
+        "displayName": "Soul Dissolver",
+        "name": "SoulDissolver",
+        "ultBaseDamagePerUp": 347.0,
+        "baseDamagePerUp": 317.0,
+        "baseDamageMultiplier": 2.27,
+        "maxRate": 10.0
+    },
+    {
+        "type": "weapon",
+        "hero": "huntress",
         "displayName": "Egganator 2000",
         "name": "Egganator2000",
         "ultBaseDamagePerUp": 302.0,
         "baseDamagePerUp": 252.0,
         "baseDamageMultiplier": 2.45,
         "maxRate": 5.0,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "pet",
+        "displayName": "Mini Mech",
+        "name": "MiniMech",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
         "maxProjSpeed": 30000
     },
     {
@@ -349,6 +368,16 @@
         "maxRate": 6.0,
         "maxProjCount": 3.0,
         "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Goblin Wrench",
+        "name": "GoblinWrench",
+        "ultBaseDamagePerUp": 245.0,
+        "baseDamagePerUp": 230.0,
+        "baseDamageMultiplier": 1.1849999,
+        "swingSpeedDamageMultiplier": 1.8429166207932752
     },
     {
         "type": "pet",
