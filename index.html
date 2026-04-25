@@ -949,7 +949,7 @@ function SetUpgradeValues(item, itemname, quality) {
             if (obj.hasOwnProperty("elemDamageMultiplier")) item.edamage_multiplier = obj.elemDamageMultiplier;
             if (obj.hasOwnProperty("templateDamageMultiplier")) item.template_multiplier = obj.templateDamageMultiplier;
             if (obj.hasOwnProperty("swingSpeedDamageMultiplier")) item.swing_multiplier = obj.swingSpeedDamageMultiplier;
-            if (obj.hasOwnProperty("extraBaseDamageMultiplier")) item.extra_bdamage_multiplier = obj.extraBaseDamageMultiplier;
+            if (obj.hasOwnProperty("playerDamageMultiplier")) item.player_damage_multiplier = obj.playerDamageMultiplier;
             if (obj.hasOwnProperty("damageDisplayMultiplier")) item.damage_display_multiplier = obj.damageDisplayMultiplier;
             if (obj.hasOwnProperty("rangedDamageDisplayMultiplier")) item.ranged_display_multiplier = obj.rangedDamageDisplayMultiplier;
             if (obj.hasOwnProperty("maxRate")) item.max_rate = obj.maxRate;
@@ -1098,7 +1098,7 @@ class Item {
         this.edamage_multiplier = 1;
         this.template_multiplier = 1;
         this.swing_multiplier = 1;
-        this.extra_bdamage_multiplier = 1;
+        this.player_damage_multiplier = 0.8;
         this.damage_display_multiplier = 1;
         this.ranged_display_multiplier = 1;
         this.rate = 0;
@@ -1134,9 +1134,9 @@ class Item {
     }
     
     InitializeUppedValues() {
-        this.upped_bdamage = Math.ceil(this.bdamage / this.bdamage_multiplier / this.extra_bdamage_multiplier / this.damage_display_multiplier / this.template_multiplier / this.swing_multiplier / 0.8);
-        this.upped_rdamage = Math.ceil(this.rdamage / this.rdamage_multiplier / this.ranged_display_multiplier / 0.8);
-        this.upped_edamage = Math.ceil(this.edamage / this.edamage_multiplier / this.damage_display_multiplier / 0.8);
+        this.upped_bdamage = this.BaseDamageRawValue(this.bdamage);
+        this.upped_rdamage = this.RangedDamageRawValue(this.rdamage);
+        this.upped_edamage = this.ElemDamageRawValue(this.edamage);
         this.bdamage_per_up = Math.floor(this.bdamage_per_up);
         this.rdamage_per_up = Math.floor(this.rdamage_per_up);
         this.edamage_per_up = Math.floor(this.edamage_per_up);
@@ -1151,21 +1151,43 @@ class Item {
     }
     
     ConvertDamageToDisplayValues() {
-        this.upped_bdamage = Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.extra_bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * 0.8);
-        this.upped_rdamage = Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * 0.8);
-        this.upped_edamage = Math.floor(this.upped_edamage * this.edamage_multiplier * this.damage_display_multiplier * 0.8);
+        this.upped_bdamage = this.BaseDamageDisplayValue();
+        this.upped_rdamage = this.RangedDamageDisplayValue();
+        this.upped_edamage = this.ElemDamageDisplayValue();
     }
     
-    BaseDamageDisplayValue() {
-        return Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.extra_bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * 0.8);
+    BaseDamageRawValue(val = this.upped_bdamage) {
+        val = Math.ceil(val / this.bdamage_multiplier / this.template_multiplier / this.swing_multiplier - Number.EPSILON);
+        val = Math.ceil(val / this.player_damage_multiplier / this.damage_display_multiplier - Number.EPSILON);
+        return val;
     }
     
-    RangedDamageDisplayValue() {
-        return Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * 0.8);
+    BaseDamageDisplayValue(val = this.upped_bdamage) {
+        val = Math.floor(val * this.player_damage_multiplier * this.damage_display_multiplier + Number.EPSILON);
+        val = Math.floor(val * this.bdamage_multiplier * this.template_multiplier * this.swing_multiplier + Number.EPSILON);
+        return val;
+        //return Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * this.player_damage_multiplier);
     }
     
-    ElemDamageDisplayValue() {
-        return Math.floor(this.upped_edamage * this.edamage_multiplier * this.damage_display_multiplier * 0.8);
+    RangedDamageRawValue(val = this.upped_rdamage) {
+        val = Math.ceil(val / this.rdamage_multiplier - Number.EPSILON);
+        val = Math.ceil(val / this.player_damage_multiplier / this.ranged_display_multiplier - Number.EPSILON);
+        return val;
+    }
+    
+    RangedDamageDisplayValue(val = this.upped_rdamage) {
+        val = Math.floor(val * this.player_damage_multiplier * this.ranged_display_multiplier + Number.EPSILON);
+        val = Math.floor(val * this.rdamage_multiplier + Number.EPSILON);
+        return val;
+        //return Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * this.player_damage_multiplier);
+    }
+    
+    ElemDamageRawValue(val = this.upped_edamage) {
+        return Math.ceil(val / this.edamage_multiplier / this.damage_display_multiplier / this.player_damage_multiplier - Number.EPSILON);
+    }
+    
+    ElemDamageDisplayValue(val = this.upped_edamage) {
+        return Math.floor(val * this.edamage_multiplier * this.damage_display_multiplier * this.player_damage_multiplier + Number.EPSILON);
     }
     
     UpgradeBaseDamage() {
@@ -1173,7 +1195,7 @@ class Item {
         const damage_per_up = (this.quality.includes("ult") && this.ult_bdamage_per_up >= this.bdamage_per_up) ? this.ult_bdamage_per_up : this.bdamage_per_up;
         let up_amount = 0;
         if (this.upped_bdamage * multiplier < damage_per_up) 
-            up_amount = Math.floor(this.upped_bdamage * multiplier);
+            up_amount = Math.floor(this.upped_bdamage * multiplier + Number.EPSILON);
         else {
             this.upped_bdamage += Math.floor(damage_per_up);
             return;
@@ -1185,7 +1207,7 @@ class Item {
     UpgradeRangedDamage() {
         let up_amount = 0;
         if (this.upped_rdamage * this.rdamage_up_multiplier < this.rdamage_per_up) 
-            up_amount = Math.floor(this.upped_rdamage * this.rdamage_up_multiplier);
+            up_amount = Math.floor(this.upped_rdamage * this.rdamage_up_multiplier + Number.EPSILON);
         else {
             this.upped_rdamage += Math.floor(this.rdamage_per_up);
             return;
@@ -1197,7 +1219,7 @@ class Item {
     UpgradeElemDamage() {
         let up_amount = 0;
         if (this.upped_edamage * this.edamage_up_multiplier < this.edamage_per_up) 
-            up_amount = Math.floor(this.upped_edamage * this.edamage_up_multiplier);
+            up_amount = Math.floor(this.upped_edamage * this.edamage_up_multiplier + Number.EPSILON);
         else {
             this.upped_edamage += Math.floor(this.edamage_per_up);
             return;
@@ -1981,7 +2003,7 @@ function GetBaseDamagePerUp(obj, ult=false) {
     let baseMultiplier = 1;
     let displayMultiplier = 1;
     let swingMultiplier = 1;
-    let extraMultiplier = 1;
+    let playerMultiplier = 0.8;
     if (obj.hasOwnProperty("templateDamageMultiplier")) {
         templateMultiplier = obj.templateDamageMultiplier;
     }
@@ -1994,10 +2016,10 @@ function GetBaseDamagePerUp(obj, ult=false) {
     if (obj.hasOwnProperty("swingSpeedDamageMultiplier")) {
         swingMultiplier = obj.swingSpeedDamageMultiplier;
     }
-    if (obj.hasOwnProperty("extraBaseDamageMultiplier")) {
-        extraMultiplier = obj.extraBaseDamageMultiplier;
+    if (obj.hasOwnProperty("playerDamageMultiplier")) {
+        playerMultiplier = obj.playerDamageMultiplier;
     }
-    let totalMultiplier = templateMultiplier * baseMultiplier * displayMultiplier * swingMultiplier * extraMultiplier * 0.8;
+    let totalMultiplier = templateMultiplier * baseMultiplier * displayMultiplier * swingMultiplier * playerMultiplier;
     if (ult) {
         return Math.floor(obj.ultBaseDamagePerUp) * totalMultiplier;
     }
@@ -2012,13 +2034,17 @@ function GetRangedDamagePerUp(obj) {
     }
     let rangedMultiplier = 1;
     let displayMultiplier = 1;
+    let playerMultiplier = 0.8;
     if (obj.hasOwnProperty("rangedDamageMultiplier")) {
         rangedMultiplier = obj.rangedDamageMultiplier;
     }
     if (obj.hasOwnProperty("rangedDamageDisplayMultiplier")) {
         displayMultiplier = obj.rangedDamageDisplayMultiplier;
     }
-    let totalMultiplier = rangedMultiplier * displayMultiplier * 0.8;
+    if (obj.hasOwnProperty("playerDamageMultiplier")) {
+        playerMultiplier = obj.playerDamageMultiplier;
+    }
+    let totalMultiplier = rangedMultiplier * displayMultiplier * playerMultiplier;
     return Math.floor(obj.rangedDamagePerUp) * totalMultiplier;
 }
 
@@ -2028,13 +2054,17 @@ function GetElemDamagePerUp(obj) {
     }
     let elemMultiplier = 1;
     let displayMultiplier = 1;
+    let playerMultiplier = 0.8;
     if (obj.hasOwnProperty("elemDamageMultiplier")) {
         elemMultiplier = obj.elemDamageMultiplier;
     }
     if (obj.hasOwnProperty("damageDisplayMultiplier")) {
         displayMultiplier = obj.damageDisplayMultiplier;
     }
-    let totalMultiplier = elemMultiplier * displayMultiplier * 0.8;
+    if (obj.hasOwnProperty("playerDamageMultiplier")) {
+        playerMultiplier = obj.playerDamageMultiplier;
+    }
+    let totalMultiplier = elemMultiplier * displayMultiplier * playerMultiplier;
     return Math.floor(obj.elemDamagePerUp) * totalMultiplier;
 }
 
