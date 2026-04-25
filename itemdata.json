@@ -1320,7 +1320,7 @@
     },
     {
         "type": "pet",
-        "displayName": " Ice Cube",
+        "displayName": "Ice Cube",
         "name": "IceCube",
         "ultBaseDamagePerUp": 140.0,
         "baseDamagePerUp": 110.0,
