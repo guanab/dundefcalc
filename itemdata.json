@@ -19,6 +19,15 @@
         "maxProjSpeed": 30000
     },
     {
+        "type": "pet",
+        "displayName": "Diamond",
+        "name": "Diamond",
+        "statCap": 800,
+        "moveSpeedMultiplier": 1.415,
+        "overrideLayout": "statstick",
+        "overrideQualityRange": "any"
+    },
+    {
         "type": "weapon",
         "hero": "apprentice",
         "displayName": "Fusion Rift",
@@ -304,16 +313,6 @@
     },
     {
         "type": "weapon",
-        "hero": "huntress",
-        "displayName": "Genie's Blunderbuss",
-        "name": "GeniesBlunderbuss",
-        "ultBaseDamagePerUp": 1232.0,
-        "baseDamagePerUp": 985.6000366,
-        "maxProjSpeed": 30000,
-        "moveSpeedMultiplier": 1.1
-    },
-    {
-        "type": "weapon",
         "hero": "monk",
         "displayName": "Gem Dagger",
         "name": "GemDagger",
@@ -331,9 +330,36 @@
     },
     {
         "type": "weapon",
+        "hero": "monk",
+        "displayName": "Constellation Dagger",
+        "name": "ConstellationDagger",
+        "templateDamageMultiplier": 1.35,
+        "ultBaseDamagePerUp": 135.0,
+        "baseDamagePerUp": 110.0,
+        "baseDamageMultiplier": 2.3699999,
+        "swingSpeedDamageMultiplier": 1.0839752024251064,
+        "rangedDamagePerUp": 70.0,
+        "rangedDamageMultiplier": 2.75,
+        "rangedDamageDisplayMultiplier": 1.0915999,
+        "maxProjCount": 2.0,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
+        "type": "weapon",
         "hero": "squire",
         "displayName": "Xiphos Blade",
         "name": "XiphosBlade",
+        "ultBaseDamagePerUp": 245.0,
+        "baseDamagePerUp": 241.5,
+        "baseDamageMultiplier": 1.1968499,
+        "swingSpeedDamageMultiplier": 1.886394578762265
+    },
+    {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Constellation Sword",
+        "name": "ConstellationSword",
         "ultBaseDamagePerUp": 245.0,
         "baseDamagePerUp": 241.5,
         "baseDamageMultiplier": 1.1968499,
@@ -359,7 +385,8 @@
         "ultBaseDamagePerUp": 140.0,
         "baseDamagePerUp": 100.0,
         "baseDamageMultiplier": 1.9967999,
-        "swingSpeedDamageMultiplier": 1.211609972032394
+        "swingSpeedDamageMultiplier": 1.211609972032394,
+        "rangedDamageMultiplier": 2.5
     },
     {
         "type": "weapon",
@@ -448,6 +475,20 @@
     },
     {
         "type": "weapon",
+        "hero": "squire",
+        "displayName": "Eternian Greatsword RL",
+        "name": "EternianGreatswordRL",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 200.0,
+        "baseDamageMultiplier": 2.47,
+        "rangedDamagePerUp": 100.0,
+        "rangedDamageMultiplier": 6.1999998,
+        "rangedDamageDisplayMultiplier": 0.46,
+        "maxProjCount": 2,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
         "hero": "huntress",
         "displayName": "Crystal Tracker RL",
         "name": "CrystalTrackerRL",
@@ -480,6 +521,18 @@
         "rangedDamagePerUp": 100.0,
         "rangedDamageMultiplier": 27.0,
         "rangedDamageDisplayMultiplier": 0.264556,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Anubis' Lamp RL",
+        "name": "AnubisLampRL",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 127.5,
+        "baseDamageMultiplier": 2.55,
+        "maxRate": 10.0,
+        "maxProjCount": 3,
         "maxProjSpeed": 30000
     },
     {
@@ -545,6 +598,19 @@
     },
     {
         "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Karathikan Stone Thrower RL",
+        "name": "KarathikanStoneThrowerRL",
+        "templateDamageMultiplier": 1.65,
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 150.0,
+        "baseDamageUpMultiplier": 0.185,
+        "baseDamageMultiplier": 4.25,
+        "maxRate": 4.0,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
         "hero": "monk",
         "displayName": "The Maquahuitl RL",
         "name": "TheMaquahuitlRL",
@@ -567,7 +633,8 @@
         "templateDamageMultiplier": 0.82,
         "ultBaseDamagePerUp": 168.0,
         "baseDamagePerUp": 100.0,
-        "baseDamageMultiplier": 2.8499999
+        "baseDamageMultiplier": 2.8499999,
+        "rangedDamageMultiplier": 2.0
     },
     {
         "type": "weapon",
@@ -610,6 +677,21 @@
         "baseDamageMultiplier": 2.5999999,
         "maxRate": 16.0,
         "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Genie King's Shardstaff RL",
+        "name": "GenieKingsShardstaffRL",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 100.0,
+        "damageDisplayMultiplier": 0.6,
+        "baseDamageMultiplier": 2.1700001,
+        "elemDamagePerUp": 400.0,
+        "elemDamageMultiplier": 0.81,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000,
+        "elementalDamageScaling": true
     },
     {
         "type": "weapon",
@@ -680,7 +762,8 @@
         "ultBaseDamagePerUp": 318.0,
         "baseDamagePerUp": 318.0,
         "baseDamageMultiplier": 1.2920001,
-        "swingSpeedDamageMultiplier": 1.2312861880239625
+        "swingSpeedDamageMultiplier": 1.2312861880239625,
+        "rangedDamageMultiplier": 2.0
     },
     {
         "type": "weapon",
@@ -699,6 +782,20 @@
     },
     {
         "type": "weapon",
+        "hero": "squire",
+        "displayName": "The Sword of Masters RL",
+        "name": "TheSwordofMastersRL",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 107.0,
+        "baseDamageMultiplier": 2.8699999,
+        "swingSpeedDamageMultiplier": 1.211609972032394,
+        "rangedDamagePerUp": 100.0,
+        "rangedDamageMultiplier": 15.0,
+        "rangedDamageDisplayMultiplier": 0.18,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
         "hero": "apprentice",
         "displayName": "Lumeric Staff",
         "name": "LumericStaffRL",
@@ -711,6 +808,17 @@
         "maxProjSpeed": 30000
     },
     {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Abyssal Finn",
+        "name": "AbyssalFinnRL",
+        "ultBaseDamagePerUp": 208.25,
+        "baseDamagePerUp": 230.0,
+        "baseDamageMultiplier": 1.47,
+        "swingSpeedDamageMultiplier": 1.5832128607827927,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
         "type": "pet",
         "displayName": "Lil' Pengy",
         "name": "LilPengy",
@@ -718,6 +826,16 @@
         "baseDamagePerUp": 80.0,
         "maxRate": 6.0,
         "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Ice Pick",
+        "name": "IcePick",
+        "ultBaseDamagePerUp": 245.0,
+        "baseDamagePerUp": 230.0,
+        "baseDamageMultiplier": 1.7,
+        "swingSpeedDamageMultiplier": 1.2933148367012113
     },
     {
         "type": "pet",
@@ -859,6 +977,17 @@
     },
     {
         "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Kraken Kannon",
+        "name": "KrakenKannon",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 110.0,
+        "baseDamageMultiplier": 5.1750002,
+        "maxRate": 4.0,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
         "hero": "apprentice",
         "displayName": "Elder Staff",
         "name": "ElderStaff",
@@ -869,6 +998,16 @@
         "elemDamagePerUp": 400.0,
         "elemDamageMultiplier": 0.75,
         "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Crystal Blade",
+        "name": "CrystalBlade",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 200.0,
+        "baseDamageMultiplier": 2.4000001,
+        "swingSpeedDamageMultiplier": 1.0248972535400633
     },
     {
         "type": "pet",
@@ -899,6 +1038,48 @@
         "damageDisplayMultiplier": 0.55,
         "maxRate": 7.0,
         "maxKnockback": 128
+    },
+    {
+        "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Samiel the Flayer",
+        "name": "SamieltheFlayer",
+        "ultBaseDamagePerUp": 550.0,
+        "baseDamagePerUp": 550.0,
+        "baseDamageMultiplier": 1.55,
+        "maxRate": 3,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Undying Rod",
+        "name": "UndyingRod",
+        "ultBaseDamagePerUp": 300.0,
+        "baseDamagePerUp": 240.0,
+        "damageDisplayMultiplier": 0.6,
+        "baseDamageMultiplier": 1.1,
+        "elemDamagePerUp": 400.0,
+        "elemDamageMultiplier": 0.84,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1,
+        "elementalDamageScaling": true
+    },
+    {
+        "type": "weapon",
+        "hero": "monk",
+        "displayName": "Shimmerblade Scimitar",
+        "name": "ShimmerbladeScimitar",
+        "templateDamageMultiplier": 1.35,
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 100.0,
+        "swingSpeedDamageMultiplier": 1.1191335138945726,
+        "rangedDamagePerUp": 100.0,
+        "rangedDamageMultiplier": 1.0700001,
+        "rangedDamageDisplayMultiplier": 2.168,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000
     },
     {
         "type": "pet",
@@ -946,6 +1127,18 @@
     },
     {
         "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Emerald Thrower",
+        "name": "EmeraldThrower",
+        "ultBaseDamagePerUp": 180.0,
+        "baseDamagePerUp": 180.0,
+        "baseDamageMultiplier": 2.0999999,
+        "maxRate": 7.0,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
+        "type": "weapon",
         "hero": "squire",
         "displayName": "Anubis's Sand Blade",
         "name": "AnubissSandBlade",
@@ -976,6 +1169,57 @@
         "baseDamagePerUp": 136.0,
         "maxRate": 6.0,
         "maxProjCount": 3.0,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "monk",
+        "displayName": "Clockwork Spear",
+        "name": "ClockworkSpear",
+        "templateDamageMultiplier": 1.35,
+        "ultBaseDamagePerUp": 300.0,
+        "baseDamagePerUp": 200.0,
+        "baseDamageMultiplier": 1.17,
+        "swingSpeedDamageMultiplier": 1.1191335138945726,
+        "rangedDamagePerUp": 106.0,
+        "rangedDamageDisplayMultiplier": 2.1600001,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000
+    },
+    {
+        "type": "weapon",
+        "hero": "squire",
+        "displayName": "Cog Sword",
+        "name": "CogSword",
+        "ultBaseDamagePerUp": 360.0,
+        "baseDamagePerUp": 360.0,
+        "baseDamageMultiplier": 1.27,
+        "swingSpeedDamageMultiplier": 1.1750768323738858
+    },
+    {
+        "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Gargoyle Staff",
+        "name": "GargoyleStaff",
+        "ultBaseDamagePerUp": 350.0,
+        "baseDamagePerUp": 275.0,
+        "damageDisplayMultiplier": 0.6,
+        "baseDamageMultiplier": 1.025,
+        "elemDamagePerUp": 400.0,
+        "elemDamageMultiplier": 0.8625,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1,
+        "elementalDamageScaling": true
+    },
+    {
+        "type": "weapon",
+        "hero": "huntress",
+        "displayName": "The Gartner",
+        "name": "TheGartner",
+        "ultBaseDamagePerUp": 550.0,
+        "baseDamagePerUp": 550.0,
+        "baseDamageMultiplier": 1.53,
         "maxProjSpeed": 30000
     },
     {
@@ -1028,7 +1272,9 @@
         "baseDamageMultiplier": 1.3,
         "elemDamageMultiplier": 1.3,
         "maxProjSpeed": 30000,
-        "moveSpeedMultiplier": 1.1
+        "moveSpeedMultiplier": 1.1,
+        "overrideLayout": "appserpent",
+        "overrideQualityRange": "myth_ultpp"
     },
     {
         "type": "pet",
@@ -1458,6 +1704,24 @@
     },
     {
         "type": "pet",
+        "displayName": "Democrat Donkey",
+        "name": "DemocratDonkey",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
+        "maxKnockback": 128
+    },
+    {
+        "type": "pet",
+        "displayName": "Republican Elephant",
+        "name": "RepublicanElephant",
+        "ultBaseDamagePerUp": 140.0,
+        "baseDamagePerUp": 80.0,
+        "maxRate": 6.0,
+        "maxKnockback": 128
+    },
+    {
+        "type": "pet",
         "displayName": "Seahorse",
         "name": "Seahorse",
         "ultBaseDamagePerUp": 140.0,
@@ -1589,18 +1853,6 @@
     },
     {
         "type": "weapon",
-        "hero": "huntress",
-        "displayName": "Frozen Rifle",
-        "name": "FrozenRifle",
-        "ultBaseDamagePerUp": 234.4038544,
-        "baseDamagePerUp": 175.0,
-        "baseDamageMultiplier": 1.96,
-        "maxRate": 3,
-        "maxProjSpeed": 30000,
-        "moveSpeedMultiplier": 1.1
-    },
-    {
-        "type": "weapon",
         "hero": "apprentice",
         "displayName": "Staff of Frost",
         "name": "StaffofFrost",
@@ -1622,13 +1874,5 @@
         "displayName": "Stat Stick / Builder",
         "overrideLayout": "statstick",
         "overrideQualityRange": "myth_ultpp"
-    },
-    {
-        "type": "pet",
-        "name": "diamond",
-        "displayName": "Diamond / Heart",
-        "statCap": 800,
-        "overrideLayout": "statstick",
-        "overrideQualityRange": "any"
     }
 ]
