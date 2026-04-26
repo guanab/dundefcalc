@@ -309,6 +309,10 @@ Custom res target<input type="checkbox" onchange="ChangeCustomRes(this.checked)"
 function ChangeItem(itemname) {
     /*
      * calls SetFields and SetQualities functions based on provided item name
+     * also parses the info for infobox
+     * 
+     * todo write something more elegant for layout selection :fridge:
+     * put the layouts and upgrade orders into json or something
      */
     ClearResult();
     ClearLog();
@@ -327,8 +331,6 @@ function ChangeItem(itemname) {
     
     let upgradeorder = "";
     
-    //todo write something more elegant :fridge:
-    //put the layouts and upgrade orders into json or something
     if (obj.hasOwnProperty("overrideLayout")) {
         SetFields(obj.overrideLayout);
         if (obj.overrideLayout === "appmoon")
@@ -543,6 +545,10 @@ function ChangeItem(itemname) {
 }
 
 function SetInfo(text) {
+    /*
+     * prints provided text on infobox div
+     * adds info symbol if text isn't empty
+     */
     if (text === "" || text === null)
         document.getElementById("infobox").innerHTML = "";
     else
@@ -552,6 +558,8 @@ function SetInfo(text) {
 function SetFields(layout) {
     /*
      * prints html content on the fields div based on provided layout name
+     * 
+     * todo make a dynamic layout builder function instead of hardcoded html
      */
     console.log("SetFields: layout name " + layout);
     switch (layout) {
@@ -1007,6 +1015,10 @@ function SetQualities(qualityrange) {
 function SetUpgradeValues(item, itemname, quality) {
     /*
      * sets upgrade values into a provided instance of Item class
+     * returns a boolean (false if no matching item found)
+     * 
+     * todo doesn't really need itemname and quality as separate arguments, could be part of item class
+     * could also bring the json object as argument instead of searching for it
      */
     for (const obj of ITEMS) {
         if (itemname === obj.name) {
@@ -1097,6 +1109,10 @@ function AllFieldsEmpty() {
 }
 
 function SearchItems() {
+    /*
+     * called when input value changes on searchbox
+     * reads input from searchbox and prints matching items on searchresults
+     */
     if (ITEMS === null) {
         ClearLog();
         PrintLog(noItemsMessage);
@@ -1133,6 +1149,10 @@ function SearchItems() {
 }
 
 function SelectSearchResult(itemname) {
+    /*
+     * called when a search result is clicked
+     * changes all select boxes to match the selected item and resets search
+     */
     const obj = ITEMS.find(obj => obj.name === itemname);
     
     document.getElementById("itemtype").value = obj.type;
@@ -1146,12 +1166,19 @@ function SelectSearchResult(itemname) {
 }
 
 function HideSearch() {
+    /*
+     * hides the search results with a delay
+     * delay is needed for a click to register on the search result
+     */
     setTimeout(() => {
         document.getElementById("searchresults").style.display = "none";
     }, 50);
 }
 
 function ShowSearch() {
+    /*
+     * unhides search results
+     */
     document.getElementById("searchresults").style.display = "inline-block";
 }
 
@@ -1251,7 +1278,6 @@ class Item {
         val = Math.floor(val * this.player_damage_multiplier * this.damage_display_multiplier + Number.EPSILON);
         val = Math.floor(val * this.bdamage_multiplier * this.template_multiplier * this.swing_multiplier + Number.EPSILON);
         return val;
-        //return Math.floor(this.upped_bdamage * this.bdamage_multiplier * this.damage_display_multiplier * this.template_multiplier * this.swing_multiplier * this.player_damage_multiplier);
     }
     
     RangedDamageRawValue(val = this.upped_rdamage) {
@@ -1264,7 +1290,6 @@ class Item {
         val = Math.floor(val * this.player_damage_multiplier * this.ranged_display_multiplier + Number.EPSILON);
         val = Math.floor(val * this.rdamage_multiplier + Number.EPSILON);
         return val;
-        //return Math.floor(this.upped_rdamage * this.rdamage_multiplier * this.ranged_display_multiplier * this.player_damage_multiplier);
     }
     
     ElemDamageRawValue(val = this.upped_edamage) {
@@ -1394,6 +1419,12 @@ class Item {
 }
 
 class Armor extends Item {
+    /*
+     * class for armor
+     * extends item with stuff to calculate resistances and multiple stats
+     * 
+     * todo could probably combine with statstick
+     */
     constructor() {
         super();
         this.resistances = [];
@@ -1524,23 +1555,15 @@ class Armor extends Item {
 }
 
 class Weapon extends Item {
+    /*
+     * class for weapons
+     */
     constructor() {
         super();
     }
 
     Calculate() {
         this.InitializeUppedValues();
-        /*this.upped_bdamage = this.bdamage;
-        this.upped_rdamage = this.rdamage;
-        this.upped_edamage = this.edamage;
-        this.upped_rate = this.rate;
-        this.upped_block = this.block;
-        this.upped_projcount = this.projcount;
-        this.upped_projspeed = this.projspeed;
-        this.upped_charge = this.charge;
-        this.upped_knockback = this.knockback;
-        this.upped_stat = this.stat;
-        this.upped_priostat = this.priostat;*/
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -1624,9 +1647,6 @@ class Weapon extends Item {
             up_count += 1;
         }
         this.ConvertDamageToDisplayValues();
-        /*this.upped_bdamage = Math.round(this.upped_bdamage);
-        this.upped_rdamage = Math.round(this.upped_rdamage);
-        this.upped_edamage = Math.round(this.upped_edamage);*/
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("weapon upgrades calculated");
@@ -1634,6 +1654,10 @@ class Weapon extends Item {
 }
 
 class Pet extends Item {
+    /*
+     * class for pets
+     * extends item with stuff needed to calculate boost pets
+     */
     constructor() {
         super();
         this.boost = 0;
@@ -1651,12 +1675,6 @@ class Pet extends Item {
         this.upped_range = this.range;
         this.upped_targets = this.targets;
         this.InitializeUppedValues();
-        /*this.upped_bdamage = this.bdamage;
-        this.upped_rate = this.rate;
-        this.upped_projspeed = this.projspeed;
-        this.upped_projcount = this.projcount;
-        this.upped_knockback = this.knockback;
-        this.upped_stat = this.stat;*/
         this.spare_ups = 0;
         let ups_spent = 0;
         let up_count = 0;
@@ -1719,7 +1737,6 @@ class Pet extends Item {
             up_count += 1;
         }
         this.ConvertDamageToDisplayValues();
-        //this.upped_bdamage = Math.round(this.upped_bdamage);
         if (ups_spent < this.upgrades - 1) this.spare_ups = this.upgrades - ups_spent - 1;
         this.calculated = true;
         console.log("pet upgrades calculated");
@@ -1727,6 +1744,11 @@ class Pet extends Item {
 }
 
 class StatStick extends Item {
+    /*
+     * class for statstick items (an item with only stats)
+     * 
+     * todo could probably combine with armor
+     */
     constructor() {
         super();
         this.stats = [];
@@ -1760,6 +1782,9 @@ class StatStick extends Item {
 }
 
 function CalculateArmor() {
+    /*
+     * calls all the necessary stuff to calculate and display an armor item
+     */
     ClearLog();
     ClearResult();
     
@@ -1834,6 +1859,9 @@ function CalculateArmor() {
 }
 
 function CalculateWeapon() {
+    /*
+     * calls all the necessary stuff to calculate and display a weapon item
+     */
     ClearLog();
     ClearResult();
     
@@ -1949,6 +1977,9 @@ function CalculateWeapon() {
 }
 
 function CalculatePet() {
+    /*
+     * calls all the necessary stuff to calculate and display a pet item
+     */
     ClearLog();
     ClearResult();
     
@@ -2038,6 +2069,9 @@ function CalculatePet() {
 }
 
 function CalculateStick() {
+    /*
+     * calls all the necessary stuff to calculate and display a statstick item
+     */
     ClearLog();
     ClearResult();
     
@@ -2081,6 +2115,9 @@ function CalculateStick() {
 }
 
 function GetBaseDamagePerUp(obj, ult=false) {
+    /*
+     * returns a multiplier corrected base damage per up value of a provided json object
+     */
     if (!obj.hasOwnProperty("baseDamagePerUp") || !obj.hasOwnProperty("ultBaseDamagePerUp")) {
         return 0;
     }
@@ -2114,6 +2151,9 @@ function GetBaseDamagePerUp(obj, ult=false) {
 }
 
 function GetRangedDamagePerUp(obj) {
+    /*
+     * returns a multiplier corrected ranged damage per up value of a provided json object
+     */
     if (!obj.hasOwnProperty("rangedDamagePerUp")) {
         return 0;
     }
@@ -2134,6 +2174,9 @@ function GetRangedDamagePerUp(obj) {
 }
 
 function GetElemDamagePerUp(obj) {
+    /*
+     * returns a multiplier corrected elemental damage per up value of a provided json object
+     */
     if (!obj.hasOwnProperty("elemDamagePerUp")) {
         return 0;
     }
@@ -2263,33 +2306,56 @@ function HighestValueFirst(array) {
 }
 
 function PrintResult(text) {
+    /*
+     * prints provided text on the result div
+     */
     document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = text;
 }
 
 function PrintLog(text) {
+    /*
+     * prints provided text on the log div
+     * meant to serve as a log that's visible to the user
+     * also prints the same text on console
+     */
     console.log(text);
     document.getElementById("log").style.display = "block";
     document.getElementById("log").innerHTML += "<div class='logmsg'>" + text + "</div>\n";
 }
 
 function PrintError(text) {
+    /*
+     * prints provided text on the log div in red color
+     * meant to serve as a log that's visible to the user
+     * also prints the same text on console
+     */
     console.log("ERROR: "+ text);
     document.getElementById("log").style.display = "block";
     document.getElementById("log").innerHTML += "<div class='errormsg'>" + text + "</div>\n";
 }
 
 function ClearLog() {
+    /*
+     * empties the log div
+     */
     document.getElementById("log").innerHTML = "";
     document.getElementById("log").style.display = "none";
 }
 
 function ClearResult() {
+    /*
+     * empties the result div
+     */
     document.getElementById("result").innerHTML = "";
     document.getElementById("result").style.display = "none";
 }
 
 async function LoadItems() {
+    /*
+     * fetches the itemdata.json file that's required for weapon and pet calculations
+     * displays a log message if something goes wrong and the actual error info in console
+     */
     try {
         const result = await fetch("./itemdata.json");
         await result.json().then((value) => {
