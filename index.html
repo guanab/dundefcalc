@@ -385,8 +385,11 @@ function ChangeItem(itemname) {
                     }
                 }
                 else {
-                    SetFields("huntsingleprojwepnorate");
-                    upgradeorder = "Proj speed > Base damage";
+                    if (obj.hasOwnProperty("maxProjSpeed")) {
+                        SetFields("huntsingleprojwepnorate");
+                        upgradeorder = "Proj speed > Base damage";
+                    }
+                    else SetFields("onlybdamagewep");
                 }
             }
         }
@@ -395,14 +398,14 @@ function ChangeItem(itemname) {
                 if (obj.hasOwnProperty("rangedDamagePerUp")) {
                     if (obj.hasOwnProperty("maxProjCount")) {
                         SetFields("monkmultiprojwephybrid");
-                        upgradeorder = "Proj count > Proj speed > Base damage > Ranged damage";
+                        upgradeorder = "Proj count > Proj speed > Base damage / Ranged damage";
                     }
                     else {
                         SetFields("monksingleprojwephybrid");
-                        upgradeorder = "Proj speed > Base damage > Ranged damage";
+                        upgradeorder = "Proj speed > Base damage / Ranged damage";
                     }
                 }
-                else SetFields("monkmeleewep");
+                else SetFields("onlybdamagewep");
             }
             else if (obj.hasOwnProperty("rangedDamagePerUp")) {
                 if (obj.hasOwnProperty("maxProjCount")){
@@ -415,8 +418,23 @@ function ChangeItem(itemname) {
         }
         else if (obj.hero === "squire") {
             if (obj.hasOwnProperty("maxProjSpeed")) {
-                SetFields("squiresingleprojwep");
-                upgradeorder = "Block > Proj speed > Base damage";
+                if (obj.hasOwnProperty("maxProjCount")){
+                    if (obj.hasOwnProperty("rangedDamagePerUp")) {
+                        SetFields("squiremultiprojwepseparated");
+                        upgradeorder = "Proj count > Block > Proj speed > Base damage / Ranged damage";
+                    }
+                    else {
+                        PrintLog(nolayout);
+                    }
+                }
+                else if (obj.hasOwnProperty("rangedDamagePerUp")) {
+                    SetFields("squiresingleprojwepseparated");
+                    upgradeorder = "Block > Proj speed > Base damage / Ranged damage";
+                }
+                else {
+                    SetFields("squiresingleprojwep");
+                    upgradeorder = "Block > Proj speed > Base damage";
+                }
             }
             else {
                 SetFields("squiremeleewep");
@@ -498,6 +516,12 @@ function ChangeItem(itemname) {
         infotext += "Max proj count: " + obj.maxProjCount + "<br>";
     if (obj.hasOwnProperty("maxProjSpeed"))
         infotext += "Max proj speed: " + obj.maxProjSpeed + "<br>";
+    if (obj.hasOwnProperty("maxRange"))
+        infotext += "Max range: " + obj.maxRange + "<br>";
+    if (obj.hasOwnProperty("maxTargets"))
+        infotext += "Max targets: " + obj.maxTargets + "<br>";
+    if (obj.hasOwnProperty("statCap"))
+        infotext += "Stat cap: " + obj.statCap + "<br>";
     if (obj.hasOwnProperty("moveSpeedMultiplier"))
         infotext += "Movespeed multiplier: " + obj.moveSpeedMultiplier + "<br>";
     if (obj.hasOwnProperty("gravityMultiplier"))
@@ -592,6 +616,20 @@ function SetFields(layout) {
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
             break;
+        case "appserpent":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Dmg target </td><td><input id="bdamagetarget" type="text"></td>\n\
+<td>Charge </td><td><input id="charge" type="text"></td></tr>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Stat </td><td><input id="stat" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
         case "huntsingleprojwep":
             document.getElementById("fields").innerHTML = '\
 <table>\n\
@@ -635,16 +673,6 @@ function SetFields(layout) {
 <tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
 <td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="2" style="text-align:right;padding-right:7px">\n\
-<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
-<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
-</table>';
-            break;
-        case "monkmeleewep":
-            document.getElementById("fields").innerHTML = '\
-<table>\n\
-<tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
-<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
-<tr><td colspan="4" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -731,6 +759,44 @@ function SetFields(layout) {
 <td>Proj speed </td><td><input id="projspeed" type="text"></td></tr>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "squiresingleprojwepseparated":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Base dmg </td><td><input id="bdamage" type="text"></td>\n\
+<td>Ranged dmg </td><td><input id="rdamage" type="text"></td>\n\
+<td>Block </td><td><input id="block" type="text"></td></tr>\n\
+<tr><td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td colspan="2" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "squiremultiprojwepseparated":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Base dmg </td><td><input id="bdamage" type="text"></td>\n\
+<td>Ranged dmg </td><td><input id="rdamage" type="text"></td>\n\
+<td>Block </td><td><input id="block" type="text"></td></tr>\n\
+<tr><td>Proj count </td><td><input id="projcount" type="text"></td>\n\
+<td>Proj speed </td><td><input id="projspeed" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td></tr>\n\
+<tr><td colspan="6" style="text-align:right;padding-right:7px">\n\
+<button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
+<button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
+</table>';
+            break;
+        case "onlybdamagewep":
+            document.getElementById("fields").innerHTML = '\
+<table>\n\
+<tr><td>Base damage </td><td><input id="bdamage" type="text"></td>\n\
+<td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
+<td style="width:120px"></td></tr>\n\
+<tr><td colspan="5" style="text-align:right;padding-right:7px">\n\
 <button style="width:100px" onclick="CalculateWeapon()">Calculate</button>\n\
 <button style="width:100px" onclick="ClearFields()">Clear</button></td></tr>\n\
 </table>';
@@ -825,7 +891,7 @@ function SetFields(layout) {
             document.getElementById("fields").innerHTML = '\
 <table>\n\
 <tr><td>Damage </td><td><input id="bdamage" type="text"></td>\n\
-<td>Damage target </td><td><input id="damagetarget" type="text"></td>\n\
+<td>Damage target </td><td><input id="bdamagetarget" type="text"></td>\n\
 <td>Stat </td><td><input id="stat" type="text"></td>\n\
 <tr><td>Upgrades </td><td><input id="upgrades" type="text"></td>\n\
 <td colspan="4" style="text-align:right;padding-right:7px">\n\
@@ -1896,9 +1962,9 @@ function CalculatePet() {
         const bdamage = parseInt(document.getElementById("bdamage").value);
         if (!isNaN(bdamage) && bdamage !== 0) pet.bdamage = bdamage;
     }
-    if (document.getElementById("damagetarget")) {
-        const damagetarget = parseInt(document.getElementById("damagetarget").value);
-        if (!isNaN(damagetarget) && damagetarget !== 0) pet.damage_target = damagetarget;
+    if (document.getElementById("bdamagetarget")) {
+        const bdamagetarget = parseInt(document.getElementById("bdamagetarget").value);
+        if (!isNaN(bdamagetarget) && bdamagetarget !== 0) pet.bdamage_target = bdamagetarget;
     }
     if (document.getElementById("rate")) {
         const rate = parseInt(document.getElementById("rate").value);
