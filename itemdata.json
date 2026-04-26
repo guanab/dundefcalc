@@ -1620,6 +1620,19 @@
         "maxProjSpeed": 30000
     },
     {
+        "type": "pet",
+        "displayName": "Jade Island",
+        "name": "JadeIsland",
+        "statCap": 400,
+        "transStatCap": 600,
+        "supStatCap": 700,
+        "ultStatCap": 800,
+        "ultPlusStatCap": 900,
+        "moveSpeedMultiplier": 1.3,
+        "overrideLayout": "statstick",
+        "overrideQualityRange": "myth_ultpp"
+    },
+    {
         "type": "weapon",
         "hero": "squire",
         "displayName": "Leaf Blade",
