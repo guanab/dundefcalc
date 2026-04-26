@@ -522,6 +522,14 @@ function ChangeItem(itemname) {
         infotext += "Max targets: " + obj.maxTargets + "<br>";
     if (obj.hasOwnProperty("statCap"))
         infotext += "Stat cap: " + obj.statCap + "<br>";
+    if (obj.hasOwnProperty("transStatCap"))
+        infotext += "Transcendent stat cap: " + obj.transStatCap + "<br>";
+    if (obj.hasOwnProperty("supStatCap"))
+        infotext += "Supreme stat cap: " + obj.supStatCap + "<br>";
+    if (obj.hasOwnProperty("ultStatCap"))
+        infotext += "Ultimate/93 stat cap: " + obj.ultStatCap + "<br>";
+    if (obj.hasOwnProperty("ultPlusStatCap"))
+        infotext += "Ultimate+ stat cap: " + obj.ultPlusStatCap + "<br>";
     if (obj.hasOwnProperty("moveSpeedMultiplier"))
         infotext += "Movespeed multiplier: " + obj.moveSpeedMultiplier + "<br>";
     if (obj.hasOwnProperty("gravityMultiplier"))
@@ -1025,7 +1033,18 @@ function SetUpgradeValues(item, itemname, quality) {
             if (obj.hasOwnProperty("maxBoost")) item.max_boost = obj.maxBoost;
             if (obj.hasOwnProperty("maxRange")) item.max_range = obj.maxRange;
             if (obj.hasOwnProperty("maxTargets")) item.max_targets = obj.maxTargets;
-            if (obj.hasOwnProperty("statCap")) item.statcap = obj.statCap;
+            if (quality.includes("ultpp"))
+                item.statcap = StatCap(quality);
+            else if (obj.hasOwnProperty("transStatCap") && quality.includes("trans"))
+                item.statcap = obj.transStatCap;
+            else if (obj.hasOwnProperty("supStatCap") && quality.includes("sup"))
+                item.statcap = obj.supStatCap;
+            else if (obj.hasOwnProperty("ultPlusStatCap") && quality.includes("ultp"))
+                item.statcap = obj.ultPlusStatCap;
+            else if (obj.hasOwnProperty("ultStatCap") && quality.includes("ult"))
+                item.statcap = obj.ultStatCap;
+            else if (obj.hasOwnProperty("statCap")) 
+                item.statcap = obj.statCap;
             else item.statcap = StatCap(quality);
             console.log("SetUpgradeValues: upgrade values fetched for item " + obj.name);
             return true;
