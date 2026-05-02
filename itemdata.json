@@ -313,6 +313,26 @@
     },
     {
         "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Genie's Blunderbuss",
+        "name": "GeniesBlunderbuss",
+        "ultBaseDamagePerUp": 1232.0,
+        "baseDamagePerUp": 985.6000366,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
+        "type": "weapon",
+        "hero": "huntress",
+        "displayName": "Constellation Blunderbuss",
+        "name": "ConstellationBlunderbuss",
+        "ultBaseDamagePerUp": 1232.0,
+        "baseDamagePerUp": 985.6000366,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
+        "type": "weapon",
         "hero": "monk",
         "displayName": "Gem Dagger",
         "name": "GemDagger",
@@ -347,6 +367,38 @@
     },
     {
         "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Forest Mage Staff",
+        "name": "ForestMageStaff",
+        "ultBaseDamagePerUp": 180.0,
+        "baseDamagePerUp": 140.0,
+        "damageDisplayMultiplier": 0.5,
+        "baseDamageMultiplier": 2.25,
+        "elemDamagePerUp": 450.0,
+        "elemDamageUpMultiplier": 0.185,
+        "elemDamageMultiplier": 0.91,
+        "maxProjCount": 4.0,
+        "maxProjSpeed": 30000,
+        "elementalDamageScaling": true
+    },
+    {
+        "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Constellation Staff",
+        "name": "ConstellationStaff",
+        "ultBaseDamagePerUp": 180.0,
+        "baseDamagePerUp": 140.0,
+        "damageDisplayMultiplier": 0.5,
+        "baseDamageMultiplier": 2.25,
+        "elemDamagePerUp": 450.0,
+        "elemDamageUpMultiplier": 0.185,
+        "elemDamageMultiplier": 0.91,
+        "maxProjCount": 4.0,
+        "maxProjSpeed": 30000,
+        "elementalDamageScaling": true
+    },
+    {
+        "type": "weapon",
         "hero": "squire",
         "displayName": "Xiphos Blade",
         "name": "XiphosBlade",
@@ -364,6 +416,22 @@
         "baseDamagePerUp": 241.5,
         "baseDamageMultiplier": 1.1968499,
         "swingSpeedDamageMultiplier": 1.886394578762265
+    },
+    {
+        "type": "weapon",
+        "hero": "apprentice",
+        "displayName": "Big Stick RL",
+        "name": "BigStickRL",
+        "ultBaseDamagePerUp": 154.0,
+        "baseDamagePerUp": 148.5,
+        "damageDisplayMultiplier": 0.6,
+        "baseDamageMultiplier": 2.244,
+        "elemDamagePerUp": 450.0,
+        "elemDamageMultiplier": 0.755,
+        "maxProjCount": 5.0,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1,
+        "elementalDamageScaling": true
     },
     {
         "type": "pet",
@@ -1674,6 +1742,16 @@
     },
     {
         "type": "weapon",
+        "hero": "squire",
+        "displayName": "Bloodletting Blade",
+        "name": "BloodlettingBlade",
+        "ultBaseDamagePerUp": 160.0,
+        "baseDamagePerUp": 136.0,
+        "baseDamageMultiplier": 1.4625,
+        "moveSpeedMultiplier": 1.1
+    },
+    {
+        "type": "weapon",
         "hero": "apprentice",
         "displayName": "Firestarter Staff",
         "name": "FirestarterStaff",
@@ -1768,6 +1846,22 @@
         "maxProjSpeed": 30000,
         "elementalDamageScaling": true,
         "overrideLayout": "appmoon"
+    },
+    {
+        "type": "weapon",
+        "hero": "monk",
+        "displayName": "Phantom Destroyer",
+        "name": "PhantomDestroyer",
+        "templateDamageMultiplier": 2.0,
+        "ultBaseDamagePerUp": 112.0,
+        "baseDamagePerUp": 112.0,
+        "baseDamageUpMultiplier": 0.18,
+        "baseDamageMultiplier": 1.05,
+        "swingSpeedDamageMultiplier": 1.1750768323738858,
+        "rangedDamagePerUp": 92.0,
+        "rangedDamageMultiplier": 0.32,
+        "maxProjSpeed": 30000,
+        "moveSpeedMultiplier": 1.1
     },
     {
         "type": "weapon",
