@@ -335,6 +335,8 @@ function ChangeItem(itemname) {
         SetFields(obj.overrideLayout);
         if (obj.overrideLayout === "appmoon")
             upgradeorder = "Charge > Proj speed > Elem damage";
+        else if (obj.overrideLayout === "appserpent")
+            upgradeorder = "Charge > Proj speed > Base damage > stat";
         else if (obj.overrideLayout === "monkmischief")
             upgradeorder = "Proj speed > Priority stat > Ranged damage";
         else if (obj.overrideLayout === "monktbwep")
